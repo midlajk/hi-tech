@@ -1,0 +1,720 @@
+const { ConnectionCheckOutFailedEvent } = require('mongodb');
+const mongoose = require('mongoose');
+
+const ClientModel = mongoose.model('Client')
+const Reference = mongoose.model('Reference')
+const PoductsSchema = mongoose.model('PoductsSchema')
+const Transportagent = mongoose.model('Transportagent')
+// const { purchasecommitmentcount, incrementPurchaseCommitmentCount, decrementPurchaseCommitmentCount } = require('../model/variables');
+const Financialyear = mongoose.model('Financialyear')
+const User = mongoose.model('User')
+
+const fs = require('fs');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const { nanoid } = require('nanoid');
+const pdfMaster = require("pdf-master");
+
+
+exports.addseller = async (req, res) => {
+  const name = req.body.name.trim().toUpperCase();
+
+  const existingClient = await ClientModel.findOne({ name: name });
+  if (existingClient || name.length<1) {
+    res.json({ success: false, message: 'client already exist' });
+
+  }else{
+    const newClient = new ClientModel({
+      name: name,
+      tds: req.body.tds,
+      address: req.body.address,
+      phone: req.body.phone,
+      recievable: 0,
+      payable: 0,
+      paid:0,
+      recieved:0,
+      storein:0,
+      storeout:0,
+    });
+
+    await newClient.save();
+    res.json({ success: true, message: 'Reference added successfully' });
+
+  }
+}
+exports.addpurchasecommitment = async (req, res) => {
+
+
+  try {
+
+    const user =await User.findById(req.session.user._id)
+
+      // Find the client by name
+      const client = await ClientModel.findOne({ name: req.body.name });
+
+      if (!client) {
+          return res.status(404).json({ error: 'Client not found' });
+      }
+      var number
+      if(user){
+        number = user.pcomm
+        user.pcomm = user.pcomm+1
+        await user.save()
+      }else{
+       var numnumber = client.purchasecommitments.length+1 
+
+ number = `${numnumber}-${req.body.name}`
+  // Get the first part of the item by trimming and splitting
+      }
+  const currentDate = new Date();
+ const day = ('0' + currentDate.getDate()).slice(-2); // Get the day with leading zero if necessary
+ const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Get the month with leading zero if necessary
+ const formattedDate = `${month}-${day}`;
+ const trimmedItem = req.body.pccomitem.trim().split(' ')[0];
+ const uniqueId = `${formattedDate}-${trimmedItem}-${number}`;
+  // Generate a unique ID using uuidv4 and include the reference
+      // Add the new purchase commitment to the purchasecommitments array
+      client.purchasecommitments.push({
+        item:req.body.pccomitem,
+        name:req.body.name,
+        date:req.body.pccomdate,
+        referance:req.body.reference,
+        id:uniqueId,
+        weight:req.body.pccomweight,
+        eppercentage:req.body.pccomep,
+        balanceweight:req.body.pccomweight,
+        balance:parseInt(req.body.pccomweight*req.body.pccomep/100),
+        rate:req.body.pccomrate,
+        additional:req.body.pccomAdditional,
+        info:req.body.pccomInfo
+      });
+   
+      // Save the updated client to the database
+      await client.save();
+
+      res.status(200).json({ message: 'Purchase commitment added successfully!' });
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+exports.addsalecommitment = async (req, res) => {
+
+  try {
+    const user =await User.findById(req.session.user._id)
+
+      const client = await ClientModel.findOne({ name: req.body.name });
+
+      if (!client) {
+          return res.status(404).json({ error: 'Client not found' });
+      }
+      var number
+      if(user){
+        number = user.scomm
+        user.scomm = user.scomm+1
+        await user.save()
+      }else{
+       var numnumber = client.salescommitmentsschema.length+1 
+
+ number = `${numnumber}-${req.body.name}`
+  // Get the first part of the item by trimming and splitting
+      }
+ 
+ const currentDate = new Date();
+ const day = ('0' + currentDate.getDate()).slice(-2); // Get the day with leading zero if necessary
+ const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Get the month with leading zero if necessary
+
+ 
+ const formattedDate = `${month}-${day}`;
+ 
+ const trimmedItem = req.body.scitem.trim().split(' ')[0]; // Get the first part of the item by trimming and splitting
+ 
+ const uniqueId = `${formattedDate}-${trimmedItem}-${number}`;
+      // Add the new purchase commitment to the purchasecommitments array
+      client.salescommitmentsschema.push({
+        item:req.body.scitem,
+        name:req.body.name,
+        date:req.body.scdate,
+        referance:req.body.reference,
+        id:uniqueId,
+        weight:req.body.scweight,
+        eppercentage:req.body.scep,
+        balanceweight:req.body.scweight,
+        balance:parseInt(req.body.scweight*req.body.scep/100),
+        rate:req.body.scrate,
+        additional:req.body.scAdditional,
+        info:req.body.scInfo
+      });
+   
+      // Save the updated client to the database
+      await client.save();
+      res.status(200).json({ message: 'Purchase commitment added successfully!' });
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+exports.addfinancial = async (req, res) => {
+  const year = req.body.year.trim().toUpperCase();
+
+  try {
+     const existingClient = await Financialyear.findOne({ year: year });
+  if (existingClient) {
+    res.json({ success: true, message: 'Reference added successfully' });
+
+  }else{
+    // Create a new reference document based on the request body
+    const financialyear = new Financialyear({
+      year: year,
+      default:new Date()
+    });
+
+    // Save the reference document to MongoDB
+    await financialyear.save();
+
+    // Send a success response to the client
+    res.json({ success: true, message: 'Reference added successfully' });
+  }
+  } catch (error) {
+    // Handle errors and send an error response
+    console.log('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+
+exports.addrefference = async (req, res) => {
+  const name = req.body.refference.trim().toUpperCase();
+
+  try {
+     const existingClient = await Reference.findOne({ name: name });
+  if (existingClient) {
+    res.json({ success: true, message: 'Reference added successfully' });
+
+  }else{
+    // Create a new reference document based on the request body
+    const newReference = new Reference({
+      name: name,
+      defaulted:new Date()
+    });
+
+    // Save the reference document to MongoDB
+    await newReference.save();
+
+    // Send a success response to the client
+    res.json({ success: true, message: 'Reference added successfully' });
+  }
+  } catch (error) {
+    // Handle errors and send an error response
+    console.log('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+exports.addproducts = async (req, res) => {
+  const name = req.body.product.trim().toUpperCase();
+  try {
+    const existingClient = await PoductsSchema.findOne({ product: name });
+    if (existingClient) {
+      res.json({ success: true, message: 'Reference added successfully' });
+  
+    }else{
+    // Create a new reference document based on the request body
+    const newproduct = new PoductsSchema({
+      itemtype:req.body.itemtype,
+      product: name,
+    byproduct:req.body.byproduct,
+    stockweight:0,
+    stockep:0,
+    stockpercentage:0,
+    });
+
+    // Save the newproduct document to MongoDB
+    await newproduct.save();
+
+    // Send a success response to the client
+    res.json({ success: true, message: 'Reference added successfully' });
+  }
+  } catch (error) {
+    // Handle errors and send an error response
+    console.log('Error:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+
+  
+}
+exports.addtransportagent = async (req, res) => {
+  const name = req.body.agent.trim().toUpperCase();
+
+    try {
+      const existingClient = await Transportagent.findOne({ agent: name });
+      if (existingClient) {
+        res.json({ success: true, message: 'Reference added successfully' });
+
+    
+      }else{
+      // Create a new reference document based on the request body
+      const newproduct = new Transportagent({
+        agent: name,
+        address:req.body.address,
+        phone:req.body.phone,
+        strength:req.body.strength,
+        accounttype:req.body.accounttype
+      });
+  
+      // Save the newproduct document to MongoDB
+      await newproduct.save();
+  
+      // Send a success response to the client
+      res.json({ success: true, message: 'Reference added successfully' });
+    }
+    } catch (error) {
+      // Handle errors and send an error response
+      console.log('Error:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  };
+
+  ////Transactions //////
+  exports.addTransactions = async (req, res) => {
+
+    try {
+      const client = await ClientModel.findOne({ name: req.body.name });
+
+      if (!client) {
+          return res.status(404).json({ error: 'Client not found' });
+      }
+
+
+      client.transaction.push({
+        name:req.body.name,
+        date:req.body.date,
+        refference:req.body.refference||'Transaction',
+        revievable:parseFloat(req.body.revievable)||0,
+        payable:parseFloat(req.body.payable)||0,
+        medium:req.body.medium,
+        recieved:parseFloat(req.body.recieved)||0,
+        paid:parseFloat(req.body.paid)||0
+      });
+
+ 
+      const paid = (client.paid||0) + parseFloat(req.body.paid)
+      const recieved = (client.recieved||0) + parseFloat(req.body.recieved)
+      client.paid = paid;
+      client.recieved = recieved;
+      await client.save();
+   
+      // Save the updated client to the database
+      res.status(201).json({ message: 'Transaction saved successfully' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+  }
+
+
+  exports.addexpencesandincome = async (req, res) => {
+
+    try {
+      const client = await Transportagent.findOne({ agent: req.body.name });
+
+      if (!client) {
+          return res.status(404).json({ error: 'Client not found' });
+      }
+
+
+      client.transaction.push({
+        name:req.body.name,
+        date:req.body.date,
+        refference:client.accounttype + ' '+req.body.refference,
+        revievable:parseFloat(req.body.revievable)||0,
+        payable:parseFloat(req.body.payable)||0,
+        medium:req.body.medium,
+        recieved:parseFloat(req.body.recieved)||0,
+        paid:parseFloat(req.body.paid)||0
+      });
+
+ 
+      const paid = (client.paid||0) + parseFloat(req.body.paid)
+      const recieved = (client.recieved||0) + parseFloat(req.body.recieved)
+      client.paid = paid;
+      client.recieved = recieved;
+      await client.save();
+   
+      // Save the updated client to the database
+      res.status(201).json({ message: 'Transaction saved successfully' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+  }
+  /////
+  function round(value, decimals) {
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(value * multiplier) / multiplier;
+  }
+ 
+  
+  
+  // Example of usage
+  exports.addstoreinsettlement = async (req, res) => {
+    try {
+      const user = await User.findById(req.session.user._id)
+
+      const client = await ClientModel.findOne({ name: req.body.name });
+      if (!client) {
+        return res.status(404).json({ error: 'Client not found' });
+      }
+      if(req.body.sscommitment){
+
+        const purchasecommitment = client.purchasecommitments.find(commitment => commitment.id === req.body.sscommitment);
+        if (purchasecommitment) {
+          // Calculate the new balance by subtracting the delivered quantity from the total quantity
+          const newBalance = purchasecommitment.balanceweight - parseInt(req.body.ssweight);
+          // Update the balance in the sales commitment object
+          purchasecommitment.balanceweight = newBalance <= 0 ? 0 : newBalance;
+          purchasecommitment.balance = newBalance <= 0 ? 0 : parseInt(newBalance * req.body.ssepp / 100);
+      
+        }
+        await client.save();
+
+        const remaining = await decrementCoffeeStorage(client._id, req.body,req.body.sscommitment);
+
+      }else{
+        var number
+        if(user){
+          number = user.pcomm
+          user.pcomm = user.pcomm+1
+          await user.save()
+        }else{
+         var numnumber = client.salescommitmentsschema.length+1 
+  
+   number = `${numnumber}-${req.body.name}`
+    // Get the first part of the item by trimming and splitting
+        }
+        const currentDate = new Date();
+        const day = ('0' + currentDate.getDate()).slice(-2); // Get the day with leading zero if necessary
+        const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Get the month with leading zero if necessary
+        const formattedDate = `${month}-${day}`;
+   const uniqueId = `${formattedDate}-Settlement-${number}`;
+      // Decrement the coffee storage as needed
+    
+      // Add new purchase commitment
+      client.purchasecommitments.push({
+        item:req.body.ssitem,
+        name:req.body.name,
+        date:req.body.ssdate,
+        referance:req.body.sscrop,
+        id:uniqueId,
+        weight:req.body.ssweight,
+        eppercentage:req.body.ssepp,
+        balanceweight:0,
+        balance:0,
+        rate:req.body.ssrate,
+        additional:'Settlement',
+      });
+      await client.save();
+      const remaining = await decrementCoffeeStorage(client._id, req.body,uniqueId);
+
+     } // Save the client with updated data     
+
+      res.status(200).json({ message: 'Operation successful!' });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }; 
+  const decrementCoffeeStorage = async (clientId, data,uniqueId) => {
+    let remaining = data.ssep;
+  
+    while (remaining > 0) {
+      try {
+        // Find a client with coffee storage > 0 for the specified item
+        const client = await ClientModel.findOne(
+          {
+            _id: clientId,
+            "coffee.storage": { $gt: 0 },
+            "coffee.item": data.ssitem, // Ensures the right item
+          },
+          { "coffee.$": 1 } // Selects only the first matching coffee item
+        );
+  
+        if (!client) break; // If no more items with storage > 0, exit the loop
+  
+        const coffeeItem = client.coffee[0]; // Get the first matching coffee item
+        const currentStorage = coffeeItem.storage;
+        const toSubtract = Math.min(currentStorage, remaining);
+  
+        remaining = round(remaining - toSubtract, 1);  
+        // Update the specific coffee item's storage
+        await ClientModel.updateOne(
+          {
+            _id: clientId,
+            "coffee._id": coffeeItem._id, // Identifies the specific coffee item to update
+          },
+          {
+            $set: {
+              "coffee.$.storage": round(currentStorage - toSubtract, 1), // Round to 1 decimal place
+            },
+          }
+        );
+        const calling = await purchasebill({ body: { ...data, tax: coffeeItem.tax,lotnumber:coffeeItem.lotnumber,uniqueId:uniqueId,weight:toSubtract,eppercentage:coffeeItem.eppercentage} });
+
+  
+        console.log("Updated coffee storage. Remaining:", remaining);
+      } catch (error) {
+        console.log("Error during update:", error); // Handle the error
+        break; // Exit the loop if there's an error
+      }
+    }
+  
+    return remaining; // Return the remaining value after all updates
+  };
+  async function purchasebill(req) {
+
+    try{
+    let payable =0;
+    let paid=0;
+    let existingClient = await ClientModel.findOne({ name: req.body.name });
+     var total = parseInt(req.body.ssrate*req.body.weight)
+     const currentDate = new Date();
+
+     // Get date components
+     const day = String(currentDate.getDate()).padStart(2, '0');
+     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+     const year = String(currentDate.getFullYear()).slice(2); // Get last two digits of the year
+     
+     // Get time components
+     const hours = String(currentDate.getHours()).padStart(2, '0');
+     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+     // Concatenate the components to form the unique ID
+     lotnumber = `${day}${month}${year}-${hours}${minutes}${seconds}`;
+    existingClient.purchasebillSchema.push({
+      date: req.body.ssdate,
+      item: req.body.ssitem,
+      invoice: lotnumber,
+      uniqueid: lotnumber,
+      commitment: req.body.uniqueId,
+      lotnumber: req.body.lotnumber,
+      weight: parseInt((req.body.weight * 100) / req.body.eppercentage),
+      qty: req.body.weight,
+      amount: req.body.ssrate,
+      subtotal: total,
+      tax: (req.body.tax||0),
+      total: total+ (total * parseFloat(req.body.tax||0) / 100),
+      tds: (existingClient.tds == 'YES'? parseInt(total * 0.1 / 100) : 0)
+    });
+  
+    payable = parseInt(total)+ parseInt(total * parseFloat(req.body.tax||0) / 100)
+    paid = (existingClient.tds == 'YES'? parseInt(total * 0.1 / 100) : 0)
+  
+  
+    existingClient.transaction.push({
+      name: req.body.name,
+      date: req.body.ssdate,
+      refference: 'Settlement '+req.body.ssitem + ' ' + req.body.weight + '*' + req.body.ssrate,
+      revievable: 0,
+      payable: parseInt(total + total* parseFloat(req.body.tax||0) / 100),
+      medium: existingClient.tds == 'YES'? 'TDS' : 'Purchase',
+      id: lotnumber,
+      recieved: 0,
+      paid: existingClient.tds == 'YES'? parseInt(total* 0.1 / 100) : 0,
+  
+      // Add other fields as needed
+    });
+    const storeout = parseFloat(existingClient.storeout || 0) + 0
+    const storein = parseFloat(existingClient.storein || 0) - (parseFloat(req.body.weight))
+    existingClient.storeout = storeout;
+    existingClient.storein = storein;
+    existingClient.payable = parseInt(existingClient.payable || 0) + payable;
+    existingClient.paid = parseInt(existingClient.recievable || 0) + paid;
+
+    await existingClient.save();
+    return { existingClient: existingClient}
+    }catch(e){
+      console.log(e)
+    }
+  }
+
+  exports.addstoreoutsettlement = async (req, res) => {
+    try {
+      const user = await User.findById(req.session.user._id)
+
+      const client = await ClientModel.findOne({ name: req.body.name });
+      if (!client) {
+        return res.status(404).json({ error: 'Client not found' });
+      }
+      if(req.body.sscommitment){
+
+        const salescommitmentsschema = client.salescommitmentsschema.find(commitment => commitment.id === req.body.sscommitment);
+        if (salescommitmentsschema) {
+          // Calculate the new balance by subtracting the delivered quantity from the total quantity
+          const newBalance = salescommitmentsschema.balanceweight - parseInt(req.body.ssweight);
+          // Update the balance in the sales commitment object
+          salescommitmentsschema.balanceweight = newBalance <= 0 ? 0 : newBalance;
+          salescommitmentsschema.balance = newBalance <= 0 ? 0 : parseInt(newBalance * req.body.ssepp / 100);
+      
+        }
+        await client.save();
+
+        const remaining = await decrementcoffeeoutstorage(client._id, req.body,req.body.sscommitment);
+
+      }else{
+    var number
+        if(user){
+          number = user.scomm
+          user.scomm = user.scomm+1
+          await user.save()
+        }else{
+         var numnumber = client.salescommitmentsschema.length+1 
+  
+   number = `${numnumber}-${req.body.name}`
+    // Get the first part of the item by trimming and splitting
+        }
+        const currentDate = new Date();
+        const day = ('0' + currentDate.getDate()).slice(-2); // Get the day with leading zero if necessary
+        const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Get the month with leading zero if necessary
+        const formattedDate = `${month}-${day}`;
+   const uniqueId = `${formattedDate}-Settlement-${number}`;
+      // Decrement the coffee storage as needed
+    
+      // Add new purchase commitment
+      client.salescommitmentsschema.push({
+        item:req.body.ssitem,
+        name:req.body.name,
+        date:req.body.ssdate,
+        referance:req.body.sscrop,
+        id:uniqueId,
+        weight:req.body.ssweight,
+        eppercentage:req.body.ssepp,
+        balanceweight:0,
+        balance:0,
+        rate:req.body.ssrate,
+        additional:'Settlement',
+      });
+  
+      await client.save();     
+       const remaining = await decrementcoffeeoutstorage(client._id, req.body,uniqueId);
+
+    }
+    // Save the client with updated data
+      res.status(200).json({ message: 'Operation successful!' });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };  
+  async function salesbill(req) {
+    try{
+    let recievable =0;
+    let recieved=0;
+    let existingClient = await ClientModel.findOne({ name: req.body.name });
+     var total = parseInt(req.body.ssrate*req.body.weight)
+     const currentDate = new Date();
+
+     // Get date components
+     const day = String(currentDate.getDate()).padStart(2, '0');
+     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+     const year = String(currentDate.getFullYear()).slice(2); // Get last two digits of the year
+     
+     // Get time components
+     const hours = String(currentDate.getHours()).padStart(2, '0');
+     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+     // Concatenate the components to form the unique ID
+     lotnumber = `${day}${month}${year}-${hours}${minutes}${seconds}`;
+    existingClient.salesbillSchema.push({
+      date: req.body.ssdate,
+      item: req.body.ssitem,
+      invoice: lotnumber,
+      uniqueid: lotnumber,
+      commitment: req.body.uniqueId,
+      lotnumber: req.body.lotnumber,
+      weight: parseInt((req.body.weight * 100) / req.body.eppercentage),
+      qty: req.body.weight,
+      amount: req.body.ssrate,
+      subtotal: total,
+      tax: (req.body.tax||0),
+      total: total+ (total * parseFloat(req.body.tax||0) / 100),
+      tds: (existingClient.tds == 'YES'? parseInt(total * 0.1 / 100) : 0)
+    });
+  
+    recievable = parseInt(total)+ parseInt(total * parseFloat(req.body.tax||0) / 100)
+    recieved = (existingClient.tds == 'YES'? parseInt(total * 0.1 / 100) : 0)
+  
+  
+    existingClient.transaction.push({
+      name: req.body.name,
+      date: req.body.ssdate,
+      refference: 'Settlement '+req.body.ssitem + ' ' + req.body.weight + '*' + req.body.ssrate,
+      revievable: recievable,
+      payable: 0,
+      medium: existingClient.tds == 'YES'? 'TDS' : 'Purchase',
+      id: lotnumber,
+      recieved: recieved,
+      paid: 0,
+  
+      // Add other fields as needed
+    });
+    const storeout = parseFloat(existingClient.storeout || 0)  - (parseFloat(req.body.weight))
+    const storein = parseFloat(existingClient.storein || 0) +0
+    existingClient.storeout = storeout;
+    existingClient.storein = storein;
+    existingClient.revievable = parseInt(existingClient.revievable || 0) + recievable;
+    existingClient.recieved = parseInt(existingClient.recieved || 0) + recieved;
+
+    await existingClient.save();
+    return { existingClient: existingClient}
+    }catch(e){
+      console.log(e)
+    }
+  }
+  const decrementcoffeeoutstorage = async (clientId, data,uniqueId) => {
+    let remaining = data.ssep;
+  
+    while (remaining > 0) {
+      try {
+        // Find a client with coffee storage > 0 for the specified item
+        const client = await ClientModel.findOne(
+          {
+            _id: clientId,
+            "despatch.storage": { $gt: 0 },
+            "despatch.item": data.ssitem, // Ensures the right item
+          },
+          { "despatch.$": 1 } // Selects only the first matching coffee item
+        );
+  
+        if (!client) break; // If no more items with storage > 0, exit the loop
+  
+        const coffeeItem = client.despatch[0]; // Get the first matching coffee item
+        const currentStorage = coffeeItem.storage;
+        const toSubtract = Math.min(currentStorage, remaining);
+  
+        remaining = round(remaining - toSubtract, 1);  
+        // Update the specific coffee item's storage
+        await ClientModel.updateOne(
+          {
+            _id: clientId,
+            "despatch._id": coffeeItem._id, // Identifies the specific coffee item to update
+          },
+          {
+            $set: {
+              "despatch.$.storage": round(currentStorage - toSubtract, 1), // Round to 1 decimal place
+            },
+          }
+        );
+        const calling = await salesbill({ body: { ...data, tax: coffeeItem.tax,lotnumber:coffeeItem.lotnumber,uniqueId:uniqueId,weight:toSubtract,eppercentage:coffeeItem.eppercentage} });
+
+  
+        console.log("Updated coffee storage. Remaining:", remaining);
+      } catch (error) {
+        console.log("Error during update:", error); // Handle the error
+        break; // Exit the loop if there's an error
+      }
+    }
+  
+    return remaining; // Return the remaining value after all updates
+  };
+ 
