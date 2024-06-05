@@ -1,27 +1,32 @@
-<%- include('./include/dashboardhead.ejs') -%>
+<%- include('../include/dashboardhead.ejs') -%>
 
     <div class="content-wrapper">
         <!-- Content -->
 
         <div class="container-xxl flex-grow-1 container-p-y">
 
-
+<h3>Account of <%=employee%> <a ><i class="bx bxs-edit me-1"></i></a></h3>
             <!-- Basic Bootstrap Table -->
             <div class="card">
               <div class="card-body">
-                <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
-                  data-bs-target="#newagentmodal">Add Agent</a>
-          
+       
+           <div class="row mt-3 text-center"> 
+                    <div class="col-4"> <h4>Total Recieved</h4>
+                        <h4>1200</h4></div>
+                    <div class="col-4"> <h4>Total Paid</h4></div>
+                    <div class="col-4"> <h4>Balance</h4></div>
+
+                </div>
                 <div class="table-responsive text-nowrap p-4">
                   <table class="table" id="sellers">
                     <thead>
                       <tr>
-                        <th>Account</th> 
-                        <th>Address</th>
-  <th>Phone</th>     
-  <th>Payable</th>
-  <th>Paid</th>
-  <th>Balance</th>
+                        <th>Date</th> 
+                          <th>Hint</th>
+                          <th>Medium</th>
+                          <th>Recieved</th>
+                          <th>Paid</th>  
+
   <th>Action</th>     
           
                       </tr>
@@ -161,53 +166,47 @@
           processing: true,
           serverSide: true,
           ajax: {
-            url: '/expenseincometotal',
-            dataSrc: 'docs', // Key that holds the array of data in the API response
+            url: '/ieaccount',
+            dataSrc: 'data', // Key that holds the array of data in the API response
             data: function (d) {
-              d.name = 'Loader'; // Add the 'name' parameter to the data object
+              d.name = '<%=employee%>'; // Add the 'name' parameter to the data object
               return d;
   
               // Add any additional parameters you want to send to the server here
             },
           },
           columns: [
-            {
-              data: null,
-              render: function (data, type, row) {
-                return `<a class="" href="/ialoaders/${row.agent}" >${row.agent}</a>`;
-              },
-            },
-            { 
-              data: null,
-              render: function (data, type, row) {
-                  return (row.address || '') 
-              }
-          },
+          {
+        data: 'date',
+        render: function (data, type, row) {
+          // Format the date using moment.js
+          return moment(data).format('DD/MM/YYYY');
+        }
+      }, 
           { 
               data: null,
               render: function (data, type, row) {
-                  return (row.phone || '') 
+                  return (row.refference || '') 
               }
           },
            
-  
           { 
               data: null,
               render: function (data, type, row) {
-                return row.recieved ? parseInt(row.recieved) : 0;
+                  return (row.medium || '') 
               }
-          }, 
-  
+          },
+        
           { 
               data: null,
               render: function (data, type, row) {
-                  return parseInt(row.paid || 0) 
+                  return parseInt(row.recieved || 0) 
               }
           },
           { 
               data: null,
               render: function (data, type, row) {
-                return parseInt(((row.recieved||0)-(row.paid || 0))) 
+                return parseInt(row.paid || 0) 
               }
           },
           {
@@ -316,7 +315,7 @@ function addtransportagent(){
     address:address,
     phone:phone,
     strength:strength,
-    accounttype:'Loader'
+    accounttype:'Labour'
   
   };
   
@@ -342,4 +341,4 @@ function addtransportagent(){
   
   }
     </script>                
-                                        <%- include('./include/end.ejs') -%>
+                                        <%- include('../include/end.ejs') -%>

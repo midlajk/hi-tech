@@ -8,6 +8,9 @@ router.get('/purchaseaccount/:name',authcheck, adminget.individualpurchaseaccoun
 
 
 router.get('/getdetailedreport',authcheck, adminget.getdetailedreport);
+router.get('/ieaccount',authcheck, adminget.ieaccount);
+router.get('/idaaccount',authcheck, adminget.idaaccount);
+
 
 
 module.exports = router;

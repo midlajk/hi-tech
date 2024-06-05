@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference');
+const Transportagent = mongoose.model('Transportagent')
 
 exports.individualpurchaseaccount = async (req, res) => {
     const client = await ClientModel.findOne({name:req.params.name})
@@ -122,3 +123,127 @@ exports.getdetailedreport = async (req, res) => {
         }})
   
 };
+
+exports.ieaccount = async (req, res) => {
+console.log(req.query.name)
+    try {
+        const name = req.query.name;
+        const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
+        const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
+        const length = parseInt(req.query.length) || 10; // Get the number of records per page
+        // Fetch data from the database with pagination
+        let pipeline = [
+          {
+              $unwind: "$transaction"
+          },
+          { $sort: { 'transaction._id': -1 } },
+
+          {
+              $skip: start
+          },
+          {
+              $limit: length
+          },
+          {
+            $group: {
+              _id: null,
+              transaction: { $push: '$transaction' } // Push matching salescommitmentsschema to array
+          }}
+      ];
+
+      // If name is provided in the query, add a $match stage to filter by name
+      if (name) {
+        pipeline.splice(1, 0, { $match: { agent: name } });
+    } 
+
+      const client = await Transportagent.aggregate(pipeline);
+
+   
+      const transaction = client.length > 0 ? client[0].transaction : [];
+      console.log(transaction)
+      let pipeline2 = [
+        {
+            $unwind: "$transaction"
+        },
+       
+    ];
+
+    // If name is provided in the query, add a $match stage to filter by name
+    if (name) {
+      pipeline2.splice(1, 0, { $match: { agent: name } });
+  }
+
+      const totalclients = await Transportagent.aggregate(pipeline2)
+      res.json({
+          draw,
+          recordsTotal: totalclients.length,
+          recordsFiltered: totalclients.length,
+          data: transaction,
+      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Server error' });
+      }
+  
+};
+exports.idaaccount = async (req, res) => {
+        try {
+            const name = req.query.name;
+            const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
+            const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
+            const length = parseInt(req.query.length) || 10; // Get the number of records per page
+            // Fetch data from the database with pagination
+            let pipeline = [
+              {
+                  $unwind: "$transaction"
+              },
+              { $sort: { 'transaction._id': -1 } },
+    
+              {
+                  $skip: start
+              },
+              {
+                  $limit: length
+              },
+              {
+                $group: {
+                  _id: null,
+                  transaction: { $push: '$transaction' } // Push matching salescommitmentsschema to array
+              }}
+          ];
+    
+          // If name is provided in the query, add a $match stage to filter by name
+          if (name) {
+            pipeline.splice(1, 0, { $match: { agent: name } });
+        } 
+    
+          const client = await Transportagent.aggregate(pipeline);
+    
+       
+          const transaction = client.length > 0 ? client[0].transaction : [];
+          console.log(transaction)
+          let pipeline2 = [
+            {
+                $unwind: "$transaction"
+            },
+           
+        ];
+    
+        // If name is provided in the query, add a $match stage to filter by name
+        if (name) {
+          pipeline2.splice(1, 0, { $match: { agent: name } });
+      }
+    
+          const totalclients = await Transportagent.aggregate(pipeline2)
+          res.json({
+              draw,
+              recordsTotal: totalclients.length,
+              recordsFiltered: totalclients.length,
+              data: transaction,
+          });
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            res.status(500).json({ error: 'Server error' });
+          }
+      
+    };

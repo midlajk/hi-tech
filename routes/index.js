@@ -97,4 +97,18 @@ router.get('/allpuchasecommitments',authMiddleware, function(req, res, next) {
 router.get('/allsalescommitments',authMiddleware, function(req, res, next) {
   res.render('allscommitments',{ route: 'commitments' });
 });
+
+router.get('/ieaccount/:employee',authMiddleware, function(req, res, next) {
+  res.render('iaccounts/ieemployee',{ route: 'employees',employee:req.params.employee });
+});
+
+router.get('/idaaccount/:employee',authMiddleware, function(req, res, next) {
+  res.render('iaccounts/idaaccount',{ route: 'deliveryagents',employee:req.params.employee });
+});
+router.get('/ialoaders/:employee',authMiddleware, function(req, res, next) {
+  res.render('iaccounts/ialoaders',{ route: 'loaders',employee:req.params.employee });
+});
+router.get('/ieiaccounts/:employee',authMiddleware, function(req, res, next) {
+  res.render('iaccounts/ieiaccounts',{ route: 'expenceincome',employee:req.params.employee });
+});
 module.exports = router;
