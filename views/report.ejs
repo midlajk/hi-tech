@@ -121,119 +121,108 @@
              
                   <div class="row mt-5">
                     <div class="col-3"><h2>Daily Report</h2></div>
-                    <div class="col-6"></div>
+                    <div class="col-5"></div>
 
-                    <div class="col-3"> <button class="btn btn-info">View Report</button> <button class="btn btn-success">Create Report</button></div>
+                    <div class="col-4"> 
+                      
+                      <input type="date" class="form-control" name="" id=""> <br>
+                      <button class="btn btn-info" id="createdailyreport">View Report</button> <button class="btn btn-success" id="createdailyreport">Create Report</button></div>
 
                 </div>
                 <div class="row mt-3">
-
                   <div class="col-2">
-
-                    <label for=""> Opening Bank Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="openingBankBalance"> Opening Bank Balance</label>
+                    <select name="" class="form-control" id="openingBankBalance"></select>
                   </div>
-                  
+                
                   <div class="col-2">
-
-                    <label for=""> Opening Cash Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="openingCashBalance"> Opening Cash Balance</label>
+                    <select name="" class="form-control" id="openingCashBalance"></select>
                   </div>
+                
                   <div class="col-2">
-
-                    <label for="">Opening Other Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
-
+                    <label for="openingOtherBalance">Opening Other Balance</label>
+                    <select name="" class="form-control" id="openingOtherBalance"></select>
                   </div>
+                
                   <div class="col-2 p-4">
-
-                    <h4>Diffrence</h4>
-
-
+                    <h4>Difference</h4>
                   </div>
+                
                   <div class="col-2 p-3">
-
                     <h4></h4>
-
-
                   </div>
                 </div>
+                
                 <div class="row mt-1">
-
                   <div class="col-2">
-
-                    <label for=""> Closing Bank Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="closingBankBalance"> Closing Bank Balance</label>
+                    <select name="" class="form-control" id="closingBankBalance"></select>
                   </div>
-                  
+                
                   <div class="col-2">
-
-                    <label for=""> Closing Cash Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="closingCashBalance"> Closing Cash Balance</label>
+                    <select name="" class="form-control" id="closingCashBalance"></select>
                   </div>
+                
                   <div class="col-2">
-
-                    <label for="">Closing Other Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
-
+                    <label for="closingOtherBalance">Closing Other Balance</label>
+                    <select name="" class="form-control" id="closingOtherBalance"></select>
                   </div>
+                
                   <div class="col-2 p-4">
-
                     <button class="btn btn-primary"> Update Balance</button>
-
-
                   </div>
-                 
                 </div>
+                
                 <div class="row mt-3">
-
                   <div class="col-2">
-
-                    <label for="">Include Arrival</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="includeArrival">Include Arrival</label>
+                    <select name="" class="form-control" id="includeArrival">
+                      <option value="YES">YES</option>
+                      <option value="NO">NO</option>
+                    </select>
                   </div>
-                  
+                
                   <div class="col-2">
-
-                    <label for="">Include Despatch</label>
-                    <select name="" class="form-control" id=""></select>
-
+                    <label for="includeDespatch">Include Despatch</label>
+                    <select name="" class="form-control" id="includeDespatch">
+                      <option value="YES">YES</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                
+                  <div class="col-2">
+                    <label for="includeBills">Include Bills</label>
+                    <select name="" class="form-control" id="includeBills">
+                      <option value="YES">YES</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                
+                  <div class="col-2">
+                    <label for="includeCommitments">Include Commitments</label>
+                    <select name="" class="form-control" id="includeCommitments">
+                      <option value="YES">YES</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                
+                  <div class="col-2">
+                    <label for="includeExpenses">Include Expenses</label>
+                    <select name="" class="form-control" id="includeExpenses">
+                      <option value="YES">YES</option>
+                      <option value="NO">NO</option>
+                    </select>
                   </div>
                   <div class="col-2">
-
-                    <label for="">Include Bills</label>
-                    <select name="" class="form-control" id=""></select>
-
-
-                  </div>
-                  <div class="col-2">
-
-                    <label for="">Include Commitments</label>
-                    <select name="" class="form-control" id=""></select>
-
-
-                  </div>
-                  <div class="col-2">
-
-                    <label for="">Include Expenses</label>
-                    <select name="" class="form-control" id=""></select>
-
-
-                  </div>
-                  <div class="col-2">
-
-                    <label for="">Include Balance</label>
-                    <select name="" class="form-control" id=""></select>
-
-
-                  </div>
+                    <div class="col-2">
+                      <label for="includeBalance">Include Balance</label>
+                      <select name="" class="form-control" id="includeBalance">
+                        <option value="YES">YES</option>
+                        <option value="NO">NO</option>
+                      </select>
+                    </div>
                 </div>
 
 </div>
@@ -268,7 +257,57 @@
 
 
 
+<script>
+  document.getElementById('createReport').addEventListener('click', function() {
+  // Gather all the values from the form
+  const openingBankBalance = document.getElementById('openingBankBalance').value;
+  const openingCashBalance = document.getElementById('openingCashBalance').value;
+  const openingOtherBalance = document.getElementById('openingOtherBalance').value;
+  const closingBankBalance = document.getElementById('closingBankBalance').value;
+  const closingCashBalance = document.getElementById('closingCashBalance').value;
+  const closingOtherBalance = document.getElementById('closingOtherBalance').value;
+  const includeArrival = document.getElementById('includeArrival').value;
+  const includeDespatch = document.getElementById('includeDespatch').value;
+  const includeBills = document.getElementById('includeBills').value;
+  const includeCommitments = document.getElementById('includeCommitments').value;
+  const includeExpenses = document.getElementById('includeExpenses').value;
+  const includeBalance = document.getElementById('includeBalance').value;
 
+  // Create the data object to send to the backend
+  const data = {
+    openingBankBalance,
+    openingCashBalance,
+    openingOtherBalance,
+    closingBankBalance,
+    closingCashBalance,
+    closingOtherBalance,
+    includeArrival,
+    includeDespatch,
+    includeBills,
+    includeCommitments,
+    includeExpenses,
+    includeBalance
+  };
+
+  // Send the data to the backend using fetch
+  fetch('/api/create-daily-report', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Handle the response from the backend
+    console.log('Success:', data);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+});
+
+</script>
 
                                     
                                         <%- include('./include/end.ejs') -%>
