@@ -992,7 +992,10 @@ exports.addtransportagent = async (req, res) => {
     fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html,async (d) => {
       const htmlContent = html;
       // Use Puppeteer to geerate PDF
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
