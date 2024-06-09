@@ -149,13 +149,14 @@ var dataTable
         { 
             data: null,
             render: function (data, type, row) {
-                return parseInt(row.recievable || 0) + parseInt(row.paid || 0);
+                return parseInt(row.recievable || 0)-parseInt(row.recieved || 0);
+                 
             }
         }, 
         { 
             data: null,
             render: function (data, type, row) {
-                return parseInt(row.payable || 0) + parseInt(row.recieved || 0);
+                return parseInt(row.payable || 0) - parseInt(row.paid || 0);
             }
         },
 

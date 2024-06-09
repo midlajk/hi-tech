@@ -1,6 +1,8 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
-
+const TelegramBot = require('node-telegram-bot-api');
+const token = '';
+const bot = new TelegramBot(token, { polling: true });
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -15,6 +17,7 @@ const { v4: uuidv4 } = require('uuid');
 const { nanoid } = require('nanoid');
 const pdfMaster = require("pdf-master");
 
+const handlebars = require('handlebars');
 
 exports.addseller = async (req, res) => {
   const name = req.body.name.trim().toUpperCase();
@@ -717,4 +720,278 @@ exports.addtransportagent = async (req, res) => {
   
     return remaining; // Return the remaining value after all updates
   };
- 
+  exports.createDailyReport = async (req, res) => {
+    const reportDate = req.body.reportdate;
+  
+    // Set the start and end of the day
+    const startOfDay = new Date(reportDate);
+    startOfDay.setHours(0, 0, 0, 0);
+  
+    const endOfDay = new Date(reportDate);
+    endOfDay.setHours(23, 59, 59, 999);
+  
+    // Match stage for the date range
+    const matchStage = { "date": { $gte: startOfDay, $lte: endOfDay } };
+  
+    let data = {companyname: 'HI TECH COFFEE',
+    reportdate:reportDate,
+    openingaccount:req.body.openingBankBalance,
+    openingcash:req.body.openingCashBalance,
+    openingother:req.body.openingOtherBalance,
+    openingtotal:parseInt(req.body.openingBankBalance)+parseInt(req.body.openingCashBalance)+parseInt(req.body.openingOtherBalance),
+  };
+
+  if (req.body.includeArrival == 'true') {
+      const pipeline = [
+        { $unwind: "$coffee" },
+        { $match: { "coffee.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "coffee.billTo": 1,
+            "coffee.item": 1,
+            "coffee.lorry": 1,
+            "coffee.bags": 1,
+            "coffee.netWeight": 1,
+            "coffee.eppercentage": 1,
+            "coffee.netepweight": 1,
+            "coffee.storage": 1,
+            "coffee.stat": 1,
+          },
+        },
+      ];
+      const result = await ClientModel.aggregate(pipeline).exec();
+      data = { ...data, arrivals: result };
+    }
+  
+    if (req.body.includeDespatch== 'true') {
+      const pipeline = [
+        { $unwind: "$despatch" },
+        { $match: { "despatch.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "despatch.billTo": 1,
+            "despatch.item": 1,
+            "despatch.lorry": 1,
+            "despatch.bags": 1,
+            "despatch.netWeight": 1,
+            "despatch.delivery": 1,
+            "despatch.eppercentage": 1,
+            "despatch.netepweight": 1,
+            "despatch.storage": 1,
+            "despatch.stat": 1,
+          },
+        },
+      ];
+      const result = await ClientModel.aggregate(pipeline).exec();
+      data = { ...data, despatch: result };
+    }
+  
+    if (req.body.includeBills== 'true') {
+      const salesPipeline = [
+        { $unwind: "$salesbillSchema" },
+        { $match: { "salesbillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "salesbillSchema.billTo": 1,
+            "salesbillSchema.item": 1,
+            "salesbillSchema.qty": 1,
+            "salesbillSchema.weight": 1,
+            "salesbillSchema.amount": 1,
+            "salesbillSchema.total": 1,
+          },
+        },
+      ];
+      const salesResult = await ClientModel.aggregate(salesPipeline).exec();
+  
+      const purchasePipeline = [
+        { $unwind: "$purchasebillSchema" },
+        { $match: { "purchasebillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "purchasebillSchema.billTo": 1,
+            "purchasebillSchema.item": 1,
+            "purchasebillSchema.qty": 1,
+            "purchasebillSchema.weight": 1,
+            "purchasebillSchema.amount": 1,
+            "purchasebillSchema.total": 1,
+          },
+        },
+      ];
+      const purchaseResult = await ClientModel.aggregate(purchasePipeline).exec();
+  
+      data = { ...data, salesBills: salesResult, purchaseBills: purchaseResult };
+    }
+  
+    if (req.body.includeCommitments== 'true') {
+      const salesCommitmentPipeline = [
+        { $unwind: "$salescommitmentsschema" },
+        { $match: { "salescommitmentsschema.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "salescommitmentsschema.name": 1,
+            "salescommitmentsschema.item": 1,
+            "salescommitmentsschema.weight": 1,
+            "salescommitmentsschema.rate": 1,
+            "salescommitmentsschema.info": 1,
+          },
+        },
+      ];
+      const salesCommitmentResult = await ClientModel.aggregate(salesCommitmentPipeline).exec();
+  
+      const purchaseCommitmentPipeline = [
+        { $unwind: "$purchasecommitments" },
+        { $match: { "purchasecommitments.date": { $gte: startOfDay, $lte: endOfDay } } },
+        {
+          $project: {
+            name: 1,
+            "purchasecommitments.name": 1,
+            "purchasecommitments.item": 1,
+            "purchasecommitments.weight": 1,
+            "purchasecommitments.rate": 1,
+            "purchasecommitments.info": 1,
+          },
+        },
+      ];
+      const purchaseCommitmentResult = await ClientModel.aggregate(purchaseCommitmentPipeline).exec();
+      data = { ...data, salesCommitments: salesCommitmentResult, purchaseCommitments: purchaseCommitmentResult };
+    }
+  
+    if (req.body.includeBalance== 'true') {
+      const pipeline = [
+        { $unwind: "$transaction" },
+        { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } }, 
+                {
+          $match: {
+            $or: [
+              { "transaction.recieved": { $gt: 0 } },
+              { "transaction.paid": { $gt: 0 } },
+            ],
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            "transaction.name": 1,
+            "transaction.refference": 1,
+            "transaction.medium": 1,
+            "transaction.recieved": 1,
+            "transaction.paid": 1,
+          },
+        },
+      ];
+      const result = await ClientModel.aggregate(pipeline).exec();
+      data = { ...data, transactions: result };
+    }
+  
+    if (req.body.includeExpenses== 'true') {
+      const pipeline = [
+        { $unwind: "$transaction" },
+        { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },        {
+          $match: {
+            $or: [
+              { "transaction.recieved": { $gt: 0 } },
+              { "transaction.paid": { $gt: 0 } },
+            ],
+          },
+        },
+        {
+          $project: {
+            agent: 1,
+            "transaction.name": 1,
+            "transaction.refference": 1,
+            "transaction.medium": 1,
+            "transaction.recieved": 1,
+            "transaction.paid": 1,
+          },
+        },
+      ];
+      const result = await Transportagent.aggregate(pipeline).exec();
+      data = { ...data, balances: result };
+    }
+    if (req.body.includepartybalance== 'true') {
+      const pipeline = [
+        // Step 1: Match documents based on the initial query        
+        // Step 2: Add fields for adjustedRecievable and adjustedPayable
+        {
+            $addFields: {
+                adjustedRecievable: { $subtract: ['$recievable', '$recieved'] },
+                adjustedPayable: { $subtract: ['$payable', '$paid'] }
+            }
+        },
+        
+        // Step 3: Add a custom sort key for filtering
+        {
+            $addFields: {
+                customSortKey: { $subtract: ['$adjustedRecievable', '$adjustedPayable'] },
+                apayable: '$adjustedPayable',
+                arecievable: '$adjustedRecievable'
+            }
+        },
+        
+        // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
+        {
+            $match: {
+                $or: [
+                    { customSortKey: { $gt: 1000 } },
+                    { customSortKey: { $lt: -1000 } }
+                ]
+            }
+        }
+    ];
+    
+      const result = await ClientModel.aggregate(pipeline).exec();
+      data = { ...data, partybalance: result };
+    }   
+    if (req.body.includecommitmentbalance== 'true') {
+      const pipeline = [
+     
+        { $unwind: "$purchasecommitments" },
+        { $match: { "purchasecommitments.balance": { $gte: 300 } } }, 
+        
+        // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
+    ];
+    
+      const result1 = await ClientModel.aggregate(pipeline).exec();
+      const pipeline2 = [
+     
+        { $unwind: "$salescommitmentsschema" },
+        { $match: { "salescommitmentsschema.balance": { $gte: 300 } } }, 
+        
+        // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
+    ];
+    
+      const result2 = await ClientModel.aggregate(pipeline2).exec();
+      data = { ...data, purchasecommitmentbalance: result1,salecommitmentbalance: result2,commitmentbalance:true };
+    }     
+    bot.sendDocument(551725830, 'http://77.37.47.185/report.html');
+
+    let options = {
+      // displayHeaderFooter: true,
+      format: "A4",
+      margin: { top: "60px", bottom: "100px" },
+      // base: 'file://' + path.resolve('./public') + '/'
+
+    };
+
+    // let PDF = await pdfMaster.generatePdf("template.hbs", { data }, options);
+
+    // 
+    // fs.writeFileSync(filePath, PDF);
+    
+    const templatePath = path.join(__dirname, 'dailyreport.hbs');
+
+        const template = fs.readFileSync(templatePath, 'utf8');
+    const compiledTemplate = handlebars.compile(template);
+    const html = compiledTemplate({ data });
+    fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html, (d) => {
+      const url = `http://localhost:3000/dailyreport.html`
+      res.status(201).json({ message: 'Form submitted successfully' });
+
+    })
+  };
+  

@@ -42,5 +42,6 @@ router.post('/addexpencesandincomes',authcheck, adminpostapis.addexpencesandinco
 
 router.post('/addstoreinsettlement',authcheck, adminpostapis.addstoreinsettlement);
 router.post('/addstoreoutsettlement',authcheck, adminpostapis.addstoreoutsettlement);
+router.post('/create-daily-report',authcheck, adminpostapis.createDailyReport);
 
 module.exports = router;
