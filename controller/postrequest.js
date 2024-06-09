@@ -953,7 +953,7 @@ exports.addtransportagent = async (req, res) => {
       const pipeline = [
      
         { $unwind: "$purchasecommitments" },
-        { $match: { "purchasecommitments.balance": { $gte: 300 } } }, 
+        { $match: { "purchasecommitments.balance": { $gte: 499 } } }, 
         
         // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
     ];
@@ -962,7 +962,7 @@ exports.addtransportagent = async (req, res) => {
       const pipeline2 = [
      
         { $unwind: "$salescommitmentsschema" },
-        { $match: { "salescommitmentsschema.balance": { $gte: 300 } } }, 
+        { $match: { "salescommitmentsschema.balance": { $gte: 499 } } }, 
         
         // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
     ];
