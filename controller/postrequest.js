@@ -11,6 +11,7 @@ const Transportagent = mongoose.model('Transportagent')
 // const { purchasecommitmentcount, incrementPurchaseCommitmentCount, decrementPurchaseCommitmentCount } = require('../model/variables');
 const Financialyear = mongoose.model('Financialyear')
 const User = mongoose.model('User')
+const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -989,31 +990,30 @@ exports.addtransportagent = async (req, res) => {
     const compiledTemplate = handlebars.compile(template);
     const html = compiledTemplate({ data });
     fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html,async (d) => {
-      bot.sendMessage(process.env.CHAT_ID,'making report')
-    //   const htmlContent = html;
-    //   // Use Puppeteer to geerate PDF
-    //   const browser = await puppeteer.launch();
-    //   const page = await browser.newPage();
-    //   await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      const htmlContent = html;
+      // Use Puppeteer to geerate PDF
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-    //   // Generate a file name
-    //   const fileName = `report_${req.body.reportdate}.pdf`;
-    //   const filePath = path.join(__dirname, fileName);
+      // Generate a file name
+      const fileName = `report_${req.body.reportdate}.pdf`;
+      const filePath = path.join(__dirname, fileName);
 
-    //   // Save PDF to file
-    //   await page.pdf({ path: filePath, format: 'A4' });
+      // Save PDF to file
+      await page.pdf({ path: filePath, format: 'A4' });
 
-    //   await browser.close();
+      await browser.close();
 
-    //   // Send the PDF file to the user
-    //   bot.sendDocument(process.env.CHAT_ID, filePath).then(() => {
-    //     // Unlink (delete) the file after sending it
-    //     fs.unlink(filePath, (err) => {
+      // Send the PDF file to the user
+      bot.sendDocument(process.env.CHAT_ID, filePath).then(() => {
+        // Unlink (delete) the file after sending it
+        fs.unlink(filePath, (err) => {
           
-    //     });
-    // }).catch((sendError) => {
-    //     console.error('Error sending document:', sendError);
-    // });;
+        });
+    }).catch((sendError) => {
+        console.error('Error sending document:', sendError);
+    });;
       res.status(201).json({ message: 'Form submitted successfully' });
 
     })
