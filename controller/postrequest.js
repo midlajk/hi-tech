@@ -1,7 +1,8 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
 const TelegramBot = require('node-telegram-bot-api');
-const token = '';
+
+const token = process.env.TELE_API ;
 const bot = new TelegramBot(token, { polling: true });
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
@@ -10,7 +11,8 @@ const Transportagent = mongoose.model('Transportagent')
 // const { purchasecommitmentcount, incrementPurchaseCommitmentCount, decrementPurchaseCommitmentCount } = require('../model/variables');
 const Financialyear = mongoose.model('Financialyear')
 const User = mongoose.model('User')
-
+const puppeteer = require('puppeteer');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -968,7 +970,6 @@ exports.addtransportagent = async (req, res) => {
       const result2 = await ClientModel.aggregate(pipeline2).exec();
       data = { ...data, purchasecommitmentbalance: result1,salecommitmentbalance: result2,commitmentbalance:true };
     }     
-    bot.sendDocument(551725830, 'http://77.37.47.185/report.html');
 
     let options = {
       // displayHeaderFooter: true,
@@ -988,8 +989,31 @@ exports.addtransportagent = async (req, res) => {
         const template = fs.readFileSync(templatePath, 'utf8');
     const compiledTemplate = handlebars.compile(template);
     const html = compiledTemplate({ data });
-    fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html, (d) => {
-      const url = `http://localhost:3000/dailyreport.html`
+    fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html,async (d) => {
+      const htmlContent = html;
+      // Use Puppeteer to geerate PDF
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+      // Generate a file name
+      const fileName = `report_${req.body.reportdate}.pdf`;
+      const filePath = path.join(__dirname, fileName);
+
+      // Save PDF to file
+      await page.pdf({ path: filePath, format: 'A4' });
+
+      await browser.close();
+
+      // Send the PDF file to the user
+      bot.sendDocument(process.env.CHAT_ID, filePath).then(() => {
+        // Unlink (delete) the file after sending it
+        fs.unlink(filePath, (err) => {
+          
+        });
+    }).catch((sendError) => {
+        console.error('Error sending document:', sendError);
+    });;
       res.status(201).json({ message: 'Form submitted successfully' });
 
     })
