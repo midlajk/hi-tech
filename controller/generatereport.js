@@ -162,6 +162,8 @@ exports.generatepurchasereport = async (req, res, hi) => {
 
       });
       product.stockweight = (product.stockweight||0)+ parseInt(req.body.netWeight)
+      product.stockep = (product.stockep||0)+ parseInt(req.body.netepweight)
+
       await existingClient.save();
       await product.save();
 
@@ -470,6 +472,7 @@ exports.generatesalesreport = async (req, res) => {
       existingClient.storeout = storeout;
       existingClient.storein = storein;
       product.stockweight = (((product.stockweight||0)- parseInt(req.body.netWeight))<=0?0:((product.stockweight||0)- parseInt(req.body.netWeight)))
+      product.stockep = (((product.stockep||0)- parseInt(req.body.netepweight))<=0?0:((product.stockep||0)- parseInt(req.body.netepweight)))
       await product.save();
       await existingClient.save();
 

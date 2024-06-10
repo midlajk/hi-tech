@@ -180,16 +180,15 @@
   </table>
 
 </div>
-<div class="col-7">
-  <h3>Products <a href="" class="btn btn-success float-right " data-bs-toggle="modal" data-bs-target="#newitems">Add Product</a></h3>
-  
+
+  <div class="table-responsive text-nowrap p-4 col-7">
+    <h3>Products <a href="" class="btn btn-success float-right " data-bs-toggle="modal" data-bs-target="#newitems">Add Product</a></h3>
   <table class="table table-bordered" id="example">
     <thead>
         <tr>
           <th>Item</th>
-          <th>Type</th>
-
             <th>Aprx Stock</th>
+            <th>Aprx EP</th>
             <th>By Products</th>
             <th>Curing</th>
             <th>Update</th>
@@ -199,7 +198,6 @@
     <tbody class="table-border-bottom-0" id="product-table-body">
       </tbody>
       </table>
-
 </div>
 </div>
                
@@ -447,10 +445,10 @@
           const row = document.createElement('tr');
           row.innerHTML = `
               <td>${product.product}</td>
-              <td>${product.itemtype}</td>
-              <td><input class="form-control stockvalue" value="${product.stockweight}" id="stockvalue"/></td>
+              <td><input class="form-control stockvalue" style="width:150px" value="${product.stockweight}" id="stockvalue"/></td>
+              <td><input class="form-control epvalue" style="width:150px" value="${product.stockep}" id="epvalue"/></td>
               <td><a href="#" class="openModalButton" id="openModalButton" data-product='${JSON.stringify(product)}' >By-Products</a> </td>
-              <td><input value="0" class="form-control curingvalue" id="curingvalue"></td>
+              <td><input value="0" class="form-control curingvalue" style="width:150px" id="curingvalue"></td>
               <td><a href="#" class="btn btn-primary text-white updateButton">Update </a></td>
           `;
           tableBody.appendChild(row);
@@ -658,13 +656,15 @@ cache: true // Enable caching to reduce server requests
       var row = $(this).closest('tr');
         var stockValue = row.find('.stockvalue').val();
         var curingValue = row.find('.curingvalue').val();
+        var epvalue = row.find('.epvalue').val();
         var productData = row.find('.openModalButton').data('product');
         var productId = productData._id;
 
         var requestData = {
         stockValue: stockValue,
         curingValue: curingValue,
-        productId: productId
+        productId: productId,
+        epvalue:epvalue
     };
 
     // Send an API POST request

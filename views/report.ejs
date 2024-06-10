@@ -212,12 +212,34 @@
                   </select>
             </div>
             <div class="col-2">
-              <label for="includeBalance">Include Commitment Balance</label>
+              <label for="includeBalance">Commitment Balance</label>
               <select name="" class="form-control" id="includecommitmentbalance">
                 <option  value="true">YES</option>
                 <option value="false">NO</option>
               </select>
         </div>
+        <div class="col-2">
+          <label for="includeBalance">To Purchase/Sale</label>
+          <select name="" class="form-control" id="topurchaseorsale">
+            <option  value="true">YES</option>
+             <option value="false">NO</option>
+          </select>
+    </div>
+        <div class="col-2">
+      <label for="includeBalance">Include Storage</label>
+      <select name="" class="form-control" id="incudestorage">
+        <option  value="true">YES</option>
+        <option value="false">NO</option>
+      </select>
+</div>
+        <div class="col-2">
+          <label for="includeBalance">Include Stock</label>
+          <select name="" class="form-control" id="includestock">
+            <option  value="true">YES</option>
+            <option value="false">NO</option>
+          </select>
+    </div>
+    
 
 </div>
 </div>
@@ -268,6 +290,9 @@
   const includeBalance = document.getElementById('includeBalance').value;
   const includepartybalance = document.getElementById('includepartybalance').value;
   const includecommitmentbalance = document.getElementById('includecommitmentbalance').value;
+  const incudestorage = document.getElementById('incudestorage').value;
+  const includestock = document.getElementById('includestock').value;
+  const topurchaseorsale = document.getElementById('topurchaseorsale').value;
 
  document.getElementById('totalbalance').innerText = parseInt(openingBankBalance)+parseInt(openingCashBalance)+parseInt(openingOtherBalance);
   // Create the data object to send to the backend
@@ -283,7 +308,10 @@
     includeExpenses,
     includeBalance,
     includepartybalance,
-    includecommitmentbalance
+    includecommitmentbalance,
+    incudestorage,
+    includestock,
+    topurchaseorsale
   };
 
   // Send the data to the backend using fetch

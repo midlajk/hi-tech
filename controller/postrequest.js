@@ -722,305 +722,8 @@ exports.addtransportagent = async (req, res) => {
   
     return remaining; // Return the remaining value after all updates
   };
-  // exports.createDailyReport = async (req, res) => {
-  //   const reportDate = req.body.reportdate;
-  
-  //   // Set the start and end of the day
-  //   const startOfDay = new Date(reportDate);
-  //   startOfDay.setHours(0, 0, 0, 0);
-  
-  //   const endOfDay = new Date(reportDate);
-  //   endOfDay.setHours(23, 59, 59, 999);
-  
-  //   // Match stage for the date range
-  //   const matchStage = { "date": { $gte: startOfDay, $lte: endOfDay } };
-  
-  //   let data = {companyname: 'HI TECH COFFEE',
-  //   reportdate:reportDate,
-  //   openingaccount:req.body.openingBankBalance,
-  //   openingcash:req.body.openingCashBalance,
-  //   openingother:req.body.openingOtherBalance,
-  //   openingtotal:parseInt(req.body.openingBankBalance)+parseInt(req.body.openingCashBalance)+parseInt(req.body.openingOtherBalance),
-  // };
-
-  // if (req.body.includeArrival == 'true') {
-  //     const pipeline = [
-  //       { $unwind: "$coffee" },
-  //       { $match: { "coffee.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "coffee.billTo": 1,
-  //           "coffee.item": 1,
-  //           "coffee.lorry": 1,
-  //           "coffee.bags": 1,
-  //           "coffee.netWeight": 1,
-  //           "coffee.eppercentage": 1,
-  //           "coffee.netepweight": 1,
-  //           "coffee.storage": 1,
-  //           "coffee.stat": 1,
-  //         },
-  //       },
-  //     ];
-  //     const result = await ClientModel.aggregate(pipeline).exec();
-  //     data = { ...data, arrivals: result };
-  //   }
-  
-  //   if (req.body.includeDespatch== 'true') {
-  //     const pipeline = [
-  //       { $unwind: "$despatch" },
-  //       { $match: { "despatch.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "despatch.billTo": 1,
-  //           "despatch.item": 1,
-  //           "despatch.lorry": 1,
-  //           "despatch.bags": 1,
-  //           "despatch.netWeight": 1,
-  //           "despatch.delivery": 1,
-  //           "despatch.eppercentage": 1,
-  //           "despatch.netepweight": 1,
-  //           "despatch.storage": 1,
-  //           "despatch.stat": 1,
-  //         },
-  //       },
-  //     ];
-  //     const result = await ClientModel.aggregate(pipeline).exec();
-  //     data = { ...data, despatch: result };
-  //   }
-  
-  //   if (req.body.includeBills== 'true') {
-  //     const salesPipeline = [
-  //       { $unwind: "$salesbillSchema" },
-  //       { $match: { "salesbillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "salesbillSchema.billTo": 1,
-  //           "salesbillSchema.item": 1,
-  //           "salesbillSchema.qty": 1,
-  //           "salesbillSchema.weight": 1,
-  //           "salesbillSchema.amount": 1,
-  //           "salesbillSchema.total": 1,
-  //         },
-  //       },
-  //     ];
-  //     const salesResult = await ClientModel.aggregate(salesPipeline).exec();
-  
-  //     const purchasePipeline = [
-  //       { $unwind: "$purchasebillSchema" },
-  //       { $match: { "purchasebillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "purchasebillSchema.billTo": 1,
-  //           "purchasebillSchema.item": 1,
-  //           "purchasebillSchema.qty": 1,
-  //           "purchasebillSchema.weight": 1,
-  //           "purchasebillSchema.amount": 1,
-  //           "purchasebillSchema.total": 1,
-  //         },
-  //       },
-  //     ];
-  //     const purchaseResult = await ClientModel.aggregate(purchasePipeline).exec();
-  
-  //     data = { ...data, salesBills: salesResult, purchaseBills: purchaseResult };
-  //   }
-  
-  //   if (req.body.includeCommitments== 'true') {
-  //     const salesCommitmentPipeline = [
-  //       { $unwind: "$salescommitmentsschema" },
-  //       { $match: { "salescommitmentsschema.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "salescommitmentsschema.name": 1,
-  //           "salescommitmentsschema.item": 1,
-  //           "salescommitmentsschema.weight": 1,
-  //           "salescommitmentsschema.rate": 1,
-  //           "salescommitmentsschema.info": 1,
-  //         },
-  //       },
-  //     ];
-  //     const salesCommitmentResult = await ClientModel.aggregate(salesCommitmentPipeline).exec();
-  
-  //     const purchaseCommitmentPipeline = [
-  //       { $unwind: "$purchasecommitments" },
-  //       { $match: { "purchasecommitments.date": { $gte: startOfDay, $lte: endOfDay } } },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "purchasecommitments.name": 1,
-  //           "purchasecommitments.item": 1,
-  //           "purchasecommitments.weight": 1,
-  //           "purchasecommitments.rate": 1,
-  //           "purchasecommitments.info": 1,
-  //         },
-  //       },
-  //     ];
-  //     const purchaseCommitmentResult = await ClientModel.aggregate(purchaseCommitmentPipeline).exec();
-  //     data = { ...data, salesCommitments: salesCommitmentResult, purchaseCommitments: purchaseCommitmentResult };
-  //   }
-  
-  //   if (req.body.includeBalance== 'true') {
-  //     const pipeline = [
-  //       { $unwind: "$transaction" },
-  //       { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } }, 
-  //               {
-  //         $match: {
-  //           $or: [
-  //             { "transaction.recieved": { $gt: 0 } },
-  //             { "transaction.paid": { $gt: 0 } },
-  //           ],
-  //         },
-  //       },
-  //       {
-  //         $project: {
-  //           name: 1,
-  //           "transaction.name": 1,
-  //           "transaction.refference": 1,
-  //           "transaction.medium": 1,
-  //           "transaction.recieved": 1,
-  //           "transaction.paid": 1,
-  //         },
-  //       },
-  //     ];
-  //     const result = await ClientModel.aggregate(pipeline).exec();
-  //     data = { ...data, transactions: result };
-  //   }
-  
-  //   if (req.body.includeExpenses== 'true') {
-  //     const pipeline = [
-  //       { $unwind: "$transaction" },
-  //       { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },        {
-  //         $match: {
-  //           $or: [
-  //             { "transaction.recieved": { $gt: 0 } },
-  //             { "transaction.paid": { $gt: 0 } },
-  //           ],
-  //         },
-  //       },
-  //       {
-  //         $project: {
-  //           agent: 1,
-  //           "transaction.name": 1,
-  //           "transaction.refference": 1,
-  //           "transaction.medium": 1,
-  //           "transaction.recieved": 1,
-  //           "transaction.paid": 1,
-  //         },
-  //       },
-  //     ];
-  //     const result = await Transportagent.aggregate(pipeline).exec();
-  //     data = { ...data, balances: result };
-  //   }
-  //   if (req.body.includepartybalance== 'true') {
-  //     const pipeline = [
-  //       // Step 1: Match documents based on the initial query        
-  //       // Step 2: Add fields for adjustedRecievable and adjustedPayable
-  //       {
-  //           $addFields: {
-  //               adjustedRecievable: { $subtract: ['$recievable', '$recieved'] },
-  //               adjustedPayable: { $subtract: ['$payable', '$paid'] }
-  //           }
-  //       },
-        
-  //       // Step 3: Add a custom sort key for filtering
-  //       {
-  //           $addFields: {
-  //               customSortKey: { $subtract: ['$adjustedRecievable', '$adjustedPayable'] },
-  //               apayable: '$adjustedPayable',
-  //               arecievable: '$adjustedRecievable'
-  //           }
-  //       },
-        
-  //       // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
-  //       {
-  //           $match: {
-  //               $or: [
-  //                   { customSortKey: { $gt: 1000 } },
-  //                   { customSortKey: { $lt: -1000 } }
-  //               ]
-  //           }
-  //       }
-  //   ];
-    
-  //     const result = await ClientModel.aggregate(pipeline).exec();
-  //     data = { ...data, partybalance: result };
-  //   }   
-  //   if (req.body.includecommitmentbalance== 'true') {
-  //     const pipeline = [
-     
-  //       { $unwind: "$purchasecommitments" },
-  //       { $match: { "purchasecommitments.balance": { $gte: 499 } } }, 
-        
-  //       // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
-  //   ];
-    
-  //     const result1 = await ClientModel.aggregate(pipeline).exec();
-  //     const pipeline2 = [
-     
-  //       { $unwind: "$salescommitmentsschema" },
-  //       { $match: { "salescommitmentsschema.balance": { $gte: 499 } } }, 
-        
-  //       // Step 4: Filter documents where customSortKey is greater than 1000 or less than -1000
-  //   ];
-    
-  //     const result2 = await ClientModel.aggregate(pipeline2).exec();
-  //     data = { ...data, purchasecommitmentbalance: result1,salecommitmentbalance: result2,commitmentbalance:true };
-  //   }     
-
-  //   let options = {
-  //     // displayHeaderFooter: true,
-  //     format: "A4",
-  //     margin: { top: "60px", bottom: "100px" },
-  //     // base: 'file://' + path.resolve('./public') + '/'
-
-  //   };
-
-  //   // let PDF = await pdfMaster.generatePdf("template.hbs", { data }, options);
-
-  //   // 
-  //   // fs.writeFileSync(filePath, PDF);
-    
-  //   const templatePath = path.join(__dirname, 'dailyreport.hbs');
-
-  //       const template = fs.readFileSync(templatePath, 'utf8');
-  //   const compiledTemplate = handlebars.compile(template);
-  //   const html = compiledTemplate({ data });
-  //   fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html,async (d) => {
-  //     const htmlContent = html;
-  //     // Use Puppeteer to geerate PDF
-  //     const browser = await puppeteer.launch({
-  //       headless: 'new',
-  //       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  //   });
-  //     const page = await browser.newPage();
-  //     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-
-  //     // Generate a file name
-  //     const fileName = `report_${req.body.reportdate}.pdf`;
-  //     const filePath = path.join(__dirname, fileName);
-
-  //     // Save PDF to file
-  //     await page.pdf({ path: filePath, format: 'A4' });
-
-  //     await browser.close();
-
-  //     // Send the PDF file to the user
-  //     bot.sendDocument(process.env.CHAT_ID, filePath).then(() => {
-  //       // Unlink (delete) the file after sending it
-  //       fs.unlink(filePath, (err) => {
-          
-  //       });
-  //   }).catch((sendError) => {
-  //       console.error('Error sending document:', sendError);
-  //   });;
-  //     res.status(201).json({ message: 'Form submitted successfully' });
-
-  //   })
-  // };
+ 
+  ////////////////////////// dAily Report fragment /////////////////
   exports.createDailyReport = async (req, res) => {
     try {
         const reportDate = req.body.reportdate;
@@ -1050,6 +753,9 @@ exports.addtransportagent = async (req, res) => {
             includeExpenses: fetchExpenses,
             includepartybalance: fetchPartyBalances,
             includecommitmentbalance: fetchCommitmentBalances,
+            incudestorage:fetchStorage,
+            includestock:fetchStock,
+            topurchaseorsale:fetchTopurchaseorsale
         };
 
         // Iterate over operations and execute those that are true
@@ -1066,9 +772,10 @@ exports.addtransportagent = async (req, res) => {
         // Delete the file after sending
         fs.unlink(filePath, (err) => {
             if (err) console.error('Error deleting file:', err);
+            res.status(201).json({ message: 'Report created successfully' });
+
         });
 
-        res.status(201).json({ message: 'Report created successfully' });
 
     } catch (error) {
         console.error('Error creating daily report:', error);
@@ -1187,14 +894,133 @@ async function fetchCommitmentBalances(startOfDay, endOfDay, data) {
     ]);
     return { ...data, purchasecommitmentbalance: purchaseResult, salecommitmentbalance: salesResult, commitmentbalance: true };
 }
+async function fetchStorage(startOfDay, endOfDay, data) {
+  const purchasePipeline = [
+    { $unwind: "$coffee" },
+    { $match: { "coffee.storage": { $gte: 10 } } },
+    {
+        $group: {
+            _id: {
+                name: "$name",
+                item: "$coffee.item"
+            },
+            totalPurchaseStorage: { $sum: "$coffee.storage" }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            name: "$_id.name",
+            item: "$_id.item",
+            totalPurchaseStorage: 1
+        }
+    }
+];
+
+const salesPipeline = [
+    { $unwind: "$despatch" },
+    { $match: { "despatch.storage": { $gte: 10 } } },
+    {
+        $group: {
+            _id: {
+                name: "$name",
+                item: "$despatch.item"
+            },
+            totalSalesStorage: { $sum: "$despatch.storage" }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            name: "$_id.name",
+            item: "$_id.item",
+            totalSalesStorage: 1
+        }
+    }
+];
+
+const [PurchaseStorage, SalesStorage] = await Promise.all([
+    ClientModel.aggregate(purchasePipeline).exec(),
+    ClientModel.aggregate(salesPipeline).exec()
+]);
+return { ...data, PurchaseStorage: PurchaseStorage, SalesStorage: SalesStorage, storagebalance: true };
+}
+async function fetchStock(startOfDay, endOfDay, data) {
+  const result = await PoductsSchema.aggregate([{ $project: { product: 1,stockweight:1,stockep:1 }}]);
+  return { ...data, stock: result };
+}
+async function fetchTopurchaseorsale(startOfDay, endOfDay, data) {
+  // Step 1: Fetch primary products and get their product names
+  const primaryProducts = await PoductsSchema.find({ itemtype: 'Primary' }, 'product').exec();
+  const productNames = primaryProducts.map(p => p.product);
+
+  // Step 2: Create aggregation pipelines
+  const createPipeline = (field, matchField, sumField) => [
+    { $unwind: `$${field}` },
+    {
+      $match: {
+        [`${field}.${matchField}`]: { $in: productNames }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: `$${field}.${sumField}` }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        total: 1
+      }
+    }
+  ];
+
+  // Step 3: Execute pipelines and get results
+  const pipelines = [
+    { field: 'despatch', matchField: 'item', sumField: 'storage', model: ClientModel },
+    { field: 'coffee', matchField: 'item', sumField: 'storage', model: ClientModel },
+    { field: 'purchasecommitments', matchField: 'item', sumField: 'balance', model: ClientModel },
+    { field: 'salescommitmentsschema', matchField: 'item', sumField: 'balance', model: ClientModel }
+  ];
+
+  const results = await Promise.all(
+    pipelines.map(({ field, matchField, sumField, model }) =>
+      model.aggregate(createPipeline(field, matchField, sumField)).exec()
+    )
+  );
+
+  // Step 4: Extract and store results
+  const [despatchResult, coffeeResult, purchaseCommitmentResult, salesCommitmentResult] = results;
+  
+  const totalDespatchStorage = despatchResult.length > 0 ? despatchResult[0].total : 0;
+  const totalCoffeeStorage = coffeeResult.length > 0 ? coffeeResult[0].total : 0;
+  const totalPurchaseCommitmentBalance = purchaseCommitmentResult.length > 0 ? purchaseCommitmentResult[0].total : 0;
+  const totalSalesCommitmentBalance = salesCommitmentResult.length > 0 ? salesCommitmentResult[0].total : 0;
+
+  // Step 5: Aggregate stockep from primary products
+  const totalStockEp = primaryProducts.reduce((sum, p) => sum + (p.stockep || 0), 0);
+
+  return {
+    ...data,
+    totalStockEp,
+    totalDespatchStorage,
+    totalCoffeeStorage,
+    totalPurchaseCommitmentBalance,
+    totalSalesCommitmentBalance,
+    topurchaseorsale:parseInt(totalStockEp+totalDespatchStorage-totalCoffeeStorage+totalPurchaseCommitmentBalance-totalSalesCommitmentBalance),
+    purchaseorsale:true
+  };
+}
 
 // Generate PDF Report
 async function generatePdfReport(data, reportDate) {
+
     const templatePath = path.join(__dirname, 'dailyreport.hbs');
     const template = fs.readFileSync(templatePath, 'utf8');
     const compiledTemplate = handlebars.compile(template);
     const html = compiledTemplate({ data });
-
+    fs.writeFile(path.join(__dirname, '..', 'public', 'dailyreport.html'), html,async (d) => {})
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -1209,3 +1035,4 @@ async function generatePdfReport(data, reportDate) {
 
     return filePath;
 }
+  ////////////////////////// dAily Report fragment /////////////////

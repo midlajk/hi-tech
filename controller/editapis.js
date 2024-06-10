@@ -91,6 +91,8 @@ exports.editpurchase = async (req, res, hi) => {
         var  storein =0
       if (coffeeItemToUpdate) {
         product.stockweight = (product.stockweight||0) - parseInt(coffeeItemToUpdate.netWeight)+ parseInt(req.body.netWeight)
+        product.stockep = (product.stockep||0) - parseInt(coffeeItemToUpdate.netepweight)+ parseInt(req.body.netepweight)
+
         await product.save();
          storeout = existingClient.storeout + 0
          storein = existingClient.storein + (parseFloat(req.body.netepweight)) - (parseFloat(coffeeItemToUpdate.netepweight))
@@ -151,6 +153,7 @@ exports.editsales = async (req, res, hi) => {
 
       if (coffeeItemToUpdate) {
         product.stockweight = (((product.stockweight||0) + parseInt(coffeeItemToUpdate.netWeight)- parseInt(req.body.netWeight))<=0?0:((product.stockweight||0) + parseInt(coffeeItemToUpdate.netWeight)- parseInt(req.body.netWeight)))
+        product.stockep = (product.stockep||0) + parseInt(coffeeItemToUpdate.netepweight)- parseInt(req.body.netepweight)
         await product.save();
         
         var storeout = parseInt(existingClient.storeout)  + (parseFloat(req.body.netepweight)) - (parseFloat(coffeeItemToUpdate.netepweight))
@@ -537,24 +540,32 @@ exports.updatestock = async (req, res, next) => {
     const productId = req.body.productId;
     const stockValue = parseInt(req.body.stockValue);
     const curingValue = parseInt(req.body.curingValue);
-
+    const epvalue = parseInt(req.body.epvalue);
     // Find the product by ID
     const product = await PoductsSchema.findById(productId);
 
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
+    const eppercentage = (epvalue/stockValue)*100
+    const updatedep = parseInt(curingValue*(eppercentage/100));
 
     // Update the stock weight of the main product
-    product.stockweight = stockValue - curingValue;
+      product.stockweight = stockValue ;
+      product.stockep = epvalue 
 
-    // Update the stock weight of by-products if any
-    for (const byproduct of product.byproduct) {
+      await product.save();
+      for (const byproduct of product.byproduct) {
       const bproduct = await PoductsSchema.findOne({ product: byproduct.name });
 
       if (bproduct) {
         const percentage = parseFloat(byproduct.percentage);
-        bproduct.stockweight = bproduct.stockweight+Math.round(curingValue * (percentage / 100));
+        bproduct.stockweight = bproduct.stockweight+Math.round(updatedep * (percentage / 100));
+        bproduct.stockep = bproduct.stockep+Math.round(updatedep * (percentage / 100));
+        const epded = product.stockep - parseInt(updatedep * (percentage / 100));
+        product.stockep = epded;
+        product.stockweight = parseInt(epded*100/eppercentage)
+        await product.save();
         await bproduct.save();
       }
     }

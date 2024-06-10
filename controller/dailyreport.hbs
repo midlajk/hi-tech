@@ -515,6 +515,116 @@
     </div>
 </div>
 {{/if}}
+
+{{#if data.storagebalance}}
+<div class="row">
+    <div class="col-12">
+        <h2>Arrival Storage</h2>
+        <table class="table table-bordered table-custom">
+            <thead>
+                <tr>
+                    <th>Party</th>
+                    <th>Item</th>     
+                    <th>Storage EP weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data.PurchaseStorage}}
+                <tr> 
+                    <tr> 
+        <td>{{this.name}}</td>
+    <td>{{this.item}}</td>
+<td>{{this.totalPurchaseStorage}}</td>
+
+</tr>            
+
+                </tr>
+                {{/each}}
+            </tbody>
+          
+        </table>
+    </div>
+     <div class="col-12">
+        <h2>Despatch Storage</h2>
+        <table class="table table-bordered table-custom">
+            <thead>
+                <tr>
+                       <th>Party</th>
+                    <th>Item</th>     
+                    <th>Storage EP weight</th>                
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data.SalesStorage}}
+                <tr> 
+                    <tr> 
+      <td>{{this.name}}</td>
+    <td>{{this.item}}</td>
+<td>{{this.totalSalesStorage}}</td>
+</tr>            
+
+                </tr>
+                {{/each}}
+            </tbody>
+          
+        </table>
+    </div>
+</div>
+{{/if}}
+{{#if data.stock.length}}
+<div class="row">
+    <div class="col-12">
+        <h2>Stock</h2>
+        <table class="table table-bordered table-custom">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Stock Weight</th>
+                    <th>Stock EP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data.stock}}
+                <tr>
+                    <td>{{product}}</td>
+                    <td>{{stockweight}}</td>
+                    <td>{{stockep}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+{{#if data.purchaseorsale}}
+ <div class="row border border-danger rounded m-1" style="padding: 5px;">
+    <div class="col-2 text-center ">
+        <label for="Openin Account Balance">Godown EP Stock</label>
+        <h4  class="">{{data.totalStockEp}}</h4>
+    </div>
+    <div class="col-2 text-center ">
+        <label for="Openin Cash Balance">EP Stock out</label>
+        <h4  class="">{{data.totalDespatchStorage}}</h4>
+    </div>
+    <div class="col-2 text-center ">
+        <label for="Openin Other Balance">EP Stock In</label>
+        <h4  class="">{{data.totalCoffeeStorage}}</h4>
+    </div>
+    <div class="col-2 text-center ">
+        <label for="Openin Other Balance">P Commitment</label>
+        <h4  class="">{{data.totalPurchaseCommitmentBalance}}</h4>
+    </div>
+    <div class="col-2 text-center ">
+        <label for="Openin Other Balance">S Commitment</label>
+        <h4  class="">{{data.totalSalesCommitmentBalance}}</h4>
+    </div>
+        <div class="col-2 text-center ">
+        <label for="Total Opening Balance">To Sell</label>
+        <h4  class="">{{data.topurchaseorsale}}</h4>
+    </div>
+</div>
+{{/if}}
+
     </div>
 
 
