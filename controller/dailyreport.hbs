@@ -336,7 +336,7 @@
     
 </div>
 {{/if}}
-{{#if data.balances.length}}
+{{#if data.balances.length }}
 <div class="row">
     <div class="col-12">
         <h2>Expenses / Credit</h2>
@@ -370,24 +370,30 @@
     
 </div>
 {{/if}}
+{{#if data.closingbalance}}
     <div class="row border border-danger rounded m-1" style="padding: 5px;">
     <div class="col-3 text-center ">
-        <label for="Openin Account Balance">Closing Account Balance</label>
-        <h4  class=""></h4>
+        <label for="Openin Account Balance">Total Recieved</label>
+        <h4  class="">{{data.recieved}}</h4>
     </div>
     <div class="col-3 text-center ">
-        <label for="Openin Cash Balance">Closing Cash Balance</label>
-        <h4  class=""></h4>
+        <label for="Openin Cash Balance">Total Paid</label>
+        <h4  class="">{{data.paid}}</h4>
     </div>
-    <div class="col-3 text-center ">
-        <label for="Openin Other Balance">Closing Other Balance</label>
-        <h4  class=""></h4>
+    <div class="col-2 text-center ">
+        <label for="Openin Other Balance">Tds Recievable</label>
+        <h4  class="">{{data.tdsrecievable}}</h4>
     </div>
-        <div class="col-3 text-center ">
-        <label for="Total Opening Balance">Total Closing Balance</label>
-        <h4  class=""></h4>
+        <div class="col-2 text-center ">
+        <label for="Total Opening Balance">Tds Payable</label>
+        <h4  class="">{{data.tdspayable}}</h4>
+    </div>
+    <div class="col-2 text-center ">
+        <label for="Total Opening Balance">Closing</label>
+        <h4  class="">{{data.closebalance}} </h4>
     </div>
 </div>
+{{/if}}
 
 {{#if data.partybalances.length}}
 <div class="row">

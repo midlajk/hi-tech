@@ -726,63 +726,66 @@ exports.addtransportagent = async (req, res) => {
   ////////////////////////// dAily Report fragment /////////////////
   exports.createDailyReport = async (req, res) => {
     try {
-        const reportDate = req.body.reportdate;
-        const startOfDay = new Date(reportDate);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(reportDate);
-        endOfDay.setHours(23, 59, 59, 999);
-
-        let data = {
-            companyname: 'HI TECH COFFEE',
-            reportdate: reportDate,
-            openingaccount: req.body.openingBankBalance,
-            openingcash: req.body.openingCashBalance,
-            openingother: req.body.openingOtherBalance,
-            openingtotal: parseInt(req.body.openingBankBalance) +
-                          parseInt(req.body.openingCashBalance) +
-                          parseInt(req.body.openingOtherBalance),
-        };
-
-        // Create a map of operations to include
-        const operations = {
-            includeArrival: fetchArrivals,
-            includeDespatch: fetchDespatches,
-            includeBills: fetchBills,
-            includeCommitments: fetchCommitments,
-            includeBalance: fetchTransactions,
-            includeExpenses: fetchExpenses,
-            includepartybalance: fetchPartyBalances,
-            includecommitmentbalance: fetchCommitmentBalances,
-            incudestorage:fetchStorage,
-            includestock:fetchStock,
-            topurchaseorsale:fetchTopurchaseorsale
-        };
-
-        // Iterate over operations and execute those that are true
-        for (const key in operations) {
-            if (req.body[key] === 'true') {
-                data = await operations[key](startOfDay, endOfDay, data);
-            }
+      const reportDate = req.body.reportdate;
+      const startOfDay = new Date(reportDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(reportDate);
+      endOfDay.setHours(23, 59, 59, 999);
+  
+      const openingBalances = {
+        bank: parseInt(req.body.openingBankBalance) || 0,
+        cash: parseInt(req.body.openingCashBalance) || 0,
+        other: parseInt(req.body.openingOtherBalance) || 0
+      };
+  
+      let data = {
+        companyname: 'HI TECH COFFEE',
+        reportdate: reportDate,
+        openingaccount: openingBalances.bank,
+        openingcash: openingBalances.cash,
+        openingother: openingBalances.other,
+        openingtotal: openingBalances.bank + openingBalances.cash + openingBalances.other
+      };
+  
+      // Create a map of operations to include
+      const operations = {
+        includeArrival: fetchArrivals,
+        includeDespatch: fetchDespatches,
+        includeBills: fetchBills,
+        includeCommitments: fetchCommitments,
+        includeBalance: fetchTransactions,
+        includeExpenses: fetchExpenses,
+        includepartybalance: fetchPartyBalances,
+        includecommitmentbalance: fetchCommitmentBalances,
+        incudestorage: fetchStorage,
+        includestock: fetchStock,
+        topurchaseorsale: fetchTopurchaseorsale,
+        closingbalance: (startOfDay, endOfDay, data) => fetchclosing(startOfDay, endOfDay, data, openingBalances)
+      };
+  
+      // Iterate over operations and execute those that are true
+      for (const key in operations) {
+        if (req.body[key] === 'true') {
+          data = await operations[key](startOfDay, endOfDay, data);
         }
-
-        // Generate and send PDF report
-        const filePath = await generatePdfReport(data, req.body.reportdate);
-        await bot.sendDocument(process.env.CHAT_ID, filePath);
-
-        // Delete the file after sending
-        fs.unlink(filePath, (err) => {
-            if (err) console.error('Error deleting file:', err);
-            res.status(201).json({ message: 'Report created successfully' });
-
-        });
-
-
+      }
+  
+      // Generate and send PDF report
+      const filePath = await generatePdfReport(data, req.body.reportdate);
+      await bot.sendDocument(process.env.CHAT_ID, filePath);
+  
+      // Delete the file after sending
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('Error deleting file:', err);
+        res.status(201).json({ message: 'Report created successfully' });
+      });
+  
     } catch (error) {
-        console.error('Error creating daily report:', error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error('Error creating daily report:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-};
-
+  };
+  
 // Fetch Arrivals
 async function fetchArrivals(startOfDay, endOfDay, data) {
     const pipeline = [
@@ -848,7 +851,7 @@ async function fetchTransactions(startOfDay, endOfDay, data) {
     const pipeline = [
         { $unwind: "$transaction" },
         { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $match: { $or: [{ "transaction.recieved": { $gt: 0 } }, { "transaction.paid": { $gt: 0 } }] } },
+        { $match: { $or: [{ "transaction.recieved": { $ne: 0 } }, { "transaction.paid": { $ne: 0 } }] } },
         { $project: { name: 1, "transaction.*": 1 } }
     ];
     const result = await ClientModel.aggregate(pipeline).exec();
@@ -860,12 +863,84 @@ async function fetchExpenses(startOfDay, endOfDay, data) {
     const pipeline = [
         { $unwind: "$transaction" },
         { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $match: { $or: [{ "transaction.recieved": { $gt: 0 } }, { "transaction.paid": { $gt: 0 } }] } },
+        { $match: { $or: [{ "transaction.recieved": { $ne: 0 } }, { "transaction.paid": { $ne: 0 } }] } },
         { $project: { agent: 1, "transaction.*": 1 } }
     ];
     const result = await Transportagent.aggregate(pipeline).exec();
     return { ...data, balances: result };
 }
+async function aggregateTransactions(model, startOfDay, endOfDay, additionalMatch = {}) {
+  const pipeline = [
+    { $unwind: "$transaction" }, // Deconstruct the transaction array
+    { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } }, // Match transactions within the date range
+    { 
+      $match: { 
+        $or: [ 
+          { "transaction.recieved": { $ne: 0 } }, 
+          { "transaction.paid": { $ne: 0 } } 
+        ],
+        ...additionalMatch // Additional match conditions
+      }
+    },
+    { 
+      $group: {
+        _id: null, // Group by null to aggregate all documents
+        totalRecieved: { $sum: "$transaction.recieved" }, // Sum of recieved
+        totalPaid: { $sum: "$transaction.paid" } // Sum of paid
+      }
+    },
+    { 
+      $project: {
+        _id: 0, // Exclude _id from the output
+        totalRecieved: 1, // Include totalRecieved in the output
+        totalPaid: 1 // Include totalPaid in the output
+      } 
+    }
+  ];
+
+  return await model.aggregate(pipeline).exec();
+}
+
+
+async function fetchclosing(startOfDay, endOfDay, data, openingBalances) {
+  // Aggregate transactions for ClientModel
+  const clientResult = await aggregateTransactions(ClientModel, startOfDay, endOfDay);
+  const transactionrecieved = clientResult?.[0]?.totalRecieved ?? 0;
+  const transactionpaid = clientResult?.[0]?.totalPaid ?? 0;
+
+  // Aggregate transactions for ProductsSchema
+  const productsResult = await aggregateTransactions(PoductsSchema, startOfDay, endOfDay);
+  const expense = productsResult?.[0]?.totalPaid ?? 0;
+  const income = productsResult?.[0]?.totalRecieved ?? 0;
+
+  // Additional aggregation for TDS
+  const tdsResult = await aggregateTransactions(ClientModel, startOfDay, endOfDay, { "transaction.medium": "tds" });
+  const tdsrecievable = tdsResult?.[0]?.totalRecieved ?? 0;
+  const tdspayable = tdsResult?.[0]?.totalPaid ?? 0;
+
+  // Calculate closing balance
+  const closingBalance = openingBalances.bank +
+    openingBalances.cash +
+    openingBalances.other +
+    transactionrecieved +
+    income -
+    transactionpaid -
+    expense +
+    tdspayable -
+    tdsrecievable;
+
+  // Combine results with existing data
+  return {
+    ...data,
+    recieved: transactionrecieved + income,
+    paid: expense + transactionpaid,
+    tdsrecievable,
+    tdspayable,
+    closebalance: closingBalance,
+    closingbalance: true
+  };
+}
+
 
 // Fetch Party Balances
 async function fetchPartyBalances(startOfDay, endOfDay, data) {

@@ -239,7 +239,13 @@
             <option value="false">NO</option>
           </select>
     </div>
-    
+    <div class="col-2">
+      <label for="includeBalance">Include Closing</label>
+      <select name="" class="form-control" id="closingbalance">
+        <option  value="true">YES</option>
+        <option value="false">NO</option>
+      </select>
+</div>
 
 </div>
 </div>
@@ -293,6 +299,7 @@
   const incudestorage = document.getElementById('incudestorage').value;
   const includestock = document.getElementById('includestock').value;
   const topurchaseorsale = document.getElementById('topurchaseorsale').value;
+  const closingbalance = document.getElementById('closingbalance').value;
 
  document.getElementById('totalbalance').innerText = parseInt(openingBankBalance)+parseInt(openingCashBalance)+parseInt(openingOtherBalance);
   // Create the data object to send to the backend
@@ -311,7 +318,8 @@
     includecommitmentbalance,
     incudestorage,
     includestock,
-    topurchaseorsale
+    topurchaseorsale,
+    closingbalance
   };
 
   // Send the data to the backend using fetch
