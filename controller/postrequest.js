@@ -1061,7 +1061,7 @@ exports.addtransportagent = async (req, res) => {
 
         // Generate and send PDF report
         const filePath = await generatePdfReport(data, req.body.reportdate);
-        await sendDocument(process.env.CHAT_ID, filePath);
+        await bot.sendDocument(process.env.CHAT_ID, filePath);
 
         // Delete the file after sending
         fs.unlink(filePath, (err) => {
