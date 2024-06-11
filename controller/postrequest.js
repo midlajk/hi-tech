@@ -852,9 +852,15 @@ async function fetchTransactions(startOfDay, endOfDay, data) {
         { $unwind: "$transaction" },
         { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },
         { $match: { $or: [{ "transaction.recieved": { $ne: 0 } }, { "transaction.paid": { $ne: 0 } }] } },
-        { $project: { name: 1, "transaction.*": 1 } }
+        { $project: { name: 1, "transaction.name": 1,
+                  "transaction.refference": 1,
+                  "transaction.medium": 1,
+                  "transaction.recieved": 1,
+                  "transaction.paid": 1,} }
     ];
     const result = await ClientModel.aggregate(pipeline).exec();
+    console.log(result)
+
     return { ...data, transactions: result };
 }
 
@@ -864,7 +870,11 @@ async function fetchExpenses(startOfDay, endOfDay, data) {
         { $unwind: "$transaction" },
         { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },
         { $match: { $or: [{ "transaction.recieved": { $ne: 0 } }, { "transaction.paid": { $ne: 0 } }] } },
-        { $project: { agent: 1, "transaction.*": 1 } }
+        { $project: { agent: 1, "transaction.name": 1,
+        "transaction.refference": 1,
+        "transaction.medium": 1,
+        "transaction.recieved": 1,
+        "transaction.paid": 1, } }
     ];
     const result = await Transportagent.aggregate(pipeline).exec();
     return { ...data, balances: result };

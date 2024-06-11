@@ -395,7 +395,7 @@
 </div>
 {{/if}}
 
-{{#if data.partybalances.length}}
+{{!-- {{#if data.data.balances}}
 <div class="row">
     <div class="col-12">
         <h2>Pending Transactions</h2>
@@ -426,7 +426,7 @@
     </div>
     
 </div>
-{{/if}}
+{{/if}} --}}
 {{#if data.partybalance.length}}
 <div class="row">
     <div class="col-12">
@@ -459,8 +459,9 @@
     
 </div>
 {{/if}}
-{{#if data.commitmentbalance}}
 <div class="row">
+    {{#if data.salecommitmentbalance.length}}
+
     <div class="col-12">
         <h2>Pending Sales</h2>
         <table class="table table-bordered table-custom">
@@ -490,6 +491,9 @@
           
         </table>
     </div>
+    {{/if}}
+    {{#if data.purchasecommitmentbalance.length}}
+
      <div class="col-12">
         <h2>Pending Purchase</h2>
         <table class="table table-bordered table-custom">
@@ -519,11 +523,13 @@
           
         </table>
     </div>
-</div>
-{{/if}}
+    {{/if}}
 
-{{#if data.storagebalance}}
+</div>
+
 <div class="row">
+    {{#if data.PurchaseStorage}}
+
     <div class="col-12">
         <h2>Arrival Storage</h2>
         <table class="table table-bordered table-custom">
@@ -550,6 +556,10 @@
           
         </table>
     </div>
+    {{/if}}
+
+    {{#if data.SalesStorage}}
+
      <div class="col-12">
         <h2>Despatch Storage</h2>
         <table class="table table-bordered table-custom">
@@ -575,8 +585,9 @@
           
         </table>
     </div>
+    {{/if}}
+
 </div>
-{{/if}}
 {{#if data.stock.length}}
 <div class="row">
     <div class="col-12">
