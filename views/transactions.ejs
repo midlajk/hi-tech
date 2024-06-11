@@ -63,8 +63,8 @@
                               <th>Name</th>
                               <th>Refference</th>
                               <th>Medium</th>
-                              <th style="color: brown;">Paid</th>
-                              <th style="color: chartreuse;">Recieved</th>
+                              <th>Paid</th>
+                              <th>Recieved</th>
                               <th>Action</th>
                             </tr>
                         </thead>
@@ -137,8 +137,20 @@ document.getElementById('transactiondate').value = formattedDate;
       { data: 'name' },
         { data: 'refference' },
         { data: 'medium' },
-        { data: 'paid' },
-       { data: 'recieved' },
+        {
+    data: 'paid',
+    render: function (data, type, row) {
+      // Return the data with red color for paid values
+      return `<span style="color: red;">${data}</span>`;
+    }
+  },
+  {
+    data: 'received',
+    render: function (data, type, row) {
+      // Return the data with green color for received values
+      return `<span style="color: green;">${data}</span>`;
+    }
+  },
         {
           data: null,
           render: function (data, type, row) {
