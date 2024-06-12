@@ -918,7 +918,7 @@ async function fetchclosing(startOfDay, endOfDay, data, openingBalances) {
   const transactionpaid = clientResult?.[0]?.totalPaid ?? 0;
 
   // Aggregate transactions for ProductsSchema
-  const productsResult = await aggregateTransactions(PoductsSchema, startOfDay, endOfDay);
+  const productsResult = await aggregateTransactions(Transportagent, startOfDay, endOfDay);
   const expense = productsResult?.[0]?.totalPaid ?? 0;
   const income = productsResult?.[0]?.totalRecieved ?? 0;
 
