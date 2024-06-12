@@ -791,7 +791,7 @@ async function fetchArrivals(startOfDay, endOfDay, data) {
     const pipeline = [
         { $unwind: "$coffee" },
         { $match: { "coffee.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "coffee.*": 1 } }
+        { $project: { name: 1, "coffee": 1 } }
     ];
     const result = await ClientModel.aggregate(pipeline).exec();
     return { ...data, arrivals: result };
@@ -802,7 +802,7 @@ async function fetchDespatches(startOfDay, endOfDay, data) {
     const pipeline = [
         { $unwind: "$despatch" },
         { $match: { "despatch.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "despatch.*": 1 } }
+        { $project: { name: 1, "despatch": 1 } }
     ];
     const result = await ClientModel.aggregate(pipeline).exec();
     return { ...data, despatch: result };
@@ -813,12 +813,12 @@ async function fetchBills(startOfDay, endOfDay, data) {
     const salesPipeline = [
         { $unwind: "$salesbillSchema" },
         { $match: { "salesbillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "salesbillSchema.*": 1 } }
+        { $project: { name: 1, "salesbillSchema": 1 } }
     ];
     const purchasePipeline = [
         { $unwind: "$purchasebillSchema" },
         { $match: { "purchasebillSchema.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "purchasebillSchema.*": 1 } }
+        { $project: { name: 1, "purchasebillSchema": 1 } }
     ];
     const [salesResult, purchaseResult] = await Promise.all([
         ClientModel.aggregate(salesPipeline).exec(),
@@ -832,12 +832,12 @@ async function fetchCommitments(startOfDay, endOfDay, data) {
     const salesCommitmentPipeline = [
         { $unwind: "$salescommitmentsschema" },
         { $match: { "salescommitmentsschema.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "salescommitmentsschema.*": 1 } }
+        { $project: { name: 1, "salescommitmentsschema": 1 } }
     ];
     const purchaseCommitmentPipeline = [
         { $unwind: "$purchasecommitments" },
         { $match: { "purchasecommitments.date": { $gte: startOfDay, $lte: endOfDay } } },
-        { $project: { name: 1, "purchasecommitments.*": 1 } }
+        { $project: { name: 1, "purchasecommitments": 1 } }
     ];
     const [salesCommitmentResult, purchaseCommitmentResult] = await Promise.all([
         ClientModel.aggregate(salesCommitmentPipeline).exec(),
