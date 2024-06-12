@@ -957,11 +957,52 @@ async function fetchPartyBalances(startOfDay, endOfDay, data) {
         { $addFields: { adjustedRecievable: { $subtract: ['$recievable', '$recieved'] }, adjustedPayable: { $subtract: ['$payable', '$paid'] } } },
         { $addFields: { customSortKey: { $subtract: ['$adjustedRecievable', '$adjustedPayable'] }, apayable: '$adjustedPayable', arecievable: '$adjustedRecievable' } },
         { $match: { $or: [{ customSortKey: { $gt: 1000 } }, { customSortKey: { $lt: -1000 } }] } }
+        ,
+        {
+          $group: {
+              _id: null,
+              totalAdjustedRecievable: { $sum: '$adjustedRecievable' },
+              totalAdjustedPayable: { $sum: '$adjustedPayable' },
+              totalCustomSortKey: { $sum: '$customSortKey' },
+              docs: { $push: '$$ROOT' } // Store matching documents for detailed output
+          }
+      },
     ];
     const result = await ClientModel.aggregate(pipeline).exec();
-    return { ...data, partybalance: result };
-}
-
+    if (result && result.length > 0) {
+      // Retrieve data from the aggregation result
+      const aggregatedData = result[0];
+  
+      // Safely extract the relevant data, ensuring defaults for null cases
+      const partyBalance = aggregatedData.docs || [];
+      const totalAdjustedRecievable = aggregatedData.totalAdjustedRecievable || 0;
+      const totalAdjustedPayable = aggregatedData.totalAdjustedPayable || 0;
+      const totalCustomSortKey = aggregatedData.totalCustomSortKey || 0;
+  
+      // Construct the final output object
+      const output = {
+          ...data,
+          partybalance: partyBalance,
+          totalAdjustedRecievable,
+          totalAdjustedPayable,
+          totalCustomSortKey
+      };
+        return output;
+  } else {
+      // Handle the case where no documents match the criteria
+      const output = {
+          ...data,
+          partybalance: [],
+          totalAdjustedRecievable: 0,
+          totalAdjustedPayable: 0,
+          totalCustomSortKey: 0
+      };
+  
+      console.log('No matching documents found.');
+      return output;
+  }
+  
+  }
 // Fetch Commitment Balances
 async function fetchCommitmentBalances(startOfDay, endOfDay, data) {
     const purchasePipeline = [
@@ -1083,11 +1124,17 @@ async function fetchTopurchaseorsale(startOfDay, endOfDay, data) {
   const totalSalesCommitmentBalance = salesCommitmentResult.length > 0 ? salesCommitmentResult[0].total : 0;
 
   // Step 5: Aggregate stockep from primary products
-  const totalStockEp = primaryProducts.reduce((sum, p) => sum + (p.stockep || 0), 0);
+  const [{ totalStockEp = 0 } = {}] = await PoductsSchema.aggregate([
+    { $match: { itemtype: "Primary" } },
+    { $group: { _id: null, totalStockEp: { $sum: "$stockep" } } },
+    { $project: { _id: 0, totalStockEp: 1 } }
+  ]);
+  
+console.log(totalStockEp)
 
   return {
     ...data,
-    totalStockEp,
+    totalStockEp:totalStockEp,
     totalDespatchStorage,
     totalCoffeeStorage,
     totalPurchaseCommitmentBalance,

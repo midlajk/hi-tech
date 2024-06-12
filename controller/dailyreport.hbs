@@ -437,7 +437,7 @@
                     <th>Party</th>
                     <th>Recievable</th>
                     <th>Payable</th>
-                    <th>Difference</th>
+                    <th>Balance Recievable</th>
                 </tr>
             </thead>
             <tbody>
@@ -453,7 +453,12 @@
                 </tr>
                 {{/each}}
             </tbody>
-          
+          <tfoot>
+            <th>Total</th>
+            <th>{{data.totalAdjustedRecievable}}</th>
+            <th>{{data.totalAdjustedPayable}}</th>
+            <th>{{data.totalCustomSortKey}}</th>
+          </tfoot>
         </table>
     </div>
     
