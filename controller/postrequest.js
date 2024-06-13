@@ -1134,11 +1134,11 @@ console.log(totalStockEp)
 
   return {
     ...data,
-    totalStockEp:totalStockEp,
-    totalDespatchStorage,
-    totalCoffeeStorage,
-    totalPurchaseCommitmentBalance,
-    totalSalesCommitmentBalance,
+    totalStockEp:parseInt(totalStockEp),
+    totalDespatchStorage:parseInt(totalDespatchStorage),
+    totalCoffeeStorage:parseInt(totalCoffeeStorage),
+    totalPurchaseCommitmentBalance:parseInt(totalPurchaseCommitmentBalance),
+    totalSalesCommitmentBalance:parseInt(totalSalesCommitmentBalance),
     topurchaseorsale:parseInt(totalStockEp+totalDespatchStorage-totalCoffeeStorage+totalPurchaseCommitmentBalance-totalSalesCommitmentBalance),
     purchaseorsale:true
   };
