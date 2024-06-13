@@ -852,6 +852,7 @@ async function fetchTransactions(startOfDay, endOfDay, data) {
         { $unwind: "$transaction" },
         { $match: { "transaction.date": { $gte: startOfDay, $lte: endOfDay } } },
         { $match: { $or: [{ "transaction.recieved": { $ne: 0 } }, { "transaction.paid": { $ne: 0 } }] } },
+        { $match: { "transaction.medium": { $not: { $regex: /^tds$/i } } } },
         { $project: { name: 1, 
           "transaction.name": 1,
                   "transaction.refference": 1,
@@ -923,7 +924,7 @@ async function fetchclosing(startOfDay, endOfDay, data, openingBalances) {
   const income = productsResult?.[0]?.totalRecieved ?? 0;
 
   // Additional aggregation for TDS
-  const tdsResult = await aggregateTransactions(ClientModel, startOfDay, endOfDay, { "transaction.medium": "tds" });
+  const tdsResult = await aggregateTransactions(ClientModel, startOfDay, endOfDay, { "transaction.medium": { $regex: /^tds$/i } });
   const tdsrecievable = tdsResult?.[0]?.totalRecieved ?? 0;
   const tdspayable = tdsResult?.[0]?.totalPaid ?? 0;
 
@@ -1130,7 +1131,6 @@ async function fetchTopurchaseorsale(startOfDay, endOfDay, data) {
     { $project: { _id: 0, totalStockEp: 1 } }
   ]);
   
-console.log(totalStockEp)
 
   return {
     ...data,
