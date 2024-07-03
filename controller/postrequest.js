@@ -534,8 +534,8 @@ exports.addtransportagent = async (req, res) => {
     existingClient.storeout = storeout;
     existingClient.storein = storein;
     existingClient.payable = parseInt(existingClient.payable || 0) + payable;
-    existingClient.paid = parseInt(existingClient.recievable || 0) + paid;
-
+    existingClient.paid = parseInt(existingClient.paid || 0) + paid;
+ ///////////////////cganges ass 
     await existingClient.save();
     return { existingClient: existingClient}
     }catch(e){
