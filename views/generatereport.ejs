@@ -293,6 +293,8 @@
                         <div style="font-size: 1.125rem;" class="d-flex flex-row align-items-start justify-content-between">
                           <span class="fw-bold">Ep % :</span>
                           <span class="fw-bold" id="eppercenagedisplay"></span>
+                          <span class="fw-bold" id="eppercenagedisplay50"></span>
+
                       </div>
                       
                         </div>
@@ -1348,6 +1350,7 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
     eppercentage = +parseFloat((netepweight / netWeight) * 100).toFixed(2)
     document.getElementById('epWeightDisplay').textContent = netepweight.toFixed(2) + " Kg";
     document.getElementById('eppercenagedisplay').textContent = eppercentage.toFixed(2) + " %";
+    document.getElementById('eppercenagedisplay50').textContent = (eppercentage/2).toFixed(2) + " %";
 
 
   }
