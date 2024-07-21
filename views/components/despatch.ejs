@@ -4,7 +4,7 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>ID</th>
+        <th>Lorry</th>
         <th>Reference</th>     
         <th>Bags</th>
         <th>Weight</th>
@@ -55,7 +55,7 @@
           // Format the date using moment.js
           return moment(data).format('DD/MM/YYYY');
         }
-      },{ data: 'lotnumber' },
+      },{ data: 'lorry' },
         { data: 'item' }, 
         { data: 'bags' },
         { data: 'netWeight' },
