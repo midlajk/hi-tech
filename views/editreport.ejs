@@ -49,8 +49,9 @@
 
                               <label class="fw-bold">Party:</label>
                               
-                        <div class="my-1 flex-nowrap input-group" onclick="navigateToAccount()">
+                        <div class="my-1 flex-nowrap input-group" >
                           <input type="text" value="<%=coffee.billTo%>"  name="billTo" id="billTo"  class="form-control" disabled>
+                          <a class="bg-light fw-bold text-secondary small input-group-text" href="/purchaseaccount/<%=coffee.billTo%>"><i class="menu-icon tf-icons bx bx-arrow-back"></i></a>
 
                         </div>
                         <label class="fw-bold">Transportation Agent:</label>
@@ -1508,10 +1509,6 @@ cache: true // Enable caching to reduce server requests
 
 });
 
-function navigateToAccount() {
-    var billTo = document.getElementById('billTo').value;
-    window.location.href = '/purchaseaccount/' + billTo;
-  }
  </script>
 
                        <%- include('./include/end.ejs') -%>
