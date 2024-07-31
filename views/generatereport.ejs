@@ -1421,15 +1421,24 @@ cache: true // Enable caching to reduce server requests
 }
 
 });
-var party
- $('.js-data-example-ajax').on('change', function () {
-  // Get the selected value
-  party = $(this).val();
-  $('#partyname').text(party);
+// var party
+//  $('.js-data-example-ajax').on('change', function () {
+//   // Get the selected value
+//   var elementId = $(this).attr('id');
 
-  // You can use the selected value as needed, for example, set it to a variable
-  // var myVariable = selectedValue;
-});
+// // Check if the ID is not equal to "delivery"
+// if (elementId == 'billto') {
+//   // Get the selected value
+//   var party = $(this).val();
+//   $('#partyname').text(party);
+// }
+
+//   // party = $(this).val();
+//   // $('#partyname').text(party);
+
+//   // You can use the selected value as needed, for example, set it to a variable
+//   // var myVariable = selectedValue;
+// });
 $('#transportagent').select2({
 
 ajax: {

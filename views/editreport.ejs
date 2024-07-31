@@ -49,7 +49,7 @@
 
                               <label class="fw-bold">Party:</label>
                               
-                        <div class="my-1 flex-nowrap input-group" >
+                        <div class="my-1 flex-nowrap input-group">
                           <input type="text" value="<%=coffee.billTo%>"  name="billTo" id="billTo"  class="form-control" disabled>
                           <a class="bg-light fw-bold text-secondary small input-group-text" href="/purchaseaccount/<%=coffee.billTo%>"><i class="menu-icon tf-icons bx bx-arrow-back"></i></a>
 
@@ -493,6 +493,7 @@
   var netWeight = '<%=coffee.netWeight%>';
   var eppercentage = '<%=coffee.eppercentage%>';
   var billedquantity = 0;
+  netepweightold = '<%=coffee.netepweight%>';
   function setBillDateToCurrentDate() {
     // Get the current date
     var currentDate = new Date().toISOString().slice(0, 10);
@@ -528,14 +529,17 @@
     };
     var reportstatus =  $("input[type='radio'][name='reportstatus']:checked").val();
 
-    if ((consignment-commitQty) < 0 || reportstatus == 'pendingreport'|| commitTotal<=0) {
+    if ((consignment-commitQty) < 0 || reportstatus == 'pendingreport'|| commitTotal<=0 || netepweight!=netepweightold ) {
           if(reportstatus=='pendingreport'){
             alert('You cant make bill before finalizing the report')
 
            }else if(commitTotal<=0){
             alert('Cant add empty data')
 
-           }else{
+           }
+           else if(netepweight!=netepweightold){
+            alert('Please save the details')
+           } else{
                       alert('You cant add more bill than original End Product  quantity')
 
            }
@@ -635,6 +639,11 @@ if (billtype === 'Purchase') {
         deleteButton.addEventListener("click", function() {
             // Remove the row from the table
             // Remove the corresponding data from the bill array 
+            if(netepweight!=netepweightold){
+              alert('plese save the details ')
+              return
+    
+            }
             fetch(`/${apib}/${billData.uniqueid}/${party}`, {
         method: 'DELETE'
     })
