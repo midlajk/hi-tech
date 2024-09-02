@@ -107,7 +107,7 @@
               </button>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="/editentry/${row.billTo}/${row._id}"><i class="bx bx-edit me-1"></i> Edit /View </a>
-                <a class="dropdown-item delete-btn" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                <a class="dropdown-item delete-btn" href="javascript:void(0);" data-id="${row.lotnumber}"  data-party="${row.billTo}"><i class="bx bx-trash me-1"></i> Delete</a>
               </div>
             </div>`;
           },
@@ -115,36 +115,30 @@
       ],
     });
 
-//     // Delete Button Click Event
-//     function deleteData(id) {
-//     $.ajax({
-//       url: `https://www.safehomes.ae/backend/deleteproperty/${id}`,
-//       type: 'DELETE',
-//       success: function (response) {
-//         dataTable.ajax.reload();
-//       },
-//       error: function (error) {
-//         console.log('Error deleting data:', error);
-//       },
-//     });
-//   }
+  
+    $('#arrivalstable').on('click', '.delete-btn', function() {
+      if(!confirm('Do you want to delete the data')){
+        return 
+      }
+    var id = $(this).data('id');
+    var party = $(this).data('party');
 
-//   function toggleFeatured(id, isFeatured) {
-//     var formDataObj = { id: id, status: isFeatured ? 'notfeatured' : 'featured' };
-
-//     $.ajax({
-//       url: `https://www.safehomes.ae/backend/addfeatured`,
-//       type: 'POST',
-//       data: JSON.stringify(formDataObj),
-//       contentType: 'application/json',
-//       success: function (response) {
-//         dataTable.ajax.reload();
-//       },
-//       error: function (error) {
-//         console.error('Error updating data:', error);
-//       },
-//     });
-//   }
+    // Send delete request to the server
+    fetch(`/deletepurchase/${id}/${party}`, {
+        method: 'DELETE'
+    }).then(response => {
+        // Check if the request was successful
+        if (response.ok) {
+            // Reload or update the DataTable
+            dataTable.ajax.reload(null, false);
+        } else {
+            // Handle errors
+            alert('Something went wrong .Please check if the data already has a bill')
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+  })
 
 //   $('#example').on('click', '.delete-btn', function () {
 //     var data = dataTable.row($(this).closest('tr')).data();

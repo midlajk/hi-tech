@@ -288,6 +288,7 @@ exports.purchasecommitment = async (req, res) => {
       // Execute the aggregation pipeline
       const client = await ClientModel.aggregate(pipeline);
       const purchasecommitments = client.length > 0 ? client[0].purchasecommitments : [];
+      console.log(totalCount)
       res.json({
           draw,
           recordsTotal: totalCount,
@@ -1161,6 +1162,7 @@ exports.salescommitments = async (req, res) => {
           const client = await ClientModel.aggregate(pipeline);
   
           const totalclients = await ClientModel.aggregate([{ $unwind: "$purchasebillSchema" }]);
+          console.log(totalclients)
   
           res.json({
               draw,
@@ -1574,7 +1576,7 @@ exports.expencesandincome  = (async (req, res) => {
         res.json({
             draw,
             recordsTotal: totalRecords,
-            recordsFiltered: commitments.length,
+            recordsFiltered:totalRecords,
             data: commitments
         });
     } catch (error) {
@@ -1639,7 +1641,7 @@ exports.allsalecommitments = async (req, res) => {
       res.json({
           draw,
           recordsTotal: totalRecords,
-          recordsFiltered: commitments.length,
+          recordsFiltered: totalRecords,
           data: commitments
       });
   } catch (error) {
@@ -1830,3 +1832,70 @@ exports.productwisestorein  = (async (req, res) => {
     
     
     });
+
+    exports.agentxloads = async (req, res) => {
+      try {
+        const name = req.query.name;
+        const draw = parseInt(req.query.draw) || 1;
+        const start = parseInt(req.query.start) || 0;
+        const length = parseInt(req.query.length) || 10;
+        const loadtype = req.query.loadtype
+        const unwindField = loadtype === 'Arrival' ? '$coffee' : '$despatch';
+        const matchField = loadtype === 'Arrival' ? 'coffee.transportagent' : 'despatch.transportagent';
+        const deliveryField = loadtype === 'Arrival' ? 'coffee.deliverymarked' : 'despatch.deliverymarked';
+
+        // Pipeline to retrieve only the coffee subdocuments
+        let pipeline = [
+          {
+            $unwind: unwindField
+          },
+          {
+            $match: {
+              [matchField]: name,
+              [deliveryField]: { $ne: 'yes' } 
+            }
+          },
+          {
+            $skip: start
+          },
+          {
+            $limit: length
+          },
+          {
+            $replaceRoot: { newRoot: unwindField } // Replace the root with the coffee subdocument
+          }
+        ];
+    
+        // Pipeline to count total matching records
+        let pipeline2 = [
+          {
+            $unwind: unwindField
+          },
+          {
+            $match: {
+              [matchField]: name,
+              [deliveryField]: { $ne: 'yes' } 
+            }
+          },
+          {
+            $count: "totalRecords" // Count the number of matching documents
+          }
+        ];
+    
+        const client = await ClientModel.aggregate(pipeline);
+        console.log(client)
+        const totalRecordsResult = await ClientModel.aggregate(pipeline2);
+    
+        const totalRecords = totalRecordsResult.length > 0 ? totalRecordsResult[0].totalRecords : 0;
+    
+          res.json({
+              draw,
+              recordsTotal: totalRecords,
+              recordsFiltered: totalRecords,
+              data: client.length>0?client:[],
+          });
+      } catch (error) {
+          console.log('Error fetching data:', error);
+          res.status(500).json({ error: 'Server error' });
+      }
+  };

@@ -44,4 +44,7 @@ router.post('/addstoreinsettlement',authcheck, adminpostapis.addstoreinsettlemen
 router.post('/addstoreoutsettlement',authcheck, adminpostapis.addstoreoutsettlement);
 router.post('/create-daily-report',authcheck, adminpostapis.createDailyReport);
 
+
+router.post('/addtrip',authcheck, adminpostapis.addtrip);
+
 module.exports = router;

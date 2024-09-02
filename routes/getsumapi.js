@@ -12,5 +12,6 @@ router.get('/getcommitmentsum',authcheck, adminpostapis.getcommitmentsum);
 router.get('/commitmenttotal',authcheck, adminpostapis.commitmenttotal);
 
 router.get('/expenseincometotal',authcheck, adminpostapis.expenseincometotal);
+router.get('/agentsum/:name',authcheck, adminpostapis.agentsum);
 
 module.exports = router;

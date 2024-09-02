@@ -425,3 +425,33 @@ exports.deletepurchase = async (req, res) => {
       }
 
   }
+
+  exports.deleteagentdata = async (req, res) => {
+    const { agent, id } = req.body;
+  console.log('sdsd')
+    try {
+        const client = await Transportagent.findOne({ agent: agent});
+
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        const transaction = client.transaction.findIndex(trans => trans._id == id);
+
+        if (transaction === -1) {
+            return res.status(404).json({ error: 'Purchase commitment not found' });
+        }
+
+        // Remove the purchase commitment from the array
+        client.transaction.splice(transaction, 1);
+        await client.save();
+
+        // If successful, send a success response
+        return res.json({ message: 'Purchase commitment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting purchase commitment:', error);
+        return res.status(500).json({ error: 'Server error' });
+    }
+    
+
+  }

@@ -44,4 +44,9 @@ router.get('/allscommitments',authcheck, adminpostapis.allsalecommitments);
 router.get('/productwisestorein',authcheck, adminpostapis.productwisestorein);
 router.get('/productwisestoreout',authcheck, adminpostapis.productwisestoreout);
 
+
+///// loads
+router.get('/agentxloads',authcheck, adminpostapis.agentxloads);
+
+
 module.exports = router;

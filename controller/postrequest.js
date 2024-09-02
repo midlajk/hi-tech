@@ -1,9 +1,9 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
-const TelegramBot = require('node-telegram-bot-api');
+// const TelegramBot = require('node-telegram-bot-api');
 
-const token = process.env.TELE_API ;
-const bot = new TelegramBot(token, { polling: true });
+// const token = process.env.TELE_API ;
+// const bot = new TelegramBot(token, { polling: true });
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -772,7 +772,7 @@ exports.addtransportagent = async (req, res) => {
   
       // Generate and send PDF report
       const filePath = await generatePdfReport(data, req.body.reportdate);
-      await bot.sendDocument(process.env.CHAT_ID, filePath);
+      // await bot.sendDocument(process.env.CHAT_ID, filePath);
   
       // Delete the file after sending
       fs.unlink(filePath, (err) => {
@@ -1167,3 +1167,26 @@ async function generatePdfReport(data, reportDate) {
     return filePath;
 }
   ////////////////////////// dAily Report fragment /////////////////
+//////add trip
+
+exports.addtrip = async (req,res)=> {
+
+  const client = await Transportagent.findOne({ agent: req.body.name });
+  client.transaction.push({
+    name:req.body.trip,
+    date: req.body.date,
+    refference: req.body.item + '  ' + req.body.quantity,
+    payable:parseInt(req.body.rate || 0),
+    medium:req.body.vehicle,
+    id:new Date().toString(),
+    revievable:0,
+    recieved:0,
+    paid:0,
+  });
+
+  // Save the updated client to the database
+  await client.save();
+  res.status(200).json({ message: 'Purchase commitment added successfully!' });
+
+
+}

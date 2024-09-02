@@ -583,3 +583,34 @@ exports.expenseincometotal = async (req, res) => {
     }
   };
   
+
+  exports.agentsum = async (req, res) => {
+    try {
+
+        const result = await Transportagent.aggregate([
+            {$match :  { agent: req.params.name }},
+            { $unwind: '$transaction' },
+            {
+                $group: {
+                    _id: null,
+                    totalPayable: { $sum: '$transaction.payable' },
+                    totalPaid: { $sum: '$transaction.paid' },
+                    totalrecieved: { $sum: '$transaction.recieved' }
+
+                }
+            }
+        ]);
+        res.json({
+            data: {
+                totalrecieved: result[0]?.totalrecieved || 0,
+                totalPayable: result[0]?.totalPayable || 0,
+                totalPaid: result[0]?.totalPaid || 0
+            }
+        });
+   
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('An error occurred while fetching clients');
+    }
+  };
+  

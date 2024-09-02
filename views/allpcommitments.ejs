@@ -117,9 +117,15 @@
    function abcd() {
       const modal = document.getElementById('purchasecommitmentadd');
       modal.style.display = 'flex';
-  
+      const today = new Date();
+
+// // Format today's date as yyyy-mm-dd
+      const formattedDate = today.toISOString().split('T')[0];
+
+// // Set the value of the input field to today's date
+      document.getElementById('pccomdate').value = formattedDate;
       // Focus on the input element
-      const inputElement = document.getElementById('pccomdate');
+      const inputElement = document.getElementById('partyname');
       inputElement.focus();
   }
    

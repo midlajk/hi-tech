@@ -123,6 +123,7 @@ exports.generatepurchasereport = async (req, res, hi) => {
   try {
     let product = await PoductsSchema.findOne({product:req.body.item})
     let existingClient = await ClientModel.findOne({ name: req.body.billTo });
+    console.log(req.body.delivery)
 
     if (existingClient) {
       // If the client exists, update the coffee array

@@ -620,3 +620,33 @@ exports.editagent = async (req, res) => {
 
   }
 }
+
+
+  exports.deliverymarked = async (req, res) => {
+  const { loadtype, id } = req.body;
+  try {
+      // Determine the field to update based on loadtype
+      const fieldToUpdate = loadtype === 'Arrival' ? 'coffee' : 'despatch';
+
+      // Use $elemMatch to find the specific element within the array
+      const updateQuery = {
+          [`${fieldToUpdate}`]: { $elemMatch: { _id: id } }
+      };
+
+      // Use $set to update the deliverymarked field to "yes"
+      const updateOperation = {
+          $set: {
+              [`${fieldToUpdate}.$.deliverymarked`]: 'yes'
+          }
+      };
+
+      // Update the document in the database
+      const result = await ClientModel.updateOne(updateQuery, updateOperation);
+      console.log(result)
+      res.status(200).json({ message: 'Purchase commitment added successfully!' });
+
+  } catch (error) {
+      console.log('Error updating delivery status:', error);
+      res.status(500).send({ message: 'Server error.' });
+  }
+}

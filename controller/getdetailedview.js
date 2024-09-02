@@ -125,7 +125,6 @@ exports.getdetailedreport = async (req, res) => {
 };
 
 exports.ieaccount = async (req, res) => {
-console.log(req.query.name)
     try {
         const name = req.query.name;
         const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
@@ -160,7 +159,6 @@ console.log(req.query.name)
 
    
       const transaction = client.length > 0 ? client[0].transaction : [];
-      console.log(transaction)
       let pipeline2 = [
         {
             $unwind: "$transaction"

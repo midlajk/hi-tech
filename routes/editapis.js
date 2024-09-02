@@ -44,4 +44,6 @@ router.post('/updatestock',authcheck, adminget.updatestock);
 router.post('/editseller',authcheck, adminget.editseller);
 router.post('/editagent',authcheck, adminget.editagent);
 
+router.post('/deliverymarked',authcheck, adminget.deliverymarked);
+
 module.exports = router;
