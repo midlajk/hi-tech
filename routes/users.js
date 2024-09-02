@@ -39,6 +39,7 @@ router.post('/login', async function(req, res, next) {
           req.session.user = user;
           req.session.islogged = true;
           req.session.token = uid;
+          req.session.workingdate= new Date();
 
           // Send JSON response to the frontend
           res.json({ success: true, message: 'User created successfully!', token: uid });
@@ -56,6 +57,7 @@ router.post('/login', async function(req, res, next) {
               req.session.user = user;
               req.session.islogged = true;
               req.session.token = uid;
+              req.session.workingdate= new Date();
 
               // Send JSON response to the frontend
               res.json({ success: true, message: 'Login successful!', token: uid });

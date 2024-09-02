@@ -1360,13 +1360,13 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
         const outturn = parseFloat(document.getElementById('outern').value) || 0;
     epweight =  (netWeight/100)*outturn
     const huskpercentage = parseFloat(document.getElementById('huskpercentage').value) || 0;
-    hcutting =  huskpercentage > 0.5 ? Math.round(((huskpercentage-0.5)/100)*epweight):0
+    hcutting =  huskpercentage > 0? Math.round((huskpercentage/100)*epweight):0
     const moisturepercentage = parseFloat(document.getElementById('moisturepercentage').value) || 0;
-    mcutting =  moisturepercentage > 13 ? Math.round(((moisturepercentage-13)/100)*epweight):0
+    mcutting =  moisturepercentage > 0 ? Math.round((moisturepercentage/100)*epweight):0
     const bbpercentage = parseFloat(document.getElementById('bbpercentage').value) || 0;
-    bbcutting =  bbpercentage > 15 ? Math.round((((bbpercentage-15)*0.15)/100)*epweight):0
+    bbcutting =  bbpercentage > 0? Math.round((bbpercentage/100)*epweight):0
     const berryborepercentage = parseFloat(document.getElementById('berryborepercentage').value) || 0;
-    berrycutting =  berryborepercentage > 2 ? Math.round((((berryborepercentage-2)*0.25)/100)*epweight):0
+    berrycutting =  berryborepercentage > 0 ? Math.round((berryborepercentage/100)*epweight):0
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 
@@ -1389,9 +1389,16 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
 
   function updatcutting() {
     const hcutting = parseFloat(document.getElementById('huskcutting').value) || 0;
+    document.getElementById('huskpercentage').value = ((hcutting/epweight)*100).toFixed(2)
+
     const mcutting = parseFloat(document.getElementById('moisturecutting').value) || 0;
+    document.getElementById('moisturepercentage').value = ((mcutting/epweight)*100).toFixed(2)
+
     const bbcutting = parseFloat(document.getElementById('bbcutting').value) || 0;
+    document.getElementById('bbpercentage').value = ((bbcutting/epweight)*100).toFixed(2)
+
     const berrycutting = parseFloat(document.getElementById('berryborecutting').value) || 0;
+    document.getElementById('berryborepercentage').value = ((berrycutting/epweight)*100).toFixed(2)
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 

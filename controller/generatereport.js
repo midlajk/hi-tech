@@ -301,7 +301,8 @@ exports.generatepurchasereport = async (req, res, hi) => {
 
       // 
       // fs.writeFileSync(filePath, PDF);
-          
+      req.session.workingdate= new Date(req.body.dateOfIssue);
+    
     const templatePath = path.join(__dirname, 'template.hbs');
 
         const template = fs.readFileSync(templatePath, 'utf8');
@@ -405,7 +406,6 @@ async function salesbill(req, res, client) {
   existingClient.storeout = storeout;
   existingClient.storein = storein;
   if (client) {
-    console.log('hhh', payable)
 
     return { existingClient: existingClient, payable: payable, recievable: recievable, recieved: recieved, paid: paid }
 
@@ -592,6 +592,7 @@ exports.generatesalesreport = async (req, res) => {
       // base: 'file://' + path.resolve('./public') + '/'
 
     };
+    req.session.workingdate= new Date(req.body.dateOfIssue);
 
     // let PDF = await pdfMaster.generatePdf("template.hbs", { data }, options);
 
