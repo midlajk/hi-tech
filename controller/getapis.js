@@ -1932,3 +1932,59 @@ exports.getattendance = async (req, res) => {
     res.status(500).send({ message: 'An error occurred while fetching attendance data.' });
 }
 };
+
+exports.getTotalWorkHours = async (req, res) => {
+  try {
+    const { attendanceFrom, attendanceTo, employee } = req.body;
+
+    // Find the employee by name to get the employee ID
+    const employeeDoc = await Transportagent.findOne({ agent: employee });
+    if (!employeeDoc) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+
+ 
+    const employeeId = employeeDoc._id.toString();
+    console.log(employeeId)
+
+    // Aggregation pipeline to calculate total work hours
+    const result = await Attendance.aggregate([
+        {
+            $match: {
+                date: {
+                    $gte: new Date(attendanceFrom),
+                    $lte: new Date(attendanceTo)
+                }
+            }
+        },
+        {
+            $unwind: '$attendance'
+        },
+        {
+            $match: {
+                'attendance.id': employeeId
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalWorkHours: { $sum: '$attendance.wrokhour' }
+            }
+        }
+    ]);
+
+    // Extract total work hours from the result
+    const totalWorkHours = result.length > 0 ? result[0].totalWorkHours : 0;
+
+    // Send the response
+    res.json({ totalWorkHours: totalWorkHours });
+
+
+    // Calculate total work hours
+   
+
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+}
+};

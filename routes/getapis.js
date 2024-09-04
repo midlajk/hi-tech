@@ -51,6 +51,7 @@ router.get('/getallemployees',authcheck, adminpostapis.getallemployees);
 
 
 router.get('/attendance/:data',authcheck, adminpostapis.getattendance);
+router.post('/getTotalWorkHours',authcheck, adminpostapis.getTotalWorkHours);
 
 
 module.exports = router;

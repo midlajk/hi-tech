@@ -1219,3 +1219,26 @@ exports.postattendance = async (req,res)=> {
     res.status(500).send({ message: 'An error occurred while processing your request.' });
 }
 }
+
+
+exports.addsalary = async (req,res)=> {
+
+  const client = await Transportagent.findOne({ agent: req.body.name });
+  client.transaction.push({
+    name:req.body.type,
+    date: req.body.date,
+    refference: req.body.from + ' - ' + req.body.to,
+    payable:parseInt(req.body.payable || 0),
+    medium:req.body.medium,
+    id:new Date().toString(),
+    revievable:0,
+    recieved:0,
+    paid:0,
+  });
+
+  // Save the updated client to the database
+  await client.save();
+  res.status(200).json({ message: 'Purchase commitment added successfully!' });
+
+
+}
