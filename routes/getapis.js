@@ -47,6 +47,10 @@ router.get('/productwisestoreout',authcheck, adminpostapis.productwisestoreout);
 
 ///// loads
 router.get('/agentxloads',authcheck, adminpostapis.agentxloads);
+router.get('/getallemployees',authcheck, adminpostapis.getallemployees);
+
+
+router.get('/attendance/:data',authcheck, adminpostapis.getattendance);
 
 
 module.exports = router;

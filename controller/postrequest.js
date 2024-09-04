@@ -18,6 +18,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { nanoid } = require('nanoid');
 const pdfMaster = require("pdf-master");
+const Attendance = mongoose.model('Attendance')
 
 const handlebars = require('handlebars');
 
@@ -1189,4 +1190,32 @@ exports.addtrip = async (req,res)=> {
   res.status(200).json({ message: 'Purchase commitment added successfully!' });
 
 
+}
+
+exports.postattendance = async (req,res)=> {
+
+  try {
+    const { date, attendance } = req.body;
+
+    // Find the existing document by date
+    let existingRecord = await Attendance.findOne({ date: new Date(date) });
+
+    if (existingRecord) {
+        // If the document exists, update the attendance array
+        existingRecord.attendance = attendance;
+        await existingRecord.save();
+        res.status(200).send({ message: 'Attendance updated successfully.' });
+    } else {
+        // If the document doesn't exist, create a new one
+        const newAttendance = new Attendance({
+            date: new Date(date),
+            attendance: attendance
+        });
+        await newAttendance.save();
+        res.status(201).send({ message: 'Attendance added successfully.' });
+    }
+} catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'An error occurred while processing your request.' });
+}
 }

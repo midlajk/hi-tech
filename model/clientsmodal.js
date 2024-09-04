@@ -221,6 +221,15 @@ const referenceSchema = new mongoose.Schema({
     password:String,
     uid:String,
   });
+  const attendance = new mongoose.Schema({
+    date: Date,
+    attendance: [{
+      id:String,
+      wrokhour:Number
+    }],
+  });
+  const Attendance = mongoose.model('Attendance', attendance); // Use a different variable name here
+
 const ClientModel = mongoose.model('Client', clientSchema); // Use a different variable name here
 const CoffeeSchema = mongoose.model('CoffeeSchema', coffeeSchema); // Use a different variable name here
 
@@ -240,3 +249,4 @@ module.exports = Transportagent;
 module.exports = CoffeeSchema;
 module.exports = User;
 module.exports = Financialyear;
+module.exports = Attendance;

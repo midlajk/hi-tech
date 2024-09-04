@@ -8,6 +8,7 @@ const PoductsSchema = mongoose.model('PoductsSchema')
 const Transportagent = mongoose.model('Transportagent')
 
 const Financialyear = mongoose.model('Financialyear')
+const Attendance = mongoose.model('Attendance')
 
 exports.getclients = async (req, res) => {
   try {
@@ -1883,7 +1884,6 @@ exports.productwisestorein  = (async (req, res) => {
         ];
     
         const client = await ClientModel.aggregate(pipeline);
-        console.log(client)
         const totalRecordsResult = await ClientModel.aggregate(pipeline2);
     
         const totalRecords = totalRecordsResult.length > 0 ? totalRecordsResult[0].totalRecords : 0;
@@ -1899,3 +1899,36 @@ exports.productwisestorein  = (async (req, res) => {
           res.status(500).json({ error: 'Server error' });
       }
   };
+
+
+  
+  exports.getallemployees = async (req, res) => {
+    try {
+      const docs = await Transportagent.find({
+        accounttype: 'Labour',
+      })
+        res.json({
+            data: docs
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+
+
+exports.getattendance = async (req, res) => {
+  try {
+    const date = new Date(req.params.data);
+    const attendanceRecord = await Attendance.findOne({ date: date });
+
+    if (attendanceRecord) {
+        res.status(200).send(attendanceRecord);
+    } else {
+
+        res.status(404).send({ message: 'No attendance record found for this date.' });
+    }
+} catch (error) {
+    res.status(500).send({ message: 'An error occurred while fetching attendance data.' });
+}
+};

@@ -4,13 +4,180 @@
         <!-- Content -->
 
         <div class="container-xxl flex-grow-1 container-p-y">
+          <style>/* Popup container */
+            .popup {
+                position: fixed;
+                top: 0;
+                right: -100%; /* Initially hidden */
+                width: 20%;
+                height: 100%;
+                background-color: #fff;
+                box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+                transition: right 0.3s ease;
+                z-index: 1000;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            @media (max-width: 1500px) {
+                .popup {
+                    width: 25%;
+                }
+            }
+            @media (max-width: 1000px) {
+                .popup {
+                    width: 30%;
+                }
+            }
+            /* For mobile devices */
+            @media (max-width: 768px) {
+                .popup {
+                    width: 100%;
+                }
+            }
+            
+            /* Open popup animation */
+            .popup.open {
+                right: 0;
+            }
+            
+            /* Close button */
+            .close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background-color: #ff5c5c;
+                border: none;
+                color: white;
+                font-size: 16px;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+            
+            /* Open button */
+            .open-btn {
+                position: fixed;
+                top: 50%;
+                right: 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                z-index: 999;
+            }
+            .submit-container {
+
+    width: 100%;
+
+}
 
 
+            </style>
+
+<div id="popup" class="popup" style="display: flex; flex-direction: column; height: 100vh; max-width: 500px;">
+  <!-- Content of the popup -->
+  <h4>Mark Attendance</h4>
+  <h6>Current Date <span id="currentDate"></span></h6>
+
+  <div class="row p-2">
+      <div class="col-12">
+        <label for=""> Attendance Date</label>
+          <input type="date" id="choosedate" class="form-control">
+      </div>
+  </div>
+
+  <div class="row p-2">
+      <div class="col-8">
+          <label for="">Employee Name</label>
+      </div>
+      <div class="col-4">
+          <label for="">Work Hour</label>
+      </div>
+  </div>
+
+  <!-- Scrollable employee container with dynamic height -->
+  <div id="employee-container" style="flex-grow: 1; overflow-y: auto; overflow-x: hidden;  padding-bottom: 60px;">
+      <!-- Employee input fields will be inserted here -->
+  </div>
+
+  <!-- Submit button at the bottom -->
+  <div class="row p-2 mt-3 mb-2" style="position: relative; bottom: 0; width: 100%; background-color: white;">
+      <div class="col-12 text-right">
+          <button class="btn btn-primary w-100" id="submitAttendance">Submit</button>
+      </div>
+  </div>
+</div>
+
+<script> $(document).ready(function(){
+  // Open the popup
+  $('#openPopup').click(function(){
+    $('#employee-container').html('')
+    getlist();
+      $('#popup').addClass('open');
+     
+  });
+
+  // Close the popup
+  $('#closePopup').click(function(){
+      $('#popup').removeClass('open');
+  });
+
+  // Close the popup by clicking outside (optional)
+  $(window).click(function(event) {
+      if (!$(event.target).closest('#popup, #openPopup').length) {
+          $('#popup').removeClass('open');
+      }
+  });
+
+  $('#choosedate').on('change', function() {
+            var selectedDate = $(this).val();
+            getattendance(selectedDate)
+        });
+
+        $('#submitAttendance').on('click', function() {
+            var selectedDate = $('#choosedate').val();
+            if(!selectedDate || !confirm('Do you want to submit this attendance')){
+              alert('Please choose a date and confirm the attendance')
+            }else{
+              var workHoursData = [];
+        
+        $('#employee-container input[type="number"]').each(function() {
+            var workHour = {
+                id: $(this).attr('id'),
+                wrokhour: parseInt($(this).val())||0
+            };
+            workHoursData.push(workHour);
+        });
+
+        $.ajax({
+            url: '/submitAttendance',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                date: selectedDate,
+                attendance: workHoursData
+            }),
+            success: function(response) {
+                alert(response.message);
+            },
+            error: function(err) {
+                console.error(err);
+                alert('An error occurred while submitting attendance.');
+            }
+        });
+    
+            }
+            
+        });
+
+});
+</script>
             <!-- Basic Bootstrap Table -->
             <div class="card">
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add Agent</a>
+                  <a class="btn btn-primary text-white" href="#" id="openPopup" class="open-btn">Mark Attendance</a>
           
                 <div class="table-responsive text-nowrap p-4">
                   <table class="table" id="sellers">
@@ -156,7 +323,14 @@
 <script>
   var thetatable
       $(document).ready(function () {
-  
+        const today = new Date();
+
+// Format today's date as yyyy-mm-dd
+const formattedDate = today.toISOString().split('T')[0];
+
+// Set the value of the input field to today's date
+document.getElementById('currentDate').innerText = formattedDate;
+
          thetatable = $('#sellers').DataTable({
           processing: true,
           serverSide: true,
@@ -340,5 +514,70 @@ function addtransportagent(){
   
   
   }
-    </script>                
+    </script>  
+    
+    <script>
+      // $(document).ready(function() {
+      //     // Fetch employee data using jQuery
+      //     getlist();
+      //       // Fetch employee data using Axios
+       
+      // });
+    
+    function getattendance(selectedDate){
+      $.ajax({
+        url: '/attendance/' + selectedDate,
+        method: 'GET',
+        success: function(response) {
+            // Clear existing input fields
+
+            // If attendance data is found, populate the fields
+            if (response.attendance && response.attendance.length > 0) {
+                response.attendance.forEach(function(entry) {
+                  var inputField = $('#' + entry.id);
+
+                    if (inputField.length > 0) {
+                        // If it exists, update the value
+                        inputField.val(entry.wrokhour);
+                    }
+                });
+            } else {
+              $('#employee-container input[type="number"]').each(function() {
+                    $(this).val(0);
+                });
+                alert('No attendance data found for this date.');
+            }
+        },
+        error: function(err) {
+          $('#employee-container input[type="number"]').each(function() {
+                    $(this).val(0);
+                });
+          alert('No attendance data found for this date.');        }
+    });
+      }
+      function getlist(){
+        axios.get('/getallemployees')
+                .then(function(response) {
+                    const employees = response.data.data;
+              employees.forEach(function(employee) {
+                  // Create a new row for each employee
+                  var row = $('<div class="row p-2"></div>');
+
+                  // Create the name column
+                  var nameCol = $('<div class="col-8"><h4>' + employee.agent + '</h4></div>');
+
+                  // Create the input field column
+                  var inputCol = $('<div class="col-4"><input type="number" class="form-control" value="0" name="employee_' + employee._id + '" id="' + employee._id + '"></div>');
+
+                  // Append the columns to the row
+                  row.append(nameCol);
+                  row.append(inputCol);
+
+                  // Append the row to the container
+                  $('#employee-container').append(row);
+              });
+            })
+         
+      }
+  </script>
                                         <%- include('./include/end.ejs') -%>

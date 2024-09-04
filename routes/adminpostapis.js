@@ -46,5 +46,6 @@ router.post('/create-daily-report',authcheck, adminpostapis.createDailyReport);
 
 
 router.post('/addtrip',authcheck, adminpostapis.addtrip);
+router.post('/submitAttendance',authcheck, adminpostapis.postattendance);
 
 module.exports = router;
