@@ -83,6 +83,7 @@ document.getElementById('transactiondate').value = formattedDate;
     // var buttonname = routeName == 'featured' ? 'Remove From Featured' : 'Add To Featured'  // Assuming you're passing this variable from EJS
 
     transactionTable = $('#transactionTable').DataTable({
+      responsive: true,
       processing: true,
       serverSide: true,
       ajax: {

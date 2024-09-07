@@ -597,6 +597,7 @@
     var buttonname =  routeName=='featured' ?'Remove From Featured':'Add To Featured'  // Assuming you're passing this variable from EJS
 
     var dataTable = $('#example').DataTable({
+      responsive: true,
       processing: true,
       serverSide: true,
       ajax: {

@@ -175,6 +175,7 @@
       $(document).ready(function () {
   
          thetatable = $('#sellers').DataTable({
+          responsive: true,
           processing: true,
           serverSide: true,
           ajax: {
@@ -309,6 +310,7 @@ $('#loadswitchbtn').click(function(e) {
   });
   function viewtable(){
     dataTable = $('#loads-table').DataTable({
+      responsive: true,
         "pageLength": 10,
         "dom": 'rtip',
 

@@ -181,6 +181,7 @@
       $(document).ready(function () {
         calculatesum()
          thetatable = $('#sellers').DataTable({
+          responsive: true,
           processing: true,
           serverSide: true,
           ajax: {
@@ -439,6 +440,7 @@ $(document).ready(function() {
   });
   function viewtable(){
   dataTable = $('#loads-table').DataTable({
+    responsive: true,
         "pageLength": 10,
         "dom": 'rtip',
 

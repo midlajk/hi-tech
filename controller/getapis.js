@@ -1472,11 +1472,7 @@ exports.expencesandincome  = (async (req, res) => {
         {
             $limit: length
         },
-        {
-          $group: {
-            _id: null,
-            transaction: { $push: '$transaction' } // Push matching salescommitmentsschema to array
-        }}
+        
     ];
 
     // If name is provided in the query, add a $match stage to filter by name
@@ -1489,7 +1485,7 @@ exports.expencesandincome  = (async (req, res) => {
     const client = await Transportagent.aggregate(pipeline);
 
    
-    const transaction = client.length > 0 ? client[0].transaction : [];
+    const transaction = client
     let pipeline2 = [
       {
           $unwind: "$transaction"

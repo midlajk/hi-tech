@@ -1144,6 +1144,7 @@ if (billtype === 'Purchase') {
     }
     // Reinitialize the DataTable with new data fetched via AJAX
     dataTable = $('#commitments-table').DataTable({
+      responsive: true,
         processing: true,
         serverSide: true,
         searching: false, // Disable search option

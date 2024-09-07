@@ -334,7 +334,7 @@ exports.addtransportagent = async (req, res) => {
       client.transaction.push({
         name:req.body.name,
         date:req.body.date,
-        refference:client.accounttype + ' '+req.body.refference,
+        refference:req.body.refference,
         revievable:parseFloat(req.body.revievable)||0,
         payable:parseFloat(req.body.payable)||0,
         medium:req.body.medium,
@@ -1197,7 +1197,6 @@ exports.postattendance = async (req,res)=> {
 
   try {
     const { date, attendance,src } = req.body;
-    console.log(req.body)
 
     // Find the existing document by date
     let existingRecord = await Attendance.findOne({ date: new Date(date) });
@@ -1323,7 +1322,7 @@ exports.addLoadingPayment = async (req, res) => {
       medium: `${req.body.agent.bags} ${req.body.unit} * ${req.body.agent.kooli}`,
       id: new Date().toString(),
       revievable: 0,
-      received: 0,
+      recieved: 0,
       paid: 0,
     });
       await client.save();

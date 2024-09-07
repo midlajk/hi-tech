@@ -116,6 +116,7 @@ var formattedDate = today.toISOString().split('T')[0];
 document.getElementById('transactiondate').value = formattedDate;
  // Assuming you're passing this variable from EJS
     transactionTable = $('#transactionTable').DataTable({
+      responsive: true,
       processing: true,
       serverSide: true,
       ajax: {

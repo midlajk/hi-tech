@@ -78,7 +78,7 @@
   <!-- Content of the popup -->
   <h4>Mark Attendance</h4>
   <h6>Current Date <span id="currentDate"></span></h6>
-
+  <button id="closePopup" class="close-btn">X</button>
   <div class="row p-2">
       <div class="col-12">
         <label for=""> Attendance Date</label>
@@ -357,6 +357,7 @@ const formattedDate = today.toISOString().split('T')[0];
 document.getElementById('currentDate').innerText = formattedDate;
 
          thetatable = $('#sellers').DataTable({
+          responsive: true,
           processing: true,
           serverSide: true,
           ajax: {
