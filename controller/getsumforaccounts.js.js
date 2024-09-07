@@ -585,10 +585,12 @@ exports.expenseincometotal = async (req, res) => {
   
 
   exports.agentsum = async (req, res) => {
+    const decodedName = req.params.name .replace(/&amp;/g, '&');
+
     try {
 
         const result = await Transportagent.aggregate([
-            {$match :  { agent: req.params.name }},
+            {$match :  { agent: decodedName}},
             { $unwind: '$transaction' },
             {
                 $group: {

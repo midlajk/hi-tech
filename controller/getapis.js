@@ -2096,7 +2096,7 @@ exports.getindividualloadingworks = async (req, res) => {
     const pipeline = [
       { $unwind: '$agents' }, // Flatten the agents array
       { $match: { 'agents.agent': decodedName } }, // Filter by agent name
-      { $sort: { date: -1 } }, // Sort by date in descending order
+      { $sort: { _id: -1 } }, // Sort by date in descending order
       { $skip: page * pageSize }, // Pagination
       { $limit: pageSize }, // Pagination
       {
@@ -2139,5 +2139,67 @@ exports.getindividualloadingworks = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving data', details: error.message });
+  }
+};
+exports.notcalculatedloads = async (req, res) => {
+  try {
+    const name = req.query.name;
+    const draw = parseInt(req.query.draw) || 1;
+    const start = parseInt(req.query.start) || 0;
+    const length = parseInt(req.query.length) || 10;
+    const decodedName = name.replace(/&amp;/g, '&');
+
+    // Pipeline to retrieve only the coffee subdocuments
+    let pipeline = [
+      {
+        $unwind: '$agents'
+      },
+      {
+        $match: {
+          'agents.agent' : decodedName,
+         'agents.total': { $lte: 0 } 
+        }
+      },
+      {
+        $skip: start
+      },
+      {
+        $limit: length
+      },
+      // {
+      //   $replaceRoot: { newRoot: unwindField } // Replace the root with the coffee subdocument
+      // }
+    ];
+
+    // Pipeline to count total matching records
+    let pipeline2 = [
+      {
+        $unwind: '$agents'
+      },
+      {
+        $match: {
+          'agents.agent' : decodedName,
+          'agents.total': { $lte: 0 } 
+        }
+      },
+      {
+        $count: "totalRecords" // Count the number of matching documents
+      }
+    ];
+
+    const client = await Loadinwork.aggregate(pipeline);
+    const totalRecordsResult = await Loadinwork.aggregate(pipeline2);
+
+    const totalRecords = totalRecordsResult.length > 0 ? totalRecordsResult[0].totalRecords : 0;
+
+      res.json({
+          draw,
+          recordsTotal: totalRecords,
+          recordsFiltered: totalRecords,
+          data: client.length>0?client:[],
+      });
+  } catch (error) {
+      console.log('Error fetching data:', error);
+      res.status(500).json({ error: 'Server error' });
   }
 };

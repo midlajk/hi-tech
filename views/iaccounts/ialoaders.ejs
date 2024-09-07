@@ -17,10 +17,9 @@
                   <a class="btn btn-primary text-white" href="/indivdualoadingworks/<%= employee %>">View Loading Works</a>
                   <div class="row mt-3 text-center"> 
                     <div class="col-4"> <h4>Total Payable</h4>
-                        <h4>1200</h4></div>
-                    <div class="col-4"> <h4>Total Paid</h4></div>
-                    <div class="col-4"> <h4>Balance</h4></div>
-
+                      <h4 id="payabletotal">0</h4></div>
+                  <div class="col-4"><h4>Total Paid</h4> <h4 id="paidtotal">0</h4></div>
+                  <div class="col-4"><h4>Balance</h4> <h4 id="balancetotal">0</h4></div>
                 </div>
                 <div class="table-responsive text-nowrap p-4">
                   <table class="table" id="sellers">
@@ -132,6 +131,43 @@
     </div>
   </div>
  </div>
+
+ <div class="modal fade hidden" id="newmodal" >
+  <div class="modal-dialog modal-dialog-centered" role="document" style="min-width: 50%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Pending Calculations</h5>
+
+      </div>
+      <div class="modal-body">
+        <form  >
+      <div class="row">
+        <table lass="table"  class="table" id="loads-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Work</th>
+              <th>Variable</th>
+              <th>Man power</th>
+              <th>Kooli</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0" id="loads-table-body">
+            <!-- Data will be populated here -->
+          </tbody>
+          </table>
+        </div>
+
+        
+      
+    </div>
+      
+  </form>
+    </div>
+  </div>
+ </div>
 <script src="../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
@@ -143,7 +179,7 @@
   var thetatable
   var employee = '<%=employee%>'
       $(document).ready(function () {
-  
+        calculatesum()
          thetatable = $('#sellers').DataTable({
           processing: true,
           serverSide: true,
@@ -337,13 +373,13 @@ function markload() {
         date: data.workdate // Assuming rent is the rate
     };
  if(src.work && src.date && src.total){
-  addtrip(src,src.rate)
+  addtrip(src)
  }else{
   alert('Please fill the fields')
  }
    
 }
-  function addtrip(data,value){
+  function addtrip(data){
     const src = {
       work: data.work,
         unit: data.unit,
@@ -362,7 +398,7 @@ function markload() {
     // Handle the server response here
     thetatable.ajax.reload();
     $('#newagentmodal').modal('hide');
-    // calculatesum()
+    calculatesum()
     // closeButton.click();
     
     // Close the modal on successful response
@@ -382,10 +418,162 @@ function markload() {
     const variables = parseFloat(document.getElementById('variables').value) || 0;
     const kooli = parseFloat(document.getElementById('kooli').value) || 0;
     const total = variables * kooli;
-    console.log(total)
 
     // Set the total value in the input field
     document.getElementById('total').value = parseInt(total) // Optional: limit to 2 decimal places
   }
-    </script>          
+    </script> 
+    <script>
+
+
+$(document).ready(function() {
+
+  var dataTable
+
+  $('#newmodal').on('shown.bs.modal', function() {
+      viewtable()
+  });
+  $('#newmodal').on('hidden.bs.modal', function() {
+    // Your function to execute when the modal is hidden
+    dataTable.destroy();
+  });
+  function viewtable(){
+  dataTable = $('#loads-table').DataTable({
+        "pageLength": 10,
+        "dom": 'rtip',
+
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: '/notcalculatedloads', // Replace with your API endpoint
+        dataSrc: 'data', // Key that holds the array of data in the API response
+        data: function (d) {
+          d.name = employee;
+          return d;
+          // Add any additional parameters you want to send to the server here
+        },
+        
+      },
+        columns: [
+  
+        {
+          data: 'date',
+          render: function (data, type, row) {
+            // Format the date using moment.js
+            return moment(data).format('DD/MM/YYYY');
+          }
+        },
+        {
+      data: 'work',
+      render: function (data, type, row) {
+        // If delivery is null, show billTo instead
+        return data ? data : row.work;
+      }
+    },       {
+      data: 'null',
+      render: function (data, type, row) {
+        // If delivery is null, show billTo instead
+        return data ? data : row.agents.bags;
+      }
+    },
+    {
+      data: 'null',
+      render: function (data, type, row) {
+        // If delivery is null, show billTo instead
+        return data ? data : row.agents.manpower;
+      }
+    },
+    {
+      data: 'null',
+      render: function (data, type, row) {
+        // Render an input field with the value of 'trip'
+        return `<input type="text" class="form-control kooli-input" value="${row.agents.kooli}" data-row-id="${row.agents._id}" data-bags="${row.agents.bags}" name="pendingkooliinput">`;
+      }
+    },
+        {
+      data: 'null',
+      render: function (data, type, row) {
+        // Render an input field with the value of 'trip'
+        return `<input type="text" class="form-control total-input" value="${row.agents.total}" data-row-id="${row.agents._id}" name="pendingtotalinput">`;
+      }
+    },
+     
+          {
+            data: null,
+            render: function (data, type, row) {
+              return `<div class="dropdown">
+                  <button type="button" class="btn btn-primary btn-sm add-btnvd" data-src='${JSON.stringify(row)}'>
+        <i class="bx bx-plus"></i> Add
+      </button>
+                  
+                </div>`;
+            },
+          },
+        ],
+      });
+      $('#loads-table').on('input', '.kooli-input', function() {
+  // Get the current row data
+  var kooliValue = parseFloat($(this).val()) || 0;
+  var bagsValue = parseFloat($(this).data('bags')) || 0;
+
+  // Calculate the new total
+  var totalValue = parseInt(bagsValue * kooliValue);
+
+  // Find the corresponding total input and update it
+  $(this).closest('tr').find('input.total-input').val(totalValue); // optional: round to 2 decimal places
+});
+
+      $('#loads-table').off('click', '.add-btnvd');
+      $('#loads-table').on('click', '.add-btnvd', function() {
+        var rowData = $(this).data('src'); // Get the row data
+    var totalinput = $(this).closest('tr').find('input.total-input').val();
+    var kooliinput = $(this).closest('tr').find('input.kooli-input').val();
+
+    dat = {
+      kooli:kooliinput||0,
+      totalinput:totalinput||0,
+      id:rowData._id,
+      agentid:rowData.agents._id
+    }
+    axios.post('/updateloadinworkDetails', dat)
+  .then(response => {
+    const src = {
+        name: employee, // Assuming employee is a global variable or defined elsewhere
+        work: rowData.work, // Or another relevant field if distance isn't correct
+        variables: rowData.agents.bags,
+        unit: rowData.unit,
+        kooli: kooliinput||0, // Assuming weight is the quantity
+        total: totalinput||0,
+        date: rowData.date // Assuming rent is the rate
+    };
+   
+    addtrip(src)
+    $('#newmodal').modal('hide');
+    // closeButton.click();
+ // Close the modal on successful response
+    
+  })
+  .catch(error => {
+    // Handle errors here
+    console.log('Error:', error);
+  });
+    // Call the assignCommitment function with the retrieved arguments (row data and trip value)
+    
+
+    // Call the assignCommitment function with the retrieved arguments
+});
+    }
+
+
+})
+function calculatesum(){
+    axios.get('/agentsum/'+employee)
+            .then(function(response) {
+                var data = response.data.data;
+                document.getElementById('payabletotal').innerText = (data.totalPayable+data.totalrecieved)
+                document.getElementById('paidtotal').innerText = data.totalPaid
+                document.getElementById('balancetotal').innerText = (data.totalPayable+data.totalrecieved-data.totalPaid)
+            })
+   }
+    </script>         
                                         <%- include('../include/end.ejs') -%>

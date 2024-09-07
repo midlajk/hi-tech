@@ -8,6 +8,7 @@ const PoductsSchema = mongoose.model('PoductsSchema')
 const Transportagent = mongoose.model('Transportagent')
 const Financialyear = mongoose.model('Financialyear')
 const User = mongoose.model('User')
+const Loadinwork = mongoose.model('Loadinwork')
 
 const fs = require('fs');
 const path = require('path');
@@ -642,7 +643,6 @@ exports.editagent = async (req, res) => {
 
       // Update the document in the database
       const result = await ClientModel.updateOne(updateQuery, updateOperation);
-      console.log(result)
       res.status(200).json({ message: 'Purchase commitment added successfully!' });
 
   } catch (error) {
@@ -650,3 +650,40 @@ exports.editagent = async (req, res) => {
       res.status(500).send({ message: 'Server error.' });
   }
 }
+
+
+exports.updateloadinworkDetails = async (req, res) => {
+  try {
+    const { kooli, totalinput, id, agentid } = req.body;
+
+    // Find the Loadinwork document
+    const loadinworkDoc = await Loadinwork.findById(id);
+
+    if (!loadinworkDoc) {
+      return res.status(404).json({ message: 'Loadinwork not found.' });
+    }
+
+    // Update the specific agent's kooli and total
+    const updatedLoadinwork = await Loadinwork.findOneAndUpdate(
+      { _id: id, "agents._id": agentid }, // Find the document with matching ID and agent ID
+      {
+        $set: {
+          "agents.$.kooli": kooli,           // Update kooli for the specific agent
+          "agents.$.total": totalinput,      // Update total for the specific agent
+          kooli: kooli,                      // Update kooli outside of agents array
+          total: loadinworkDoc.variables * kooli, // Update total outside of agents array
+        }
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedLoadinwork) {
+      return res.status(404).json({ message: 'Agent or work not found.' });
+    }
+
+    res.status(200).json({ message: 'Agent and work details updated successfully!', data: updatedLoadinwork });
+  } catch (error) {
+    console.error('Error updating agent and work details:', error);
+    res.status(500).json({ message: 'An error occurred while updating agent and work details.' });
+  }
+};

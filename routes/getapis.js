@@ -57,5 +57,6 @@ router.get('/getallattendance',authcheck, adminpostapis.getallattendance);
 router.get('/getworkagents',authcheck, adminpostapis.getworkagents);
 router.get('/getloadingworks',authcheck, adminpostapis.getloadingworks);
 router.get('/getindividualloadingworks',authcheck, adminpostapis.getindividualloadingworks);
+router.get('/notcalculatedloads',authcheck, adminpostapis.notcalculatedloads);
 
 module.exports = router;
