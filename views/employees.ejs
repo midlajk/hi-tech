@@ -144,7 +144,8 @@
         $('#employee-container input[type="number"]').each(function() {
             var workHour = {
                 id: $(this).attr('id'),
-                wrokhour: parseInt($(this).val())||0
+                wrokhour: parseInt($(this).val())||0,
+                src: $(this).data('src')
             };
             workHoursData.push(workHour);
         });
@@ -175,10 +176,12 @@
             <!-- Basic Bootstrap Table -->
             <div class="card">
               <div class="card-body">
-                <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
+                <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add Agent</a>
                   <a class="btn btn-primary text-white" href="#" id="openPopup" class="open-btn">Mark Attendance</a>
-          
+                  <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
+                  data-bs-target="#attendancereport">Attendance Report</a>
+
                 <div class="table-responsive text-nowrap p-4">
                   <table class="table" id="sellers">
                     <thead>
@@ -222,40 +225,62 @@
 </div>
 <!-- / Layout wrapper -->
 
-<div class="modal fade hidden" id="transportagentModal">
+<div class="modal fade hidden" id="attendancereport">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalCenterTitle">Add New account</h5>
+        <h5 class="modal-title" id="modalCenterTitle">Attendance Report</h5>
       
       </div>
       <div class="modal-body">
         <form  id="transportagentform">
       <div class="row">
         <div class="col mb-3">
-          <label for="name" class="form-label">Name</label>
-          <input required type="text" name="editname" id="editname" class="form-control" placeholder="Enter Name">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="fromdate" id="fromdate" class="form-control" placeholder="Enter Name">
         </div>
-        <input type="hidden" name="id" id="id">
+        <div class="col mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="todate" name="todate" class="form-control" placeholder="Enter Phone">
+        </div>
+        <div class="col-2 mb-3">
+          <label for="description" class="form-label"></label>
+          <button type="button" id="checkattendance" class="btn btn-primary btn-sm add-btnvd mt-2">
+            <i class="bx bx-check"></i> Check
+        </button>      
+        </div>
+        </div>
+        <div class="row">
+          <table>
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Work Hours</th>
+                  <th>Base Pay</th>
+                  <th>Total</th>
+                  <th>Action</th>
+
+                </tr>
+              </thead>
+              <tbody id="attendancedetails">
+
+              </tbody>
+
+          </table>
+
+
+
+
         </div>
 
-        <div class="row">
-        <div class="col mb-3">
-          <label for="description" class="form-label">Phone</label>
-          <input  type="text" id="editphone" name="editphone" class="form-control" placeholder="Enter Phone">
-        </div>
-        <div class="col mb-3">
-          <label for="address" class="form-label">Address</label>
-          <input type="text" id="editaddress" name="editaddress" class="form-control" placeholder="Enter Address">
-        </div>
-      </div>
+        
       
     </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
           Close
         </button>
-        <button type="submit" form="sellerform" id="submitbutton" onclick="updateexpence()" class="btn btn-primary">Add Party</button>
+        <button type="submit"  class="btn btn-primary">Download Attendance</button>
       </div>
   </form>
     </div>
@@ -567,7 +592,7 @@ function addtransportagent(){
                   var nameCol = $('<div class="col-8"><h4>' + employee.agent + '</h4></div>');
 
                   // Create the input field column
-                  var inputCol = $('<div class="col-4"><input type="number" class="form-control" value="0" name="employee_' + employee._id + '" id="' + employee._id + '"></div>');
+                  var inputCol = $('<div class="col-4"><input type="number" class="form-control" value="0" name="employee_' + employee._id + '" id="' + employee._id + '" data-src="'+employee.agent+'"></div>');
 
                   // Append the columns to the row
                   row.append(nameCol);
@@ -579,5 +604,103 @@ function addtransportagent(){
             })
          
       }
+  </script>
+  <script>
+
+$(document).ready(function() {
+    $('#checkattendance').on('click', function() {
+        // Get the date values from the input fields
+        const fromDate = $('#fromdate').val();
+        const toDate = $('#todate').val();
+
+        // Send an API request to fetch attendance data
+        $.ajax({
+            url: '/getallattendance',  // Modify this to your API endpoint
+            method: 'GET',
+            data: {
+                from: fromDate,
+                to: toDate
+            },
+            success: function(response) {
+                // Clear existing table rows
+                $('#attendancedetails').empty();
+
+                // Loop through each employee's data and create table rows
+                response.attendanceData.forEach((employee, index) => {
+    const row = `
+        <tr>
+            <td>${employee.src}</td>
+            <td>${employee.totalWorkHours}</td>
+            <td><input class="form-control basepay-input" data-index="${index}" id="basepay-${index}" type="number" placeholder="Enter Base Pay"></td>
+            <td><input class="form-control" id="totalamount-${index}" type="number" readonly></td>
+            <td>
+                <button type="button" id="addsalary-${index}" class="btn btn-primary btn-sm add-btnvdd mt-2" data-id="${employee.id}" data-index="${index}">
+                    <i class="bx bx-check"></i> Add Salary
+                </button>
+            </td>
+        </tr>
+    `;
+    $('#attendancedetails').append(row);
+});
+
+// When basepay is changed, update the total amount field
+$(document).on('input', '.basepay-input', function() {
+    const index = $(this).data('index');
+    const basePay = parseFloat($(this).val()) || 0;
+    const workHours = response.attendanceData[index].totalWorkHours;
+    const totalAmount = basePay * workHours;
+
+    // Set the corresponding total amount field
+    $(`#totalamount-${index}`).val(totalAmount);
+});
+
+$(document).on('click', '.add-btnvdd', function() {
+    const index = $(this).data('index');
+    const employeeId = $(this).data('id');
+    const workHours = response.attendanceData[index].totalWorkHours;
+    const name = response.attendanceData[index].src;
+    const basePay = parseFloat($(`#basepay-${index}`).val()) || 0;
+    const totalAmount = parseFloat($(`#totalamount-${index}`).val()) || 0;
+    const from = $('#fromdate').val(); // Assuming 'from' is the ID of the 'from' date input
+    const to = $('#todate').val(); // Assuming 'to' is the ID of the 'to' date input
+
+    if (!basePay || !totalAmount) {
+        alert("Please enter a valid base pay and ensure the total amount is calculated.");
+        return;
+    }
+    const src = {
+      name:name,
+        type: 'W + '+(workHours||0)+ 'H',
+        medium: 'Salary',
+        from: from||'',
+        to: to||'Un bounded',
+        date:new Date(),
+        payable:totalAmount,
+
+    };
+
+    // Send POST request to the server to add salary
+    axios.post('/addsalary', src)
+  .then(response => {
+    // Handle the server response here
+ 
+    // closeButton.click();
+    $(`#addsalary-${index}`).hide();
+    // Close the modal on successful response
+    
+  })
+  .catch(error => {
+    // Handle errors here
+    console.log('Error:', error);
+  });
+});
+            },
+            error: function(error) {
+                console.error('Error fetching attendance data:', error);
+            }
+        });
+    });
+});
+
   </script>
                                         <%- include('./include/end.ejs') -%>

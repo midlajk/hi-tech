@@ -9,6 +9,7 @@ const Transportagent = mongoose.model('Transportagent')
 
 const Financialyear = mongoose.model('Financialyear')
 const Attendance = mongoose.model('Attendance')
+const Loadinwork = mongoose.model('Loadinwork')
 
 exports.getclients = async (req, res) => {
   try {
@@ -1246,7 +1247,6 @@ exports.salescommitments = async (req, res) => {
 
 
 exports.arrivalsstorage = async (req, res) => {
-  console.log('sdsds')
   try {
       const name = req.query.name;
       const draw = parseInt(req.query.draw) || 1;
@@ -1945,7 +1945,6 @@ exports.getTotalWorkHours = async (req, res) => {
 
  
     const employeeId = employeeDoc._id.toString();
-    console.log(employeeId)
 
     // Aggregation pipeline to calculate total work hours
     const result = await Attendance.aggregate([
@@ -1987,4 +1986,158 @@ exports.getTotalWorkHours = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
 }
+};
+
+exports.getallattendance = async (req, res) => {
+  try {
+      const { from, to } = req.query;
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+      console.log(req.query)
+
+      // Aggregation pipeline
+      const result = await Attendance.aggregate([
+          {
+              // Match records within the date range
+              $match: {
+                  date: { $gte: fromDate, $lte: toDate }
+              }
+          },
+          {
+              // Unwind the attendance array so each employee is treated as a document
+              $unwind: "$attendance"
+          },
+          {
+              // Group by employee id and sum their work hours
+              $group: {
+                  _id: "$attendance.id",
+                  src: { $first: "$attendance.src" },
+                  totalWorkHours: { $sum: "$attendance.wrokhour" }
+              }
+          }
+      ]);
+
+      res.json({ success: true, attendanceData: result });
+  } catch (error) {
+      console.error('Error fetching attendance with aggregation:', error);
+      res.status(500).json({ success: false, message: 'Error fetching attendance' });
+  }
+};
+
+
+exports.getworkagents = async (req, res) => {
+  try {
+    const searchTerm = req.query.term;
+    const accountTypeFilter = { accounttype: 'Loader' };
+
+    if (!searchTerm) {
+      // Fetch 20 random agents where accounttype is 'Loader'
+      const agents = await Transportagent.aggregate([
+        { $match: accountTypeFilter },
+        { $sample: { size: 20 } }
+      ]);
+
+      const names = agents.map(agent => agent.agent);
+      res.json({ results: names });
+    } else {
+      // Escape special regex characters in the search term
+      const escapedSearchTerm = searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+      // Find agents where accounttype is 'Loader' and agent name matches the search term
+      const agents = await Transportagent.find(
+        { agent: { $regex: escapedSearchTerm, $options: 'i' }, ...accountTypeFilter },
+        'agent'
+      );
+
+      const names = agents.map(agent => agent.agent);
+      res.json({ results: names });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+exports.getloadingworks = async (req, res) => {
+  try {
+    const page = req.query.start / req.query.length; // Calculate current page number
+    const pageSize = parseInt(req.query.length);
+
+    // Server-side pagination and filtering
+    const data = await Loadinwork.find() 
+    .sort({ _id: -1 }) // Sort by 'date' in descending order (-1)
+    .skip(page * pageSize)
+    .limit(pageSize);
+
+    // Get the total count for pagination
+    const totalRecords = await Loadinwork.countDocuments();
+
+    res.json({
+      draw: req.query.draw,
+      recordsTotal: totalRecords,
+      recordsFiltered: totalRecords,
+      docs: data, // This is the key where the data will be
+    });
+  } catch (error) {
+      console.log('Error fetching data:', error);
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.getindividualloadingworks = async (req, res) => {
+  try {
+    const { name } = req.query; // Filter by agent name if provided
+    const page = parseInt(req.query.start) || 0;
+    const pageSize = parseInt(req.query.length) || 10;
+    const draw = parseInt(req.query.draw) || 1;
+    const decodedName = name.replace(/&amp;/g, '&');
+    // Aggregation pipeline for paginated data
+    const pipeline = [
+      { $unwind: '$agents' }, // Flatten the agents array
+      { $match: { 'agents.agent': decodedName } }, // Filter by agent name
+      { $sort: { date: -1 } }, // Sort by date in descending order
+      { $skip: page * pageSize }, // Pagination
+      { $limit: pageSize }, // Pagination
+      {
+        $project: {
+          date: 1,
+          work: 1,
+          unit: 1,
+          'agents.agent': 1,
+          'agents.manpower': 1,
+          'agents.bags': 1,
+          'agents.kooli': 1,
+          'agents.total': 1
+        }
+      }
+    ];
+
+    // Aggregation pipeline for total count
+    const pipeline2 = [
+      { $unwind: '$agents' }, // Flatten the agents array
+      { $match: { 'agents.agent': decodedName } }, // Filter by agent name
+      { $count: 'totalCount' } // Count the number of documents
+    ];
+
+    // Execute both pipelines
+    const [totalCountResult, data] = await Promise.all([
+      Loadinwork.aggregate(pipeline2), // Get total count
+      Loadinwork.aggregate(pipeline) // Get paginated data
+    ]);
+
+    // Determine the total count
+    const totalCount = totalCountResult.length > 0 ? totalCountResult[0].totalCount : 0;
+    console.log(totalCountResult)
+
+    // Send response
+    res.json({
+      draw: draw,
+      recordsTotal: totalCount,
+      recordsFiltered: totalCount,
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving data', details: error.message });
+  }
 };

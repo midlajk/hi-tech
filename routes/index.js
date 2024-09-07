@@ -92,7 +92,9 @@ router.get('/employees',authMiddleware, function(req, res, next) {
 router.get('/expenceincome',authMiddleware, function(req, res, next) {
   res.render('expenceincome',{ route: 'expenceincome' });
 });
-
+router.get('/loadinworks',authMiddleware, function(req, res, next) {
+  res.render('loadinworks',{ route: 'loadinworks' });
+});
 router.get('/allpuchasecommitments',authMiddleware, function(req, res, next) {
   res.render('allpcommitments',{ route: 'commitments' });
 });
@@ -112,5 +114,9 @@ router.get('/ialoaders/:employee',authMiddleware, function(req, res, next) {
 });
 router.get('/ieiaccounts/:employee',authMiddleware, function(req, res, next) {
   res.render('iaccounts/ieiaccounts',{ route: 'expenceincome',employee:req.params.employee });
+});
+
+router.get('/indivdualoadingworks/:employee',authMiddleware, function(req, res, next) {
+  res.render('iaccounts/individuallodingworks',{ route: 'employees',employee:req.params.employee });
 });
 module.exports = router;

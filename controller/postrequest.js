@@ -19,6 +19,7 @@ const { v4: uuidv4 } = require('uuid');
 const { nanoid } = require('nanoid');
 const pdfMaster = require("pdf-master");
 const Attendance = mongoose.model('Attendance')
+const Loadinwork = mongoose.model('Loadinwork')
 
 const handlebars = require('handlebars');
 
@@ -1195,7 +1196,8 @@ exports.addtrip = async (req,res)=> {
 exports.postattendance = async (req,res)=> {
 
   try {
-    const { date, attendance } = req.body;
+    const { date, attendance,src } = req.body;
+    console.log(req.body)
 
     // Find the existing document by date
     let existingRecord = await Attendance.findOne({ date: new Date(date) });
@@ -1209,7 +1211,8 @@ exports.postattendance = async (req,res)=> {
         // If the document doesn't exist, create a new one
         const newAttendance = new Attendance({
             date: new Date(date),
-            attendance: attendance
+            attendance: attendance,
+  
         });
         await newAttendance.save();
         res.status(201).send({ message: 'Attendance added successfully.' });
@@ -1221,24 +1224,165 @@ exports.postattendance = async (req,res)=> {
 }
 
 
-exports.addsalary = async (req,res)=> {
+// exports.addsalary = async (req,res)=> {
 
-  const client = await Transportagent.findOne({ agent: req.body.name });
-  client.transaction.push({
-    name:req.body.type,
-    date: req.body.date,
-    refference: req.body.from + ' - ' + req.body.to,
-    payable:parseInt(req.body.payable || 0),
-    medium:req.body.medium,
-    id:new Date().toString(),
-    revievable:0,
-    recieved:0,
-    paid:0,
-  });
+//   const client = await Transportagent.findOne({ agent: req.body.name });
+//   client.transaction.push({
+//     name:req.body.type,
+//     date: req.body.date,
+//     refference: req.body.from + ' - ' + req.body.to,
+//     payable:parseInt(req.body.payable || 0),
+//     medium:req.body.medium,
+//     id:new Date().toString(),
+//     revievable:0,
+//     recieved:0,
+//     paid:0,
+//   });
 
-  // Save the updated client to the database
-  await client.save();
-  res.status(200).json({ message: 'Purchase commitment added successfully!' });
+//   // Save the updated client to the database
+//   await client.save();
+//   res.status(200).json({ message: 'Purchase commitment added successfully!' });
 
 
-}
+// }
+
+exports.addsalary = async (req, res) => {
+  try {
+      const reference = req.body.from + ' - ' + req.body.to;
+
+      // Aggregation to check if the transaction with the given reference exists
+      const client = await Transportagent.aggregate([
+          {
+              // Match the agent
+              $match: { agent: req.body.name }
+          },
+          {
+              // Unwind the transaction array so we can check each transaction
+              $unwind: "$transaction"
+          },
+          {
+              // Match if the transaction with the same reference exists
+              $match: { "transaction.refference": reference }
+          },
+          {
+              // Limit the result to 1 to avoid unnecessary full scans
+              $limit: 1
+          }
+      ]);
+
+      // If the aggregation found a matching transaction, return an error
+      if (client.length > 0) {
+          return res.status(400).json({ message: 'Transaction with this reference already exists' });
+      }
+
+      // If no matching reference was found, add the new transaction
+      const foundClient = await Transportagent.findOne({ agent: req.body.name });
+      if (!foundClient) {
+          return res.status(404).json({ message: 'Transport agent not found' });
+      }
+
+      foundClient.transaction.push({
+          name: req.body.type,
+          date: req.body.date,
+          refference: reference,
+          payable: parseInt(req.body.payable || 0),
+          medium: req.body.medium,
+          id: new Date().toString(),
+          revievable: 0,
+          recieved: 0,
+          paid: 0,
+      });
+
+      // Save the updated client to the database
+      await foundClient.save();
+
+      // Respond with success
+      res.status(200).json({ message: 'Salary added successfully!' });
+
+  } catch (error) {
+      console.error('Error adding salary:', error);
+      res.status(500).json({ message: 'Error adding salary' });
+  }
+};
+exports.addLoadingPayment = async (req, res) => {
+  try {
+    const decodedName = req.body.agent.agent.replace(/&amp;/g, '&');
+    console.log(req.body)
+    // Find the transport agent by agent name
+    const client = await Transportagent.findOne({ agent: decodedName });
+    if (!client) {
+      return res.status(404).json({ message: 'Agent not found.' });
+    }
+ console.log('here')
+    // Add a transaction to the agent's transaction history
+    client.transaction.push({
+      name: decodedName,
+      date: req.body.date,
+      refference: req.body.work,
+      payable: parseInt(req.body.agent.total),
+      medium: `${req.body.agent.bags} ${req.body.unit} * ${req.body.agent.kooli}`,
+      id: new Date().toString(),
+      revievable: 0,
+      received: 0,
+      paid: 0,
+    });
+      await client.save();
+
+    // If `fun` is not defined or false, save the client document
+    if (!req.body.fun) {
+      return res.status(200).json({ message: 'Payment added successfully!' });
+    }else{
+      return
+    }
+
+    // Otherwise, if `fun` is true, the client document is not saved here
+  } catch (error) {
+    console.error('Error adding loading payment:', error);
+    res.status(500).json({ message: 'An error occurred while processing payment.' });
+  }
+};
+
+// Controller for adding loading work
+// Controller for adding loading work
+exports.addLoadingWork = async (req, res) => {
+  try {
+    // Create a new Loadinwork document
+    const newWork = new Loadinwork({
+      date: new Date(req.body.date),
+      work: req.body.work,
+      unit: req.body.unit,
+      variables: req.body.bags,
+      kooli: req.body.basekooli,
+      total: req.body.total,
+      agents: req.body.agents,
+    });
+
+    // Save the new work document to MongoDB
+    await newWork.save();
+
+    // If the total is greater than 0, process each agent's loading payment
+    if (req.body.total > 0) {
+      const agentPayments = req.body.agents.map((agent) =>
+        exports.addLoadingPayment({
+          body: {
+            agent: agent,
+            fun: 'yes',
+            work: req.body.work,
+            date: req.body.date,
+            unit: req.body.unit,
+          }
+        }, res) // Pass `res` if needed
+      );
+
+      // Wait for all the agent payments to complete
+      await Promise.all(agentPayments);
+    }
+
+    res.status(200).json({ message: 'Loading work and payments processed successfully!' });
+  } catch (error) {
+    console.error('Error adding loading work:', error);
+    res.status(500).json({ message: 'An error occurred while adding loading work.' });
+  }
+};
+
+// Controller for adding/loading payment

@@ -131,6 +131,8 @@ exports.ieaccount = async (req, res) => {
         const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
         const length = parseInt(req.query.length) || 10; // Get the number of records per page
         // Fetch data from the database with pagination
+        const decodedName = name.replace(/&amp;/g, '&');
+
         let pipeline = [
           {
               $unwind: "$transaction"
@@ -152,7 +154,7 @@ exports.ieaccount = async (req, res) => {
 
       // If name is provided in the query, add a $match stage to filter by name
       if (name) {
-        pipeline.splice(1, 0, { $match: { agent: name } });
+        pipeline.splice(1, 0, { $match: { agent: decodedName } });
     } 
 
       const client = await Transportagent.aggregate(pipeline);
@@ -168,7 +170,7 @@ exports.ieaccount = async (req, res) => {
 
     // If name is provided in the query, add a $match stage to filter by name
     if (name) {
-      pipeline2.splice(1, 0, { $match: { agent: name } });
+      pipeline2.splice(1, 0, { $match: { agent: decodedName } });
   }
 
       const totalclients = await Transportagent.aggregate(pipeline2)
@@ -219,7 +221,6 @@ exports.idaaccount = async (req, res) => {
     
        
           const transaction = client.length > 0 ? client[0].transaction : [];
-          console.log(transaction)
           let pipeline2 = [
             {
                 $unwind: "$transaction"

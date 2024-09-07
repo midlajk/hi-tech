@@ -15,6 +15,7 @@ router.delete('/deletesales/:id/:name',authMiddleware, adminpostapis.deletesales
 router.delete('/expencesandincome/:id/:name',authMiddleware, adminpostapis.deleteexpencesandincome);
 router.delete('/deleteagent',authMiddleware, adminpostapis.deleteagent);
 router.delete('/deleteagentdata',authMiddleware, adminpostapis.deleteagentdata);
+router.delete('/deleteloadingwork',authMiddleware, adminpostapis.deleteagentdata);
 
 
 module.exports = router;

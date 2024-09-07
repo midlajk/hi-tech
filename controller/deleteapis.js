@@ -9,6 +9,7 @@ const Transportagent = mongoose.model('Transportagent')
 const bcrypt = require('bcrypt');
 const User = mongoose.model('User')
 
+const Loadinwork = mongoose.model('Loadinwork')
 
 exports.deletepurchasecommitment = async (req, res) => {
     try {
@@ -428,9 +429,10 @@ exports.deletepurchase = async (req, res) => {
 
   exports.deleteagentdata = async (req, res) => {
     const { agent, id } = req.body;
-  console.log('sdsd')
     try {
-        const client = await Transportagent.findOne({ agent: agent});
+        const decodedName = agent.replace(/&amp;/g, '&');
+
+        const client = await Transportagent.findOne({ agent: decodedName});
 
         if (!client) {
             return res.status(404).json({ error: 'Client not found' });
@@ -453,5 +455,18 @@ exports.deletepurchase = async (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
     
+
+  }
+
+  exports.deleteloadingwork = async (req, res) => {
+    const { id, } = req.body;
+    // If user exists, compare hashed passwords
+
+    const existingClient = await Loadinwork.findByIdAndDelete(id);
+    
+      res.json({ success: true, message: 'Reference added successfully' });
+  
+    
+
 
   }

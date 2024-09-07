@@ -225,11 +225,28 @@ const referenceSchema = new mongoose.Schema({
     date: Date,
     attendance: [{
       id:String,
-      wrokhour:Number
+      wrokhour:Number,
+      src:String
     }],
   });
   const Attendance = mongoose.model('Attendance', attendance); // Use a different variable name here
+  const loadinwork = new mongoose.Schema({
+    date: Date,
+    work:String,
+    unit:String,
+    variables:Number,
+    kooli:Number,
+    total:Number,
+    agents: [{
+      agent:String,
+      manpower:Number,
+      bags:Number,
+      kooli:Number,
+      total:Number,
 
+    }],
+  });
+  const Loadinwork = mongoose.model('Loadinwork', loadinwork);
 const ClientModel = mongoose.model('Client', clientSchema); // Use a different variable name here
 const CoffeeSchema = mongoose.model('CoffeeSchema', coffeeSchema); // Use a different variable name here
 
@@ -250,3 +267,4 @@ module.exports = CoffeeSchema;
 module.exports = User;
 module.exports = Financialyear;
 module.exports = Attendance;
+module.exports = Loadinwork;
