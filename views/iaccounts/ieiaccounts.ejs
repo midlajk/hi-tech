@@ -11,10 +11,11 @@
               <div class="card-body">
        
            <div class="row mt-3 text-center"> 
-                    <div class="col-4"> <h4>Total Recieved</h4>
-                        <h4>1200</h4></div>
-                    <div class="col-4"> <h4>Total Paid</h4></div>
-                    <div class="col-4"> <h4>Balance</h4></div>
+            <div class="col-4"> <h4>Total Payable</h4>
+              <h4 id="payabletotal">0</h4></div>
+          <div class="col-4"><h4>Total Paid</h4> <h4 id="paidtotal">0</h4></div>
+          <div class="col-4"><h4>Balance</h4> <h4 id="balancetotal">0</h4></div>
+
 
                 </div>
                 <div class="table-responsive text-nowrap p-4">
@@ -160,8 +161,9 @@
 
 <script>
   var thetatable
+  var employee = '<%=employee%>'
       $(document).ready(function () {
-  
+        calculatesum()
          thetatable = $('#sellers').DataTable({
           responsive: true,
           processing: true,
@@ -341,5 +343,15 @@ function addtransportagent(){
   
   
   }
+  function calculatesum(){
+    axios.get('/agentsum/'+employee)
+            .then(function(response) {
+              console.log(response)
+                var data = response.data.data;
+                document.getElementById('payabletotal').innerText = (data.totalPayable+data.totalrecieved)
+                document.getElementById('paidtotal').innerText = data.totalPaid
+                document.getElementById('balancetotal').innerText = (data.totalPayable+data.totalrecieved-data.totalPaid)
+            })
+   }
     </script>                
                                         <%- include('../include/end.ejs') -%>

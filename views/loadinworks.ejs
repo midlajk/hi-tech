@@ -407,6 +407,12 @@ function submitwork(){
       var closeButton = document.getElementById('closePopup');
       thetatable.ajax.reload()
   // Trigger the click event on the button
+        $('#work').val('');
+        $('#bags').val('');
+        $('#basekooli').val('');
+
+        // Reset dataArray
+        dataArray = [];
   closeButton.click();
       }
     })
