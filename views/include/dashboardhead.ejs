@@ -137,12 +137,14 @@
                     <!-- Dashboard -->
 
                     <br>
+                    
                     <li class="menu-item <%= route=='dashboard'?'active':'' %>">
                         <a href="/dashboard" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-home-circle"></i>
                             <div data-i18n="Enquiries">Dashoard</div>
                         </a>
                     </li>
+                    <% if(usertype == 'Admin'){%>
                     <li class="menu-item <%= route=='generatereport'?'active':'' %>">
                         <a href="/generatereport" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-note"></i>
@@ -222,6 +224,7 @@
                             <div data-i18n="Properties">Commitments</div>
                         </a>
                     </li>
+                    <% }%>
                     <li class="menu-header small text-uppercase">
                         <span class="menu-header-text">Work Flow Managment</span>
                     </li>
@@ -249,16 +252,18 @@
                     <li class="menu-header small text-uppercase">
                         <span class="menu-header-text">Report & Utility</span>
                     </li>
-                    <li class="menu-item <%= route=='expenceincome'?'active':'' %>">
-                        <a href="/expenceincome" class="menu-link">
-                            <i class="menu-icon tf-icons bx bxs-user-account"></i>
-                            <div data-i18n="Admin Management">Expenses & Incomes</div>
-                        </a>
-                    </li>
+                    
                     <li class="menu-item <%= route=='loadinworks'?'active':'' %>">
                         <a href="/loadinworks" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-rewind-circle"></i>
                             <div data-i18n="Add Property">Loading Works</div>
+                        </a>
+                    </li>
+                    <% if(usertype == 'Admin'){%>
+                    <li class="menu-item <%= route=='expenceincome'?'active':'' %>">
+                        <a href="/expenceincome" class="menu-link">
+                            <i class="menu-icon tf-icons bx bxs-user-account"></i>
+                            <div data-i18n="Admin Management">Expenses & Incomes</div>
                         </a>
                     </li>
                     <li class="menu-item <%= route=='report'?'active':'' %>">
@@ -276,7 +281,7 @@
                             <div data-i18n="Admin Management">Management</div>
                         </a>
                     </li>
-
+                <%}%>
                     <li class="menu-item">
                         <a href="/logout" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-log-out"></i>

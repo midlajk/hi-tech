@@ -1266,16 +1266,18 @@ async function submitForm() {
     if (response) {
       alert('Form submitted successfully');
       // You can redirect or perform any other action here
-      const pdfWindow = window.open('/report.html', '_blank');
-      if (pdfWindow) {
-        // Listen for the beforeunload event
-        window.addEventListener('beforeunload', () => {
-          // Reload the screen after the printing tab is closed or after the PDF is printed
-          window.location.reload();
-        });
-      } else {
-        alert('Error opening PDF file');
-      }
+      // window.location.reload();
+
+      // const pdfWindow = window.open('/report.html', '_blank');
+      // if (pdfWindow) {
+      //   // Listen for the beforeunload event
+      //   window.addEventListener('beforeunload', () => {
+      //     // Reload the screen after the printing tab is closed or after the PDF is printed
+      //     window.location.reload();
+      //   });
+      // } else {
+      //   alert('Error opening PDF file');
+      // }
       window.location.reload();
       $('#Loadingmodal').removeClass('d-block');
 

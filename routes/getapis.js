@@ -2,13 +2,14 @@ var express = require('express');
 var router = express.Router();
 const adminpostapis = require('../controller/getapis');
 const authcheck = require('../middleware/authcheck');
+const loginMiddleware = require('../middleware/logincheck.js');
 
 /* GET home page. */
 router.get('/getclients',authcheck, adminpostapis.getclients);
 router.get('/getnames',authcheck, adminpostapis.getnames);
 router.get('/getproducts',authcheck, adminpostapis.getproducts);
 router.get('/getdetailedproductproducts',authcheck, adminpostapis.getdetailedproductproducts);
-router.get('/getotherallnames',authcheck, adminpostapis.getotherallnames);
+router.get('/getotherallnames',loginMiddleware, adminpostapis.getotherallnames);
 
 router.get('/purchasecommitments',authcheck, adminpostapis.purchasecommitment);
 router.get('/salescommitments',authcheck, adminpostapis.salescommitments);
@@ -17,13 +18,13 @@ router.get('/individualdespatch',authcheck, adminpostapis.individualdespatch);
 router.get('/getrefferance',authcheck, adminpostapis.getrefference);
 router.get('/getfinancialyears',authcheck, adminpostapis.getfinancialyears);
 
-router.get('/getTransportAgent',authcheck, adminpostapis.getTransportAgent);
+router.get('/getTransportAgent',loginMiddleware, adminpostapis.getTransportAgent);
 router.get('/salesbills',authcheck, adminpostapis.salesbills);
 router.get('/purchasebills',authcheck, adminpostapis.purchasebills);
 router.get('/salesstorages',authcheck,adminpostapis.storeout);
 router.get('/purchasestorages',authcheck, adminpostapis.storein);
 router.get('/alltransactions',authcheck, adminpostapis.transactions);
-router.get('/expencesandincomes',authcheck, adminpostapis.expencesandincome);
+router.get('/expencesandincomes',loginMiddleware, adminpostapis.expencesandincome);
 
 /////
 router.get('/arrivals',authcheck, adminpostapis.arrivals);
@@ -46,17 +47,17 @@ router.get('/productwisestoreout',authcheck, adminpostapis.productwisestoreout);
 
 
 ///// loads
-router.get('/agentxloads',authcheck, adminpostapis.agentxloads);
-router.get('/getallemployees',authcheck, adminpostapis.getallemployees);
+router.get('/agentxloads',loginMiddleware, adminpostapis.agentxloads);
+router.get('/getallemployees',loginMiddleware, adminpostapis.getallemployees);
 
 
-router.get('/attendance/:data',authcheck, adminpostapis.getattendance);
-router.post('/getTotalWorkHours',authcheck, adminpostapis.getTotalWorkHours);
-router.get('/getallattendance',authcheck, adminpostapis.getallattendance);
+router.get('/attendance/:data',loginMiddleware, adminpostapis.getattendance);
+router.post('/getTotalWorkHours',loginMiddleware, adminpostapis.getTotalWorkHours);
+router.get('/getallattendance',loginMiddleware, adminpostapis.getallattendance);
 
-router.get('/getworkagents',authcheck, adminpostapis.getworkagents);
-router.get('/getloadingworks',authcheck, adminpostapis.getloadingworks);
-router.get('/getindividualloadingworks',authcheck, adminpostapis.getindividualloadingworks);
-router.get('/notcalculatedloads',authcheck, adminpostapis.notcalculatedloads);
+router.get('/getworkagents',loginMiddleware, adminpostapis.getworkagents);
+router.get('/getloadingworks',loginMiddleware, adminpostapis.getloadingworks);
+router.get('/getindividualloadingworks',loginMiddleware, adminpostapis.getindividualloadingworks);
+router.get('/notcalculatedloads',loginMiddleware, adminpostapis.notcalculatedloads);
 
 module.exports = router;

@@ -1,9 +1,9 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
-// const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
 
-// const token = process.env.TELE_API ;
-// const bot = new TelegramBot(token, { polling: true });
+const token = process.env.TELE_API ;
+const bot = new TelegramBot(token, { polling: true });
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -774,7 +774,7 @@ exports.addtransportagent = async (req, res) => {
   
       // Generate and send PDF report
       const filePath = await generatePdfReport(data, req.body.reportdate);
-      // await bot.sendDocument(process.env.CHAT_ID, filePath);
+      await bot.sendDocument(process.env.CHAT_ID, filePath);
   
       // Delete the file after sending
       fs.unlink(filePath, (err) => {
@@ -1312,7 +1312,6 @@ exports.addLoadingPayment = async (req, res) => {
     if (!client) {
       return res.status(404).json({ message: 'Agent not found.' });
     }
- console.log('here')
     // Add a transaction to the agent's transaction history
     client.transaction.push({
       name: decodedName,

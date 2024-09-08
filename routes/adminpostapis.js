@@ -3,6 +3,7 @@ var router = express.Router();
 const adminpostapis = require('../controller/postrequest');
 const generatereport = require('../controller/generatereport');
 const authcheck = require('../middleware/authcheck');
+const loginMiddleware = require('../middleware/logincheck.js');
 
 /* GET home page. */
 
@@ -24,7 +25,7 @@ router.post('/addreference',authcheck, adminpostapis.addrefference);
 router.post('/newfinancial',authcheck, adminpostapis.addfinancial);
 
 router.post('/addproducts',authcheck, adminpostapis.addproducts);
-router.post('/addtransportagent',authcheck, adminpostapis.addtransportagent);
+router.post('/addtransportagent',loginMiddleware, adminpostapis.addtransportagent);
 router.post('/saveTransaction',authcheck, adminpostapis.addTransactions);
 router.post('/generatebill',authcheck, (req, res, next) => {
   // Check the value of req.body.billtype
@@ -38,17 +39,17 @@ router.post('/generatebill',authcheck, (req, res, next) => {
     generatereport.salesbill(req, res);
   }
 });
-router.post('/addexpencesandincomes',authcheck, adminpostapis.addexpencesandincome);
+router.post('/addexpencesandincomes',loginMiddleware, adminpostapis.addexpencesandincome);
 
 router.post('/addstoreinsettlement',authcheck, adminpostapis.addstoreinsettlement);
 router.post('/addstoreoutsettlement',authcheck, adminpostapis.addstoreoutsettlement);
 router.post('/create-daily-report',authcheck, adminpostapis.createDailyReport);
 
 
-router.post('/addtrip',authcheck, adminpostapis.addtrip);
-router.post('/submitAttendance',authcheck, adminpostapis.postattendance);
+router.post('/addtrip',loginMiddleware, adminpostapis.addtrip);
+router.post('/submitAttendance',loginMiddleware, adminpostapis.postattendance);
 router.post('/addsalary',authcheck, adminpostapis.addsalary);
-router.post('/addloadingwork',authcheck, adminpostapis.addLoadingWork);
-router.post('/aditionalloadinwork',authcheck, adminpostapis.addLoadingPayment);
+router.post('/addloadingwork',loginMiddleware, adminpostapis.addLoadingWork);
+router.post('/aditionalloadinwork',loginMiddleware, adminpostapis.addLoadingPayment);
 
 module.exports = router;

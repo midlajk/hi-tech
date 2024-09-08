@@ -9,7 +9,6 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 router.post('/login', async function(req, res, next) {
-    console.log(req.body)
   const { username, password } = req.body;
   const uid = Date.now();
 
@@ -19,22 +18,23 @@ router.post('/login', async function(req, res, next) {
 
       if (!users) {
           // If user doesn't exist, create a new one
-          const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-          user = new User({ 
-              username, 
-              password: hashedPassword,
-              pbillid: 0, // Initial value for pbillid
-              sbill: 0, // Initial value for sbill
-              creditnoteid: 0, // Initial value for creditnoteid
-              debitnoteid: 0, // Initial value for debitnoteid
-              purdbillid: 0,
-              surdbillid: 0,
-              pcomm: 0,
-              scomm: 0, // Initial value for urdbillid
-              uid: uid
-          });
-          await user.save();
-
+        //   const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+        //   user = new User({ 
+        //       username, 
+        //       password: hashedPassword,
+        //       pbillid: 0, // Initial value for pbillid
+        //       sbill: 0, // Initial value for sbill
+        //       creditnoteid: 0, // Initial value for creditnoteid
+        //       debitnoteid: 0, // Initial value for debitnoteid
+        //       purdbillid: 0,
+        //       surdbillid: 0,
+        //       pcomm: 0,
+        //       scomm: 0, // Initial value for urdbillid
+        //       uid: uid,
+        //       accounttype : 'Admin'
+        //   });
+        //   await user.save();
+                user = await createnewuser(username,password,uid)
           // Store user session data
           req.session.user = user;
           req.session.islogged = true;
@@ -85,4 +85,38 @@ router.get('/logout', (req, res) => {
         }
   });
 });
+router.post('/addnewuser', async function(req, res, next) {
+    const { username, password } = req.body;
+    const uid = Date.now();
+    user = await createnewuser(username,password,uid,'Employee')
+    res.json({ success: true, message: 'User created successfully!', token: uid });
+
+})
+  
+async function createnewuser(username,password,uid,usertype){
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+    user = new User({ 
+        username, 
+        password: hashedPassword,
+        pbillid: 0, // Initial value for pbillid
+        sbill: 0, // Initial value for sbill
+        creditnoteid: 0, // Initial value for creditnoteid
+        debitnoteid: 0, // Initial value for debitnoteid
+        purdbillid: 0,
+        surdbillid: 0,
+        pcomm: 0,
+        scomm: 0, // Initial value for urdbillid
+        uid: uid,
+        accounttype : usertype?usertype:'Admin'
+    });
+    await user.save();
+
+    // Store user session data
+   return user;
+
+    // Send JSON response to the frontend
+  
+}
+
 module.exports = router;
+

@@ -7,6 +7,7 @@ const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const authMiddleware = require('../middleware/authcheck.js');
 const Financialyear = mongoose.model('Financialyear')
+const loginMiddleware = require('../middleware/logincheck.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -16,7 +17,7 @@ router.get('/', function(req, res, next) {
 router.get('/login', function(req, res, next) {
   res.render('login',{ title: 'Express' });
 });
-router.get('/dashboard',authMiddleware, async function(req, res, next) {
+router.get('/dashboard',loginMiddleware, async function(req, res, next) {
 
   res.render('dashboard',{ route: 'dashboard' });
 
@@ -62,10 +63,10 @@ router.get('/settings',authMiddleware, async function(req, res, next) {
     .sort({ defaulted: -1 })
   res.render('settings',{ route: 'settings',user:req.session.user ,refferance:reference?reference.name:'',year:year?year.year:'' });
 });
-router.get('/deliveryagents',authMiddleware, function(req, res, next) {
+router.get('/deliveryagents',loginMiddleware, function(req, res, next) {
   res.render('deliveryagents',{ route: 'deliveryagents' });
 });
-router.get('/loaders',authMiddleware, function(req, res, next) {
+router.get('/loaders',loginMiddleware, function(req, res, next) {
   res.render('loaders',{ route: 'loaders' });
 });
 router.get('/purchases',authMiddleware, function(req, res, next) {
@@ -86,13 +87,13 @@ router.get('/getsalescommitmentreport/:products',authMiddleware, function(req, r
 router.get('/report',authMiddleware, function(req, res, next) {
   res.render('report',{ route: 'report' });
 });
-router.get('/employees',authMiddleware, function(req, res, next) {
+router.get('/employees',loginMiddleware, function(req, res, next) {
   res.render('employees',{ route: 'employees' });
 });
-router.get('/expenceincome',authMiddleware, function(req, res, next) {
+router.get('/expenceincome',loginMiddleware, function(req, res, next) {
   res.render('expenceincome',{ route: 'expenceincome' });
 });
-router.get('/loadinworks',authMiddleware, function(req, res, next) {
+router.get('/loadinworks',loginMiddleware, function(req, res, next) {
   res.render('loadinworks',{ route: 'loadinworks' });
 });
 router.get('/allpuchasecommitments',authMiddleware, function(req, res, next) {
@@ -102,21 +103,21 @@ router.get('/allsalescommitments',authMiddleware, function(req, res, next) {
   res.render('allscommitments',{ route: 'commitments' });
 });
 
-router.get('/ieaccount/:employee',authMiddleware, function(req, res, next) {
+router.get('/ieaccount/:employee',loginMiddleware, function(req, res, next) {
   res.render('iaccounts/ieemployee',{ route: 'employees',employee:req.params.employee });
 });
 
-router.get('/idaaccount/:employee',authMiddleware, function(req, res, next) {
+router.get('/idaaccount/:employee',loginMiddleware, function(req, res, next) {
   res.render('iaccounts/idaaccount',{ route: 'deliveryagents',employee:req.params.employee });
 });
-router.get('/ialoaders/:employee',authMiddleware, function(req, res, next) {
+router.get('/ialoaders/:employee',loginMiddleware, function(req, res, next) {
   res.render('iaccounts/ialoaders',{ route: 'loaders',employee:req.params.employee });
 });
-router.get('/ieiaccounts/:employee',authMiddleware, function(req, res, next) {
+router.get('/ieiaccounts/:employee',loginMiddleware, function(req, res, next) {
   res.render('iaccounts/ieiaccounts',{ route: 'expenceincome',employee:req.params.employee });
 });
 
-router.get('/indivdualoadingworks/:employee',authMiddleware, function(req, res, next) {
+router.get('/indivdualoadingworks/:employee',loginMiddleware, function(req, res, next) {
   res.render('iaccounts/individuallodingworks',{ route: 'employees',employee:req.params.employee });
 });
 module.exports = router;

@@ -472,28 +472,28 @@ $(document).ready(function() {
         return data ? data : row.work;
       }
     },       {
-      data: 'null',
+      data: null,
       render: function (data, type, row) {
         // If delivery is null, show billTo instead
-        return data ? data : row.agents.bags;
+        return row.agents.bags;
       }
     },
     {
-      data: 'null',
+      data: null,
       render: function (data, type, row) {
         // If delivery is null, show billTo instead
-        return data ? data : row.agents.manpower;
+        return  row.agents.manpower;
       }
     },
     {
-      data: 'null',
+      data: null,
       render: function (data, type, row) {
         // Render an input field with the value of 'trip'
         return `<input type="text" class="form-control kooli-input" value="${row.agents.kooli}" data-row-id="${row.agents._id}" data-bags="${row.agents.bags}" name="pendingkooliinput">`;
       }
     },
         {
-      data: 'null',
+      data: null,
       render: function (data, type, row) {
         // Render an input field with the value of 'trip'
         return `<input type="text" class="form-control total-input" value="${row.agents.total}" data-row-id="${row.agents._id}" name="pendingtotalinput">`;

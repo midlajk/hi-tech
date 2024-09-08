@@ -220,6 +220,7 @@ const referenceSchema = new mongoose.Schema({
     username:String,
     password:String,
     uid:String,
+    accounttype:String,
   });
   const attendance = new mongoose.Schema({
     date: Date,

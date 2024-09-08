@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const adminget = require('../controller/editapis');
 const authcheck = require('../middleware/authcheck');
+const loginMiddleware = require('../middleware/logincheck.js');
 
 /* GET home page. */
 router.get('/editentry/:idname/:id',authcheck, adminget.editentry);
@@ -42,9 +43,9 @@ router.post('/updatestock',authcheck, adminget.updatestock);
 
 
 router.post('/editseller',authcheck, adminget.editseller);
-router.post('/editagent',authcheck, adminget.editagent);
+router.post('/editagent',loginMiddleware, adminget.editagent);
 
-router.post('/deliverymarked',authcheck, adminget.deliverymarked);
-router.post('/updateloadinworkDetails',authcheck, adminget.updateloadinworkDetails);
+router.post('/deliverymarked',loginMiddleware, adminget.deliverymarked);
+router.post('/updateloadinworkDetails',loginMiddleware, adminget.updateloadinworkDetails);
 
 module.exports = router;

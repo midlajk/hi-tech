@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User')
-const authMiddleware = async(req, res, next) => {
+const loginMiddleware = async(req, res, next) => {
     // Check for token in request headers
     const admin = req.session.islogged;
 
@@ -9,7 +9,7 @@ const authMiddleware = async(req, res, next) => {
         return res.redirect('/login');
     }else{
        const user = await User.findOne({uid:req.session.token})
-       if(user && user.accounttype =='Admin'){
+       if(user){
         req.session.user = user
         next()
        }else{
@@ -20,4 +20,4 @@ const authMiddleware = async(req, res, next) => {
  
 };
 
-module.exports = authMiddleware;
+module.exports = loginMiddleware;
