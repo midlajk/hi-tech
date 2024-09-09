@@ -346,7 +346,7 @@ $('#loadswitchbtn').click(function(e) {
         { data: 'item' },
         { data: 'quantity' },
         {
-      data: 'null',
+      data: null,
       render: function (data, type, row) {
         // Render an input field with the value of 'trip'
         return `<input type="text" class="form-control trip-input" data-row-id="${row._id}" name="trip">`;

@@ -10,7 +10,7 @@ router.get('/purchaseaccount/:name',authcheck, adminget.individualpurchaseaccoun
 
 router.get('/getdetailedreport',authcheck, adminget.getdetailedreport);
 router.get('/ieaccount',loginMiddleware, adminget.ieaccount);
-router.get('/idaaccount',authcheck, adminget.idaaccount);
+router.get('/idaaccount',loginMiddleware, adminget.idaaccount);
 
 
 

@@ -98,7 +98,7 @@
                             </div>
                         <div class="col">
                           
-                           <label class="fw-bold">Bags/Ton/other varables:</label>
+                           <label class="fw-bold">Bags/Ton</label>
 
                                  <input placeholder="bags" type="number" name="bags" id="bags" class="form-control my-2">
 
@@ -410,9 +410,14 @@ function submitwork(){
         $('#work').val('');
         $('#bags').val('');
         $('#basekooli').val('');
+        $('#agent').val('');
+        $('#manpower').val('');
 
         // Reset dataArray
         dataArray = [];
+        const resultTableBody = $('#resultTableBody');
+  resultTableBody.empty(); // Clear the table before updating
+
   closeButton.click();
       }
     })

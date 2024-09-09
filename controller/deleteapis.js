@@ -460,7 +460,6 @@ exports.deletepurchase = async (req, res) => {
 
   exports.deleteloadingwork = async (req, res) => {
     const { id, } = req.body;
-    // If user exists, compare hashed passwords
 
     const existingClient = await Loadinwork.findByIdAndDelete(id);
     

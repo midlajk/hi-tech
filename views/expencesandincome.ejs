@@ -286,54 +286,6 @@ document.getElementById('transactiondate').value = formattedDate;
     });
     });
 
-    // Delete Button Click Event
-//     function deleteData(id) {
-//     $.ajax({
-//       url: `https://www.safehomes.ae/backend/deleteproperty/${id}`,
-//       type: 'DELETE',
-//       success: function (response) {
-//         dataTable.ajax.reload();
-//       },
-//       error: function (error) {
-//         console.error('Error deleting data:', error);
-//       },
-//     });
-//   }
-
-//   function toggleFeatured(id, isFeatured) {
-//     var formDataObj = { id: id, status: isFeatured ? 'notfeatured' : 'featured' };
-
-//     $.ajax({
-//       url: `https://www.safehomes.ae/backend/addfeatured`,
-//       type: 'POST',
-//       data: JSON.stringify(formDataObj),
-//       contentType: 'application/json',
-//       success: function (response) {
-//         dataTable.ajax.reload();
-//       },
-//       error: function (error) {
-//         console.error('Error updating data:', error);
-//       },
-//     });
-//   }
-
-//   $('#example').on('click', '.delete-btn', function () {
-//     var data = dataTable.row($(this).closest('tr')).data();
-//     var id = data._id;
-//     deleteData(id);
-//   });
-
-//   $('#example').on('click', '.featured-button', function () {
-//     var data = dataTable.row($(this).closest('tr')).data();
-//     var id = data._id;
-    
-//     if (routeName === 'featured') {
-//       toggleFeatured(id, true); // Remove from Featured
-//     } else if (routeName === 'properties') {
-//       toggleFeatured(id, false); // Add to Featured
-//     }
-//   });
-// 
 $('.js-data-example-ajax').select2({
 
 ajax: {

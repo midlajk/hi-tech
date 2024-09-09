@@ -417,3 +417,189 @@ action="/submit-bill" method="post"
   // };
   ////////////////////////// dAily Report fragment /////////////////
  
+
+  <script>
+  var employee = '<%=employee%>'
+  $(document).ready(function() {
+    calculatesum()
+    var loadtype = 'Despatch'
+    
+    var dataTable
+  $('#loadswitchbtn').click(function(e) {
+          e.preventDefault(); // Prevent the default action of the anchor tag
+          dataTable.destroy();
+          // Get the current text of the span
+          var currentText = $('#loadtype').text();
+          
+          // Toggle the text between 'Despatch' and 'Arrival'
+          if (currentText === 'Despatch') {
+              $('#loadtype').text('Arrival');
+              loadtype = 'Arrival'
+          } else {
+              $('#loadtype').text('Despatch');
+              loadtype = 'Despatch'
+          }
+          viewtable()
+      });
+      $('#viewloadmodal').on('shown.bs.modal', function() {
+        viewtable()
+    });
+    function viewtable(){
+      dataTable = $('#loads-table').DataTable({
+          "pageLength": 10,
+          "dom": 'rtip',
+  
+        processing: true,
+        serverSide: true,
+        ajax: {
+          url: '/agentxloads', // Replace with your API endpoint
+          dataSrc: 'data', // Key that holds the array of data in the API response
+          data: function (d) {
+            d.name = employee;
+            d.loadtype = loadtype; // Add the 'name' parameter to the data object
+            return d;
+            // Add any additional parameters you want to send to the server here
+          },
+          
+        },
+          columns: [
+    
+          {
+            data: 'date',
+            render: function (data, type, row) {
+              // Format the date using moment.js
+              return moment(data).format('DD/MM/YYYY');
+            }
+          },
+          {
+        data: 'delivery',
+        render: function (data, type, row) {
+          // If delivery is null, show billTo instead
+          return data ? data : row.billTo;
+        }
+      },        { data: 'lorry' },
+          { data: 'item' },
+          { data: 'quantity' },
+          {
+        data: null,
+        render: function (data, type, row) {
+          // Render an input field with the value of 'trip'
+          return `<input type="text" class="form-control trip-input" data-row-id="${row._id}" name="trip">`;
+        }
+      },
+       
+            {
+              data: null,
+              render: function (data, type, row) {
+                return `<div class="dropdown">
+                    <button type="button" class="btn btn-primary btn-sm add-btn" data-src='${JSON.stringify(row)}'>
+          <i class="bx bx-plus"></i> Add
+        </button>
+                    
+                  </div>`;
+              },
+            },
+          ],
+        });
+        $('#loads-table').on('click', '.add-btn', function() {
+          var rowData = $(this).data('src'); // Get the row data
+      var tripValue = $(this).closest('tr').find('input.trip-input').val();
+      dat = {
+        loadtype:loadtype,
+        id:rowData._id
+      }
+      axios.post('/deliverymarked', dat)
+    .then(response => {
+      // Handle the server response here
+      dataTable.ajax.reload();
+      addtrip(rowData,tripValue)
+      $('#viewloadmodal').modal('hide');
+      // closeButton.click();
+      
+      // Close the modal on successful response
+      
+    })
+    .catch(error => {
+      // Handle errors here
+      console.log('Error:', error);
+    });
+      // Call the assignCommitment function with the retrieved arguments (row data and trip value)
+      
+  
+      // Call the assignCommitment function with the retrieved arguments
+  });
+     
+    }
+     $('#viewloadmodal').on('hidden.bs.modal', function() {
+          // Function to run when the modal is hidden (closed)
+          dataTable.destroy();
+            });
+    })
+    function markload() {
+      // Retrieve the form element
+      const form = document.getElementById('transportagentform');
+      
+      // Get form data using FormData API
+      const formData = new FormData(form);
+      
+      // Convert FormData to an object
+      const data = Object.fromEntries(formData.entries());
+  
+      // Construct the `src` object
+      const src = {
+          name: employee, // Assuming employee is a global variable or defined elsewhere
+          delivery: data.distance, // Or another relevant field if distance isn't correct
+          lorry: data.vehi,
+          item: data.item,
+          quantity: data.weight, // Assuming weight is the quantity
+          date: data.tripdate,
+          rate: data.rent // Assuming rent is the rate
+      };
+   if(src.delivery && src.date && src.rate){
+    addtrip(src,src.rate)
+   }else{
+    alert('Please fill the fields')
+   }
+     
+  }
+    function addtrip(data,value){
+      const src = {
+          name: employee,
+          trip: data.delivery || data.billTo,
+          vehicle: data.lorry,
+          item: data.item,
+          quantity: data.quantity,
+          date:data.date,
+          rate:value
+  
+      };
+  
+      axios.post('/addtrip', src)
+    .then(response => {
+      // Handle the server response here
+      thetatable.ajax.reload();
+      $('#newagentmodal').modal('hide');
+      calculatesum()
+      // closeButton.click();
+      
+      // Close the modal on successful response
+      
+    })
+    .catch(error => {
+      // Handle errors here
+      console.log('Error:', error);
+    });
+  
+     
+    }
+    function calculatesum(){
+      axios.get('/agentsum/'+employee)
+              .then(function(response) {
+                console.log(response)
+                  var data = response.data.data;
+                  document.getElementById('payabletotal').innerText = (data.totalPayable+data.totalrecieved)
+                  document.getElementById('paidtotal').innerText = data.totalPaid
+                  document.getElementById('balancetotal').innerText = (data.totalPayable+data.totalrecieved-data.totalPaid)
+              })
+     }
+      </script>
