@@ -348,7 +348,7 @@
       var id = $(this).data('id');
       if (confirm("Please enter your password to confirm deletion:")) { // User clicked "OK"
           // Send a request to deleteuser API endpoint with the entered password
-          fetch('/deleteagent', {
+          fetch('/deleteloadingwork', {
               method: 'DELETE',
               headers: {
                   'Content-Type': 'application/json'
