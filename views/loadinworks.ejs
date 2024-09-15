@@ -410,14 +410,13 @@ function submitwork(){
         $('#work').val('');
         $('#bags').val('');
         $('#basekooli').val('');
-        $('#agent').val('');
         $('#manpower').val('');
 
         // Reset dataArray
         dataArray = [];
         const resultTableBody = $('#resultTableBody');
   resultTableBody.empty(); // Clear the table before updating
-
+  numberofworkers = 0;
   closeButton.click();
       }
     })
@@ -516,6 +515,10 @@ $('#sumitworkerswork').on('click', function() {
 
     updateTable(); // Update the result table
   } else {
+    dataArray = [];
+        const resultTableBody = $('#resultTableBody');
+  resultTableBody.empty(); // Clear the table before updating
+  numberofworkers= 0;
     alert('Please fill all fields before submitting.');
   }
 });
