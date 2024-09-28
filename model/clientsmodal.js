@@ -154,6 +154,7 @@ const Transaction = new Schema({
   id:String,
   recieved:Number,
   paid:Number,
+  bills:Array
 
   // Add other fields as needed
 });

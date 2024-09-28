@@ -63,7 +63,7 @@ async function purchasebill(req, res, client) {
   existingClient.transaction.push({
     name: req.body.name,
     date: req.body.date,
-    refference: req.body.item + ' ' + req.body.quantity + '*' + req.body.rate,
+    refference: req.body.item + ' ' + parseFloat((req.body.quantity * 100) / req.body.eppercentage).toFixed(1)+ '*'+req.body.eppercentage +'% *' + req.body.rate,
     revievable: 0,
     payable: parseInt(parseFloat(req.body.total) + req.body.total * parseFloat(req.body.tax) / 100),
     medium: existingClient.tds == 'YES'? 'TDS' : 'Purchase',
@@ -371,7 +371,7 @@ async function salesbill(req, res, client) {
   existingClient.transaction.push({
     name: req.body.name,
     date: req.body.date,
-    refference: req.body.item + ' ' + req.body.quantity + '*' + req.body.rate,
+    refference: req.body.item + ' ' + parseInt((req.body.quantity * 100) / req.body.eppercentage) + '*'+req.body.eppercentage+'% *' + req.body.rate,
     revievable: parseInt(parseFloat(req.body.total) + req.body.total * parseFloat(req.body.tax) / 100),
     payable: 0,
     medium: existingClient.tds == 'YES' ? 'TDS' : 'Sale',
