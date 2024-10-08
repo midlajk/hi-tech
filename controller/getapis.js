@@ -248,7 +248,13 @@ exports.purchasecommitment = async (req, res) => {
       const item = req.query.item; // Get the item parameter
       const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
       const length = parseInt(req.query.length) || 10; // Get the number of records per page
+      const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
 
+      // Determine sorting criteria based on filter value
+      let sortField = 'purchasecommitments._id'; // Default sorting by _id
+      if (filter === 'date') {
+          sortField = 'purchasecommitments.date'; // Sort by date if filter is 'date'
+      }
       // Construct the aggregation pipeline
       const pipeline = [
           {
@@ -270,7 +276,7 @@ exports.purchasecommitment = async (req, res) => {
       const countPipeline = [...pipeline, { $count: 'totalCount' }];
       const countResult = await ClientModel.aggregate(countPipeline);
       const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-      pipeline.push({ $sort: { 'purchasecommitments._id': -1 } });
+      pipeline.push({ $sort: { [sortField]: -1 } });
 
       // Add pagination stages
       pipeline.push(
@@ -309,7 +315,13 @@ exports.salescommitments = async (req, res) => {
       const item = req.query.item; // Get the item parameter
       const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
       const length = parseInt(req.query.length) || 10; // Get the number of records per page
+      const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
 
+      // Determine sorting criteria based on filter value
+      let sortField = 'salescommitmentsschema._id'; // Default sorting by _id
+      if (filter === 'date') {
+          sortField = 'salescommitmentsschema.date'; // Sort by date if filter is 'date'
+      }
       // Construct the aggregation pipeline
       const pipeline = [
           {
@@ -331,7 +343,7 @@ exports.salescommitments = async (req, res) => {
       const countPipeline = [...pipeline, { $count: 'totalCount' }];
       const countResult = await ClientModel.aggregate(countPipeline);
       const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-      pipeline.push({ $sort: { 'salescommitmentsschema._id': -1 } });
+      pipeline.push({ $sort: { [sortField]: -1 } });
       // Add pagination stages
       pipeline.push(
           { $skip: start }, // Skip records for pagination
@@ -371,12 +383,18 @@ exports.salescommitments = async (req, res) => {
           const draw = parseInt(req.query.draw) || 1;
           const start = parseInt(req.query.start) || 0;
           const length = parseInt(req.query.length) || 10;
-  
+          const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+          // Determine sorting criteria based on filter value
+          let sortField = 'coffee._id'; // Default sorting by _id
+          if (filter === 'date') {
+              sortField = 'coffee.date'; // Sort by date if filter is 'date'
+          }
           let pipeline = [
               {
                   $unwind: "$coffee"
               },
-             { $sort: { 'coffee._id': -1 } },
+             { $sort: { [sortField]: -1 } },
               {
                   $skip: start
               },
@@ -425,7 +443,13 @@ exports.salescommitments = async (req, res) => {
   exports.despatch = async (req, res) => {
     try {
       const name = req.query.name;
+      const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
 
+      // Determine sorting criteria based on filter value
+      let sortField = 'despatch._id'; // Default sorting by _id
+      if (filter === 'date') {
+          sortField = 'despatch.date'; // Sort by date if filter is 'date'
+      }
         const draw = parseInt(req.query.draw) || 1;
         const start = parseInt(req.query.start) || 0;
         const length = parseInt(req.query.length) || 10;
@@ -434,7 +458,7 @@ exports.salescommitments = async (req, res) => {
             {
                 $unwind: "$despatch"
             },
-            { $sort: { 'despatch._id': -1 } },
+            { $sort: { [sortField]: -1 } },
 
             {
                 $skip: start
@@ -778,10 +802,10 @@ exports.salescommitments = async (req, res) => {
 
       /////
       exports.transactions  = (async (req, res) => {
-        console.log('here')
         // Assuming you have already imported required modules and set up your Express app
         
         // API endpoint for paginated data
+
         
           try {
             const name = req.query.name;
@@ -789,11 +813,18 @@ exports.salescommitments = async (req, res) => {
             const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
             const length = parseInt(req.query.length) || 10; // Get the number of records per page
             // Fetch data from the database with pagination
+            const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+            // Determine sorting criteria based on filter value
+            let sortField = 'transaction._id'; // Default sorting by _id
+            if (filter === 'date') {
+                sortField = 'transaction.date'; // Sort by date if filter is 'date'
+            }
             let pipeline = [
               {
                   $unwind: "$transaction"
               },
-              { $sort: { 'transaction._id': -1 } },
+              { $sort: { [sortField]: -1 } },
 
               {
                   $skip: start

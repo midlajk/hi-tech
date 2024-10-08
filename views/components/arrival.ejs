@@ -36,7 +36,7 @@
 
 <script>
   window.individualarrivals = function () {
-     
+     console.log(filterdata)
     // var geturl = routeName == 'featured' ? 'featuredpropertieslist' : 'propertieslist'  // Assuming you're passing this variable from EJS
     // var buttonname = routeName == 'featured' ? 'Remove From Featured' : 'Add To Featured'  // Assuming you're passing this variable from EJS
 
@@ -48,7 +48,8 @@
         url: '/arrivals', // Replace with your API endpoint
         dataSrc: 'data', // Key that holds the array of data in the API response
         data: function (d) {
-             d.name = name; // Add the 'name' parameter to the data object
+             d.name = name;
+             d.filter = filterdata  // Add the 'name' parameter to the data object
             return d;
           // Add any additional parameters you want to send to the server here
         },

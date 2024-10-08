@@ -1,5 +1,7 @@
 <div class="table-responsive text-nowrap p-4">
-  <h3>Transactions</h3>
+  
+  
+  
   <table class="table" style="width: 100%;">
     <tr>
       <th>Date</th>
@@ -71,7 +73,6 @@
 <script>
   window.individualtransactions = function () {
     var today = new Date();
-
 // Format the date to YYYY-MM-DD (required format for input type="date")
 var formattedDate = today.toISOString().split('T')[0];
 
@@ -90,7 +91,8 @@ document.getElementById('transactiondate').value = formattedDate;
         url: '/alltransactions', // Replace with your API endpoint
         dataSrc: 'data', // Key that holds the array of data in the API response
         data: function (d) {
-             d.name = name; // Add the 'name' parameter to the data object
+             d.name = name;
+             d.filter = filterdata // Add the 'name' parameter to the data object
             return d;
           // Add any additional parameters you want to send to the server here
         },

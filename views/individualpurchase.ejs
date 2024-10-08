@@ -72,6 +72,14 @@
     Balance RS: <span id="balanceweightspan"></span>
   </h3>
 </div>
+<div class="col-2 mb-1">
+  <label for="Filter">Filter Data</label>
+  <select class="float-right form-control" style="max-width: 150px;" name="filterdata" id="filterdata" onchange="filterDataChanged()">
+<option value="_id">Id Wise</option>
+<option value="date">Date Wise</option>
+
+  </select>
+</div>
 
              
             </div>
@@ -94,7 +102,8 @@
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/purchasebill.ejs") -%>
 
-                </div>    <div id="salesbilldiv" class="tab-content d-none">
+                </div>  
+                  <div id="salesbilldiv" class="tab-content d-none">
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/salesbill.ejs") -%>
 
@@ -124,22 +133,23 @@
                   <%- include("./components/salesstore.ejs") -%>
 
                 </div>  
-                <div id="storeindiv" class="tab-content d-none">
+                <div id="storeindiv" class="tab-content mt-2 card d-none">
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/storein.ejs",{reference:reference}) -%>
 
                 </div>  
-                <div id="storeindivdetailed" class="tab-content d-none">
+                <div id="storeindivdetailed" class="tab-content card ">
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/storeindetail.ejs") -%>
 
                 </div>  
-                <div id="transactiondiv" class="tab-content">
+                <div id="transactiondiv" class="tab-content card mt-2">
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/transactiondiv.ejs") -%>
 
-                </div>  
-                <div id="storeoutdivdetailed" class="tab-content">
+                </div>
+
+                <div id="storeoutdivdetailed" class="tab-content card mt-2 d-none">
                   <!-- Content will be loaded here based on userType -->
                   <%- include("./components/salesstoredetail.ejs") -%>
 
@@ -224,7 +234,7 @@ var name = '<%= name %>';
     let transactionTable;
     let storeIndetailtable;
     let storeoutdetailtable;
-
+      let filterdata = '_id'
     const purchasecommitmentdiv = $('#purchasecommitmentdiv');
     const salescommitmentsdiv = $('#salescommitmentsdiv');
     const arrivalssdiv = $('#arrivalssdiv');
@@ -236,7 +246,6 @@ var name = '<%= name %>';
     const transactiondiv = $('#transactiondiv');
     const storeindivdetailed = $('#storeindivdetailed');
     const storeoutdivdetailed = $('#storeoutdivdetailed');
-
 //     function showpcommitments() {
 //       salescommitmentsdiv.addClass('d-none')
 //       purchasecommitmentdiv.removeClass('d-none')
@@ -299,50 +308,66 @@ function initializeDataTable(tableInstance, dataFunction,data) {
 function showpcommitments() {
   showContent(purchasecommitmentdiv, dataTable);
   initializeDataTable(dataTable, purchasecommitments);
+  activeTableInstance = showpcommitments
 }
 
 function showscommitments() {
   showContent(salescommitmentsdiv, scTable);
   initializeDataTable(scTable, salescommitments);
+  activeTableInstance = showscommitments
 }
 
 function showarrival() {
   showContent(arrivalssdiv, alTable);
   initializeDataTable(alTable, individualarrivals);
+  activeTableInstance = showarrival
 }
 function showdespatch() {
   showContent(despatcsdiv, dpTable);
   initializeDataTable(dpTable, individualdespatch);
+  activeTableInstance = showdespatch
 }
 function showsalesbill() {
   showContent(salesbilldiv, sbillTable);
   initializeDataTable(sbillTable, individualsalesbill);
+  activeTableInstance = showsalesbill
 }
 function showpurchasebill() {
   showContent(purchasebilldiv,psbillTable);
   initializeDataTable(psbillTable, purchasebilltable);
+  activeTableInstance = showpurchasebill
 }
 function showstoreout() {
   showContent(storeoutdiv,storeoutTable);
   initializeDataTable(storeoutTable, individualstoreout);
+  activeTableInstance = showstoreout
 }  
 function showstoreoutdetail(data) {
   showContent(storeoutdivdetailed,storeoutdetailtable);
   initializeDataTable(storeoutdetailtable, individualstoreoutdetail,data);
+  activeTableInstance = showstoreoutdetail
 }  
 
 function showstoreindetail(data) {
   showContent(storeindivdetailed,storeIndetailtable);
   initializeDataTable(storeIndetailtable, individualstoragedetail,data);
+  activeTableInstance = showstoreindetail
 }
 function showstorein() {
   showContent(storeindiv,storeIntable);
   initializeDataTable(storeIntable, individualstorein);
+  activeTableInstance = showstorein
 }
 function showtransactions() {
   showContent(transactiondiv,transactionTable);
   initializeDataTable(transactionTable, individualtransactions);
+  activeTableInstance = showtransactions
 }
+function filterDataChanged() {
+    const selectedValue = document.getElementById('filterdata').value;
+    filterdata = selectedValue
+    activeTableInstance()
+  }
 $(document).ready(function() {
     // Your function to run on page load
     showtransactions();
@@ -359,7 +384,6 @@ async function getdetailedreport(){
         // Add more parameters as needed
     }
 }).then(function(response) {
-              console.log(response)
                 var data = response.data.data;
                 // Populate fields with fetched data
                 $('#balanceweightspan').text(parseInt(data.balance));
@@ -411,6 +435,7 @@ function changeaccount(){
     // Redirect to the purchase account page with the selected account name
     window.location.href = "/purchaseaccount/" + selectedAccount;
 }
+
 </script>
 
                                     
