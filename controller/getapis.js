@@ -386,15 +386,22 @@ exports.salescommitments = async (req, res) => {
           const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
 
           // Determine sorting criteria based on filter value
-          let sortField = 'coffee._id'; // Default sorting by _id
-          if (filter === 'date') {
-              sortField = 'coffee.date'; // Sort by date if filter is 'date'
-          }
+          // let sortField = 'coffee._id'; // Default sorting by _id
+          // if (filter === 'date') {
+          //     sortField = 'coffee.date'; // Sort by date if filter is 'date'
+          // }
+
+          let sortField = { 'transaction._id': -1 }; // Default sorting by _id
+
+if (filter === 'date') {
+    // Sort by date first, and if dates are the same, sort by _id
+    sortField = { 'transaction.date': -1, 'transaction._id': -1 };
+}
           let pipeline = [
               {
                   $unwind: "$coffee"
               },
-             { $sort: { [sortField]: -1 } },
+             { $sort: sortField },
               {
                   $skip: start
               },
