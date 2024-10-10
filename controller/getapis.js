@@ -391,11 +391,11 @@ exports.salescommitments = async (req, res) => {
           //     sortField = 'coffee.date'; // Sort by date if filter is 'date'
           // }
 
-          let sortField = { 'transaction._id': -1 }; // Default sorting by _id
+          let sortField = { 'coffee._id': -1 }; // Default sorting by _id
 
 if (filter === 'date') {
     // Sort by date first, and if dates are the same, sort by _id
-    sortField = { 'transaction.date': -1, 'transaction._id': -1 };
+    sortField = { 'coffee.date': -1, 'coffee._id': -1 };
 }
           let pipeline = [
               {
