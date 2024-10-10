@@ -816,15 +816,17 @@ exports.salescommitments = async (req, res) => {
             const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
 
             // Determine sorting criteria based on filter value
-            let sortField = 'transaction._id'; // Default sorting by _id
+            let sortField = { 'transaction._id': -1 }; // Default sorting by _id
+
             if (filter === 'date') {
-                sortField = 'transaction.date'; // Sort by date if filter is 'date'
+                // Sort by date first, and if dates are the same, sort by _id
+                sortField = { 'transaction.date': -1, 'transaction._id': -1 };
             }
             let pipeline = [
               {
                   $unwind: "$transaction"
               },
-              { $sort: { [sortField]: -1 } },
+              { $sort: sortField },
 
               {
                   $skip: start
