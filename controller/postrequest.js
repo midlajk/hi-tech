@@ -296,7 +296,7 @@ exports.addTransactions = async (req, res) => {
 
     client.transaction.push({
       name: req.body.name,
-      date: req.body.date,
+      date: new Date(req.body.date),
       refference: req.body.refference || 'Transaction',
       revievable: parseFloat(req.body.revievable) || 0,
       payable: parseFloat(req.body.payable) || 0,
@@ -333,7 +333,7 @@ exports.addexpencesandincome = async (req, res) => {
 
     client.transaction.push({
       name: req.body.name,
-      date: req.body.date,
+      date: new Date(req.body.date),
       refference: req.body.refference,
       revievable: parseFloat(req.body.revievable) || 0,
       payable: parseFloat(req.body.payable) || 0,
@@ -449,7 +449,7 @@ exports.addstoreinsettlement = async (req, res) => {
     paid = (client.tds == 'YES' ? parseInt(req.body.sstotal * 0.1 / 100) : 0)
     client.transaction.push({
       name: req.body.name,
-      date: req.body.ssdate,
+      date: new Date(req.body.ssdate),
       refference: 'Settlement ' + req.body.ssweight + '* ' + req.body.ssepp + '% *' + req.body.ssrate,
       revievable: 0,
       payable: payable,
@@ -656,7 +656,7 @@ exports.addstoreoutsettlement = async (req, res) => {
 
     client.transaction.push({
       name: req.body.name,
-      date: req.body.ssdate,
+      date: new Date(req.body.ssdate),
       refference: 'Settlement ' + req.body.ssitem + ' ' + req.body.weight + '*' + req.body.ssrate,
       revievable: recievable,
       payable: 0,
@@ -1260,7 +1260,7 @@ exports.addtrip = async (req, res) => {
   const client = await Transportagent.findOne({ agent: req.body.name });
   client.transaction.push({
     name: req.body.trip,
-    date: req.body.date,
+    date: new Date(req.body.date),
     refference: req.body.item + '  ' + req.body.quantity,
     payable: parseInt(req.body.rate || 0),
     medium: req.body.vehicle,
@@ -1366,7 +1366,7 @@ exports.addsalary = async (req, res) => {
 
     foundClient.transaction.push({
       name: req.body.type,
-      date: req.body.date,
+      date: new Date(req.body.date),
       refference: reference,
       payable: parseInt(req.body.payable || 0),
       medium: req.body.medium,
@@ -1399,7 +1399,7 @@ exports.addLoadingPayment = async (req, res) => {
     // Add a transaction to the agent's transaction history
     client.transaction.push({
       name: decodedName,
-      date: req.body.date,
+      date: new Date(req.body.date),
       refference: req.body.work,
       payable: parseInt(req.body.agent.total),
       medium: `${req.body.agent.bags} ${req.body.unit} * ${req.body.agent.kooli}`,
