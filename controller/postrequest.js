@@ -1,9 +1,9 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
-const TelegramBot = require('node-telegram-bot-api');
+// const TelegramBot = require('node-telegram-bot-api');
 
-const token = process.env.TELE_API;
-const bot = new TelegramBot(token, { polling: true }); 
+// const token = process.env.TELE_API;
+// const bot = new TelegramBot(token, { polling: true }); 
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -536,13 +536,14 @@ async function purchasebill(req) {
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, '0');
+const lotnumb = `${day}${month}${year}-${hours}${minutes}${seconds}${milliseconds}`;
     // Concatenate the components to form the unique ID
-    lotnumber = `${day}${month}${year}-${hours}${minutes}${seconds}`;
     existingClient.purchasebillSchema.push({
       date: req.body.ssdate,
       item: req.body.ssitem,
-      invoice: lotnumber,
-      uniqueid: lotnumber,
+      invoice: req.body.lotnumber,
+      uniqueid: lotnumb,
       commitment: req.body.uniqueId,
       lotnumber: req.body.lotnumber,
       weight: parseInt((req.body.weight * 100) / req.body.eppercentage),
@@ -557,7 +558,7 @@ async function purchasebill(req) {
 
     if (transaction) {
       // Add the new element to the transaction's 'bill' array
-      transaction.bills.push(lotnumber);
+      transaction.bills.push(lotnumb);
     }
 
 
@@ -657,7 +658,7 @@ exports.addstoreoutsettlement = async (req, res) => {
     client.transaction.push({
       name: req.body.name,
       date: new Date(req.body.ssdate),
-      refference: 'Settlement ' + req.body.ssitem + ' ' + req.body.weight + '*' + req.body.ssrate,
+      refference: 'S-' +req.body.ssitem +' ' + req.body.ssweight + '* ' + req.body.ssepp + '% *' + req.body.ssrate,
       revievable: recievable,
       payable: 0,
       medium: client.tds == 'YES' ? 'TDS' : 'Purchase',
@@ -700,12 +701,13 @@ async function salesbill(req) {
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
     // Concatenate the components to form the unique ID
-    lotnumber = `${day}${month}${year}-${hours}${minutes}${seconds}`;
+    const milliseconds = String(currentDate.getMilliseconds()).padStart(3, '0');
+    const lotnumb = `${day}${month}${year}-${hours}${minutes}${seconds}${milliseconds}`;
     existingClient.salesbillSchema.push({
       date: req.body.ssdate,
       item: req.body.ssitem,
-      invoice: lotnumber,
-      uniqueid: lotnumber,
+      invoice: req.body.lotnumber,
+      uniqueid: lotnumb,
       commitment: req.body.uniqueId,
       lotnumber: req.body.lotnumber,
       weight: parseInt((req.body.weight * 100) / req.body.eppercentage),
@@ -720,7 +722,7 @@ async function salesbill(req) {
 
     if (transaction) {
       // Add the new element to the transaction's 'bill' array
-      transaction.bills.push(lotnumber);
+      transaction.bills.push(lotnumb);
     }
 
 
@@ -850,7 +852,7 @@ exports.createDailyReport = async (req, res) => {
 
     // Generate and send PDF report
     const filePath = await generatePdfReport(data, req.body.reportdate);
-    await bot.sendDocument(process.env.CHAT_ID, filePath);
+    // await bot.sendDocument(process.env.CHAT_ID, filePath);
 
     // Delete the file after sending
     fs.unlink(filePath, (err) => {

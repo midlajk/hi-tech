@@ -57,7 +57,7 @@
           // Format the date using moment.js
           return moment(data).format('DD/MM/YYYY');
         }
-      },  { data: 'invoice' },
+      },  { data: 'uniqueid' },
         { data: 'item' },
         { data: 'lotnumber' },
         { data: 'commitment' },
@@ -82,6 +82,7 @@
         },
       ],
     });
+    $('#sbillTable').off('click', '.delete-btn');
 
     $('#sbillTable').on('click', '.delete-btn', function() {
     var id = $(this).data('id');

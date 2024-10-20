@@ -83,7 +83,8 @@
     });
 
     // Delete Button Click Event
-  
+    $('#despatchtable').off('click', '.delete-btn');
+
     $('#despatchtable').on('click', '.delete-btn', function() {
       if(!confirm('Do you want to delete the data')){
         return 

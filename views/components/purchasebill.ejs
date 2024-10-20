@@ -62,7 +62,7 @@
           return moment(data).format('DD/MM/YYYY');
         }
       },
-      { data: 'invoice' },
+      { data: 'uniqueid' },
         { data: 'item' },
         { data: 'lotnumber' },
         { data: 'commitment' },
@@ -85,6 +85,7 @@
         },
       ],
     });
+    $('#purchasebilltable').off('click', '.delete-btn');
 
     $('#purchasebilltable').on('click', '.delete-btn', function() {
     var id = $(this).data('id');

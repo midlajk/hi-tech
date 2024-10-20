@@ -267,6 +267,8 @@ document.getElementById('transactiondate').value = formattedDate;
         },
       ],
     });
+    $('#transactionTable').off('click', '.delete-btn');
+
     $('#transactionTable').on('click', '.delete-btn', function () {
       var id = $(this).data('id');
     var party = $(this).data('party');

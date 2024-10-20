@@ -47,15 +47,14 @@
         </div>
         <div class="col mb-3">
           <label for="image" class="form-label">Tax</label>
-          <select  id="ssreference" name="ssreference" class="form-control">
+          <select  id="ssreferences" name="ssreferences" class="form-control">
             <option value="0">sgst-0% + cgst-0% + igst-0%</option>
             <option value="5">sgst-2.5% + cgst-2.5% + igst-0%</option>
             <option value="10">sgst-2.5% + cgst-2.5% + igst-5%</option>
 
 
           </select>
-        </div>
-      </div>
+        
         </div>
       </div>
 
@@ -95,7 +94,8 @@
 <input type="hidden" name="ssitems" id="ssitems">
         </div>
       </div>
-    
+    </div>
+
  <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" onclick="closesalesetllement()"
         data-bs-dismiss="modal">
@@ -396,13 +396,14 @@ $('#ssweights, #ssrates,#ssepps').on('input', function() {
 async function postsalesettlement() {
     const ssdate = document.getElementById('ssdates').value;
     const sscrop = document.getElementById('sscrops').value;
-    const ssreference = document.getElementById('ssreferences').value;
+    const ssreference = document.getElementById('ssreference').value;
     const ssweight = document.getElementById('ssweights').value;
     const ssep = document.getElementById('sseps').value;
     const ssepp = document.getElementById('ssepps').value;
     const ssrate = document.getElementById('ssrates').value;
     const ssitem = document.getElementById('ssitems').value;
     const sscommitment = document.getElementById('sscommitments').value;
+    const sstotal = document.getElementById('sstotals').value;
 
     const payload = {
       name:name,
@@ -414,8 +415,8 @@ async function postsalesettlement() {
       ssepp: ssepp,
       ssrate: ssrate,
       ssitem: ssitem,
-      sscommitment:sscommitment
-
+      sscommitment:sscommitment,
+      sstotal:sstotal
     };
     if(!ssdate||!ssweight||!ssepp||!ssrate||!ssitem){
       return alert('Please fill Date,Item,Weight,Ep,Rate fields')

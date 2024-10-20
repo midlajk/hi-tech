@@ -89,7 +89,8 @@
 
     // Delete Button Click Event
   
-  
+    $('#arrivaltable').off('click', '.delete-btn');
+
     $('#arrivaltable').on('click', '.delete-btn', function() {
       if(!confirm('Do you want to delete the data')){
         return 

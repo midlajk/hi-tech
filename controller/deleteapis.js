@@ -65,6 +65,7 @@ exports.deletesalescommitments = async (req, res) => {
 
 
 exports.deletepurchasebill = async (req, res) => {
+
     const billId = req.params.billId;
 
     try {
@@ -75,18 +76,36 @@ exports.deletepurchasebill = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
         const purchasebill = client.purchasebillSchema.find(commitment => commitment.uniqueid == billId);
-        const transaction = client.transaction.find(data => data.id == billId);
+        // const transaction = client.transaction.find(data => data.id == billId);
+        const transaction = client.transaction.find(data => 
+            data.id === billId || data.bills.includes(billId)
+          );
         const coffee = client.coffee.find(data => data.lotnumber == purchasebill.lotnumber);
         if (coffee) {
             coffee.storage = coffee.storage + purchasebill.qty
 
         }
         const purchasebillSchema = client.purchasebillSchema.findIndex(commitment => commitment.uniqueid == billId);
-        const transactionindex = client.transaction.findIndex(data => data.id == billId);
-        var payable = transaction.payable
-        var recievable = transaction.revievable
-        var paid = transaction.paid
-        var recieved = transaction.recieved
+        const transactionindex = client.transaction.findIndex(data => data.id === billId || data.bills.includes(billId));
+        var payable = 0
+        var recievable = 0
+        var paid = 0
+        var recieved = 0
+        if(transaction && transaction.bills.length>1){
+            payable = purchasebill.total
+            recievable = 0
+            paid = purchasebill.tds
+            recieved = 0
+        }else if(transaction){
+         payable = transaction.payable
+         recievable = transaction.revievable
+         paid = transaction.paid
+         recieved = transaction.recieved
+
+        }
+
+       
+
         const storeout = client.storeout + 0
         const storein = client.storein + parseFloat(purchasebill.qty)
 
@@ -103,9 +122,23 @@ exports.deletepurchasebill = async (req, res) => {
             purchasecommitment.balance = parseInt(weight * coffee.eppercentage / 100);
 
         }
+        if (transaction && transaction.bills.length>1) {
+            // Calculate the new balance by subtracting the delivered quantity from the total quantity
+            // Update the balance in the sales commitment object
+            var transactionpayable = payable
+            var transactionpaid = paid
+
+            transaction.payable = transaction.payable-transactionpayable;
+            transaction.paid = transaction.paid-transactionpaid;
+        
+            transaction.bills = transaction.bills.filter(bill => bill !== billId);
+
+        }else if(transaction){
+                    client.transaction.splice(transactionindex, 1);
+
+        }
         // Remove the purchase commitment from the array
         client.purchasebillSchema.splice(purchasebillSchema, 1);
-        client.transaction.splice(transactionindex, 1);
         client.payable = client.payable - payable;
         client.recievable = client.recievable - recievable;
         client.paid = client.paid - paid;
@@ -137,8 +170,10 @@ exports.deletesalesbill = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
         const salesbill = client.salesbillSchema.find(commitment => commitment.uniqueid == billId);
-        console.log(salesbill)
-        const transaction = client.transaction.find(data => data.id == billId);
+        // const transaction = client.transaction.find(data => data.id == billId);
+        const transaction = client.transaction.find(data => 
+            data.id === billId || data.bills.includes(billId)
+          );
         const coffee = client.despatch.find(data => data.lotnumber == salesbill.lotnumber);
         if (coffee) {
             coffee.storage = coffee.storage + salesbill.qty
@@ -146,11 +181,29 @@ exports.deletesalesbill = async (req, res) => {
 
         }
         const salesbillSchema = client.salesbillSchema.findIndex(commitment => commitment.uniqueid == billId);
-        const transactionindex = client.transaction.findIndex(data => data.id == billId);
-        var payable = transaction.payable
-        var recievable = transaction.revievable
-        var paid = transaction.paid
-        var recieved = transaction.recieved
+        // const transactionindex = client.transaction.findIndex(data => data.id == billId);
+        const transactionindex = client.transaction.findIndex(data => data.id === billId || data.bills.includes(billId));
+        var payable = 0
+        var recievable = 0
+        var paid = 0
+        var recieved = 0
+        if(transaction && transaction.bills.length>1){
+            console.log('here')
+            payable = 0
+            recievable = salesbill.total
+            paid = 0
+            recieved = salesbill.tds
+        }else if(transaction){
+         payable = transaction.payable
+         recievable = transaction.revievable
+         paid = transaction.paid
+         recieved = transaction.recieved
+
+        }
+        // var payable = transaction.payable
+        // var recievable = transaction.revievable
+        // var paid = transaction.paid
+        // var recieved = transaction.recieved
         const storeout = client.storeout + parseFloat(salesbill.qty)
         const storein = client.storein + 0
 
@@ -167,9 +220,24 @@ exports.deletesalesbill = async (req, res) => {
             salescommitment.balance = parseInt(weight * coffee.eppercentage / 100);
 
         }
+        if (transaction && transaction.bills.length>1) {
+            // Calculate the new balance by subtracting the delivered quantity from the total quantity
+            // Update the balance in the sales commitment object
+            // var transrecievable = recievable
+            // var transrecieved = recieved
+
+            transaction.revievable = transaction.revievable-recievable;
+            transaction.recieved = transaction.recieved-recieved;
+        
+            transaction.bills = transaction.bills.filter(bill => bill !== billId);
+
+        }else if(transaction){
+                    client.transaction.splice(transactionindex, 1);
+
+        }
         // Remove the purchase commitment from the array
         client.salesbillSchema.splice(salesbillSchema, 1);
-        client.transaction.splice(transactionindex, 1);
+        // client.transaction.splice(transactionindex, 1);
         client.payable = client.payable - payable;
         client.recievable = client.recievable - recievable;
         client.paid = client.paid - paid;

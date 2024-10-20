@@ -113,6 +113,8 @@
         },
       ],
     });
+    $('#arrivalstable').off('click', '.delete-btn');
+
     $('#arrivalstable').on('click', '.delete-btn', function() {
     var id = $(this).data('id');
     var uniqueid = $(this).data('uniqueid');

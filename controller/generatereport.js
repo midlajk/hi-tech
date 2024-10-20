@@ -70,7 +70,7 @@ async function purchasebill(req, res, client) {
     id: req.body.uniqueid,
     recieved: 0,
     paid: existingClient.tds == 'YES'? parseInt(req.body.total * 0.1 / 100) : 0,
-
+    bills:[req.body.uniqueid]
     // Add other fields as needed
   });
 
@@ -123,7 +123,6 @@ exports.generatepurchasereport = async (req, res, hi) => {
   try {
     let product = await PoductsSchema.findOne({product:req.body.item})
     let existingClient = await ClientModel.findOne({ name: req.body.billTo });
-    console.log(req.body.delivery)
 
     if (existingClient) {
       // If the client exists, update the coffee array

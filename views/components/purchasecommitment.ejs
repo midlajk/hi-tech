@@ -178,6 +178,7 @@
         },
       ],
     });
+    $('#example').off('click', '.delete-btn');
 
     $('#example').on('click', '.delete-btn', function() {
     var id = $(this).data('id');

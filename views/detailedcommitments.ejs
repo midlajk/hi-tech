@@ -213,6 +213,8 @@ function abcd() {
         },
       ],
     });
+    $('#arrivalstable').off('click', '.delete-btn');
+
     $('#arrivalstable').on('click', '.delete-btn', function() {
     var id = $(this).data('id');
     var party = $(this).data('party');

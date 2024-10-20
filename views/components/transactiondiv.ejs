@@ -131,6 +131,7 @@ document.getElementById('transactiondate').value = formattedDate;
 
     // Delete Button Click Event
   
+    $('#transactionTable').off('click', '.delete-btn');
 
     $('#transactionTable').on('click', '.delete-btn', function () {
       var id = $(this).data('id');
