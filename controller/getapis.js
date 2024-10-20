@@ -61,7 +61,6 @@ exports.getclients = async (req, res) => {
 
       // Execute the aggregation pipeline to fetch sorted clients
       const clients = await ClientModel.aggregate(aggregationPipeline);
-      console.log(clients)
 
       // Count total records that match the search criteria
       const totalClients = await ClientModel.countDocuments(query);
