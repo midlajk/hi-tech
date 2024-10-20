@@ -49,7 +49,8 @@
         url: '/purchasebills', // Replace with your API endpoint
         dataSrc: 'data', // Key that holds the array of data in the API response
         data: function (d) {
-             d.name = name; // Add the 'name' parameter to the data object
+             d.name = name;
+             d.filter = filterdata; // Add the 'name' parameter to the data object
             return d;
           // Add any additional parameters you want to send to the server here
         },

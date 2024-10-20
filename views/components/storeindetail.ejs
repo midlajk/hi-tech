@@ -19,7 +19,7 @@
   </table>
 
 </div>
-</
+
 
 
 <!-- Include Axios library (if not already included) -->
@@ -43,7 +43,8 @@
         dataSrc: 'data', // Key that holds the array of data in the API response
         data: function (d) {
              d.name = name;
-             d.item =  itemname// Add the 'name' parameter to the data object
+             d.item =  itemname;
+             d.filter = filterdata;// Add the 'name' parameter to the data object
             return d;
           // Add any additional parameters you want to send to the server here
         },

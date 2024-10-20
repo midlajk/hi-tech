@@ -226,7 +226,7 @@ dataTable = $('#commitments-table').DataTable({
         return `<div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow assign-commitment-btn" 
                      data-id="${row.id}"
-                    data-weight="${row.balance}"
+                    data-weight="${row.balanceweight}"
                     data-rate="${row.rate}"
                     >
               <i class="bx bx-plus-circle text-primary"></i>
@@ -239,17 +239,18 @@ dataTable = $('#commitments-table').DataTable({
 });
 }
 $('#commitments-table').on('click', '.assign-commitment-btn', function() {
-    var actualep = document.getElementById('actualepcom').value
-    var actualweightcom = document.getElementById('actualweightcom').value
-
-    var weight = 0
-    var actualweight =0 ;
-    if(actualep > 0){
-      weight = actualep
-      actualweight = actualweightcom
-    }else{
-      weight = $(this).data('weight');   
-    }
+    // var actualep = document.getElementById('actualepcom').value
+    // var actualweightcom = document.getElementById('actualweightcom').value
+     var eppercentage = document.getElementById('ssepp').value
+    // var weight = 0
+    var actualweight =$(this).data('weight'); 
+    var actualep = ((actualweight/100)*eppercentage).toFixed(1)
+    // if(actualep > 0){
+    //   weight = actualep
+    //   actualweight = actualweightcom
+    // }else{
+    //   weight = $(this).data('weight');   
+    // }
     var id = $(this).data('id');
     var rate = $(this).data('rate');   
     $('#sscommitment').val(id)
@@ -258,7 +259,7 @@ $('#commitments-table').on('click', '.assign-commitment-btn', function() {
     $('#ssweight').val(actualweight)
     $('#ssep').val(actualep)
 
-    $('#sstotal').val(parseInt(rate*weight))
+    $('#sstotal').val(parseInt(rate*actualep))
 
     // Call the assignCommitment function with the retrieved arguments
 });

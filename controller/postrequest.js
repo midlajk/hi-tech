@@ -482,8 +482,14 @@ const decrementCoffeeStorage = async (clientId, data, uniqueId,lastTransactionId
       const client = await ClientModel.findOne(
         {
           _id: clientId,
-          "coffee.storage": { $gt: 0 },
-          "coffee.item": data.ssitem, // Ensures the right item
+          coffee: {
+            $elemMatch: {
+              item: data.ssitem, // Matches the specific item
+              storage: { $gt: 0 } // Ensures storage is greater than 0
+            }
+          }
+          // "coffee.storage": { $gt: 0 },
+          // "coffee.item": data.ssitem, // Ensures the right item
         },
         { "coffee.$": 1 } // Selects only the first matching coffee item
       );
@@ -758,15 +764,22 @@ async function salesbill(req) {
 }
 const decrementcoffeeoutstorage = async (clientId, data, uniqueId,lastTransactionId) => {
   let remaining = data.ssep;
-
+console.log(data.ssitem)
   while (remaining > 0) {
     try {
       // Find a client with coffee storage > 0 for the specified item
       const client = await ClientModel.findOne(
         {
           _id: clientId,
-          "despatch.storage": { $gt: 0 },
-          "despatch.item": data.ssitem, // Ensures the right item
+          // "despatch.storage": { $gt: 0 },
+          // "despatch.item": data.ssitem,
+          despatch: {
+            $elemMatch: {
+              item: data.ssitem, // Matches the specific item
+              storage: { $gt: 0 } // Ensures storage is greater than 0
+            }
+          }
+           // Ensures the right item
         },
         { "despatch.$": 1 } // Selects only the first matching coffee item
       );

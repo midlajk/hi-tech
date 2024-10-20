@@ -510,7 +510,6 @@ if (filter === 'date') {
    
       ///////////////////////////////////////////////////////////////// biills
       exports.salesbills  = (async (req, res) => {
-        console.log('sdsd')
         // Assuming you have already imported required modules and set up your Express app
         
         // API endpoint for paginated data
@@ -518,7 +517,14 @@ if (filter === 'date') {
             const name = req.query.name;
             const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
             const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
-            const length = parseInt(req.query.length) || 10; // Get the number of records per page
+            const length = parseInt(req.query.length) || 10;
+            const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+            // Determine sorting criteria based on filter value
+            let sortField = 'salesbillSchema._id'; // Default sorting by _id
+            if (filter === 'date') {
+                sortField = 'salesbillSchema.date'; // Sort by date if filter is 'date'
+            } // Get the number of records per page
             // Fetch data from the database with pagination
             const client = await ClientModel.aggregate([
               {
@@ -527,7 +533,7 @@ if (filter === 'date') {
               {
                   $unwind: "$salesbillSchema"
               },
-              { $sort: { 'salesbillSchema._id': -1 } },
+              { $sort: { [sortField]: -1 } },
 
               {
                   $skip: start
@@ -589,6 +595,13 @@ if (filter === 'date') {
               const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
               const length = parseInt(req.query.length) || 10; // Get the number of records per page
               // Fetch data from the database with pagination
+              const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+              // Determine sorting criteria based on filter value
+              let sortField = 'purchasebillSchema._id'; // Default sorting by _id
+              if (filter === 'date') {
+                  sortField = 'purchasebillSchema.date'; // Sort by date if filter is 'date'
+              }
               const client = await ClientModel.aggregate([
                 {
                   $match: { name: name } // Match documents by name
@@ -596,7 +609,7 @@ if (filter === 'date') {
                 {
                     $unwind: "$purchasebillSchema"
                 },
-                { $sort: { 'purchasebillSchema._id': -1 } },
+                { $sort: { [sortField]: -1 } },
 
                 {
                     $skip: start
@@ -653,6 +666,13 @@ if (filter === 'date') {
             const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
             const length = parseInt(req.query.length) || 10; // Get the number of records per page
             // Fetch data from the database with pagination
+            const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+      // Determine sorting criteria based on filter value
+      let sortField = 'coffee._id'; // Default sorting by _id
+      if (filter === 'date') {
+          sortField = 'coffee.date'; // Sort by date if filter is 'date'
+      }
             const client = await ClientModel.aggregate([
               
               {
@@ -667,7 +687,7 @@ if (filter === 'date') {
               {
                 $match: { "coffee.storage": { $gt: 0 } } // Match documents where coffee.storage is greater than 0
             },
-            { $sort: { 'coffee._id': -1 } },
+            { $sort: { [sortField]: -1 } },
 
               {
                   $skip: start
@@ -735,6 +755,13 @@ if (filter === 'date') {
               const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
               const length = parseInt(req.query.length) || 10; // Get the number of records per page
               // Fetch data from the database with pagination
+              const filter = req.query.filter || '_id'; // Get the filter type (default is '_id')
+
+              // Determine sorting criteria based on filter value
+              let sortField = 'despatch._id'; // Default sorting by _id
+              if (filter === 'date') {
+                  sortField = 'despatch.date'; // Sort by date if filter is 'date'
+              }
               const client = await ClientModel.aggregate([
                 {
                   $match: { name: name } // Match documents by name
@@ -748,7 +775,7 @@ if (filter === 'date') {
                 {
                   $match: { "despatch.storage": { $gt: 0 } } // Match documents where coffee.storage is greater than 0
               },
-              { $sort: { 'despatch._id': -1 } },
+              { $sort: { [sortField]: -1 } },
 
               
                 {

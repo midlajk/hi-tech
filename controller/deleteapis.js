@@ -64,7 +64,7 @@ exports.deletesalescommitments = async (req, res) => {
 };
 
 
-exports.deletepurchasebill = async (req, res) => {
+const deletepurchasebill = async (req, res) => {
 
     const billId = req.params.billId;
 
@@ -72,8 +72,14 @@ exports.deletepurchasebill = async (req, res) => {
         const client = await ClientModel.findOne({ name: req.params.name });
 
         if (!client) {
+            if(req.params.fun){
+                return;
 
-            return res.status(404).json({ error: 'Client not found' });
+            }else{
+                 return res.status(404).json({ error: 'Client not found' });
+            }
+
+           
         }
         const purchasebill = client.purchasebillSchema.find(commitment => commitment.uniqueid == billId);
         // const transaction = client.transaction.find(data => data.id == billId);
@@ -149,17 +155,25 @@ exports.deletepurchasebill = async (req, res) => {
         await client.save();
 
         // If successful, send a success response
-        return res.json({ message: 'Purchase commitment deleted successfully' });
+        if(req.params.fun){
+            return;
+        }else{
+            return res.json({ message: 'Purchase commitment deleted successfully' });
+        }
+        
     } catch (error) {
-        console.log(error)
-
-        console.log('Error deleting purchase commitment:', error);
+        if(req.params.fun){
+            return;
+        }else{
+            console.log('Error deleting purchase commitment:', error);
         return res.status(500).json({ error: 'Server error' });
+        }
+        
     }
 };
+exports.deletepurchasebill = deletepurchasebill;
 
-
-exports.deletesalesbill = async (req, res) => {
+const deletesalesbill = async (req, res) => {
     const billId = req.params.billId;
 
     try {
@@ -167,7 +181,13 @@ exports.deletesalesbill = async (req, res) => {
 
         if (!client) {
 
-            return res.status(404).json({ error: 'Client not found' });
+            if(req.params.fun){
+                return;
+
+            }else{
+                 return res.status(404).json({ error: 'Client not found' });
+            }
+
         }
         const salesbill = client.salesbillSchema.find(commitment => commitment.uniqueid == billId);
         // const transaction = client.transaction.find(data => data.id == billId);
@@ -208,6 +228,7 @@ exports.deletesalesbill = async (req, res) => {
         const storein = client.storein + 0
 
         if (salesbillSchema === -1) {
+            
             return res.status(404).json({ error: 'Purchase commitment not found' });
         }
         const salescommitment = client.salescommitmentsschema.find(commitment => commitment.id === salesbill.commitment);
@@ -248,15 +269,22 @@ exports.deletesalesbill = async (req, res) => {
         await client.save();
 
         // If successful, send a success response
-        return res.json({ message: 'Purchase commitment deleted successfully' });
+        if(req.params.fun){
+            console.log('here')
+            return;
+        }else{
+            return res.json({ message: ' deleted successfully' });
+        };
     } catch (error) {
-        console.log(error)
-
-        console.log('Error deleting purchase commitment:', error);
+        if(req.params.fun){
+            return;
+        }else{
+            console.log('Error deleting purchase commitment:', error);
         return res.status(500).json({ error: 'Server error' });
+        }
     }
 };
-
+exports.deletesalesbill = deletesalesbill;
 exports.deleteuser = async (req, res) => {
     const { id, password } = req.body;
     let user = await User.findOne({ username:req.session.user.username });
@@ -289,25 +317,44 @@ exports.deleteuser = async (req, res) => {
         const transaction = client.transaction.find(transaction => transaction._id == id);
      
         const transactionindex = client.transaction.findIndex(data => data._id == id);
-        console.log(transaction)
         var payable = transaction.payable
         var recievable = transaction.revievable
         var paid = transaction.paid
         var recieved = transaction.recieved
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found' });
+        }
 
-      
-        // Remove the purchase commitment from the array
-        client.transaction.splice(transactionindex, 1);
-        client.payable = (client.payable||0) - payable;
+        if (recievable > 0 && transaction.bills && transaction.bills.length > 0) {
+            // Call a function for each element in bills array
+            for (const bill of transaction.bills) {
+                req.params.billId = bill;
+                req.params.fun = true; // Set billId for each iteration
+                await deletesalesbill(req, res); // Call your function here for each bill
+            }
+        }else if (payable > 0 && transaction.bills && transaction.bills.length > 0) {
+            // Call a different function for each element in bills array
+            for (const bill of transaction.bills) {
+                req.params.billId = bill;
+                req.params.fun = true;  // Set billId for each iteration
+                await deletepurchasebill(req, res); // Call your function here for each bill
+            }
+        }else{
+            client.transaction.splice(transactionindex, 1); 
+            client.payable = (client.payable||0) - payable;
         client.recievable = (client.recievable||0) - recievable;
         client.paid = (client.paid||0) - paid;
         client.recieved = (client.recieved||0) - recieved;
+        }
+      
+        // Remove the purchase commitment from the array
+        
+       
         await client.save();
 
         // If successful, send a success response
         return res.json({ message: 'Purchase commitment deleted successfully' });
     } catch (error) {
-        console.log(error)
 
         console.log('Error deleting purchase commitment:', error);
         return res.status(500).json({ error: 'Server error' });

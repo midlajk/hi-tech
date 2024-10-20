@@ -175,7 +175,6 @@
   var billableeppercentages =0;
 
   function opensaleaCommitments() {
-    console.log('sdsd')
 
 
 const ditem = document.getElementById('ssitems').value
@@ -233,7 +232,7 @@ dataTable = $('#sale-commitments-table').DataTable({
         return `<div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow assign-commitment-btn" 
                      data-id="${row.id}"
-                    data-weight="${row.balance}"
+                    data-weight="${row.balanceweight}"
                     data-rate="${row.rate}"
                     >
               <i class="bx bx-plus-circle text-primary"></i>
@@ -246,17 +245,20 @@ dataTable = $('#sale-commitments-table').DataTable({
 });
 }
 $('#sale-commitments-table').on('click', '.assign-commitment-btn', function() {
-    var actualep = document.getElementById('actualepcoms').value
-    var actualweightcoms = document.getElementById('actualweightcoms').value
-
-    var weight = 0
-    var actualweight =0 ;
-    if(actualep > 0){
-      weight = actualep
-      actualweight = actualweightcoms
-    }else{
-      weight = $(this).data('weight');   
-    }
+    // var actualep = document.getElementById('actualepcoms').value
+    // var actualweightcoms = document.getElementById('actualweightcoms').value
+    var eppercentage = document.getElementById('sseps').value
+    // var weight = 0
+    var actualweight =$(this).data('weight'); 
+    var actualep = ((actualweight/100)*eppercentage).toFixed(1)
+    // var weight = 0
+    // var actualweight =0 ;
+    // if(actualep > 0){
+    //   weight = actualep
+    //   actualweight = actualweightcoms
+    // }else{
+    //   weight = $(this).data('weight');   
+    // }
     var id = $(this).data('id');
     var rate = $(this).data('rate');   
     $('#sscommitments').val(id)
@@ -265,7 +267,7 @@ $('#sale-commitments-table').on('click', '.assign-commitment-btn', function() {
     $('#ssweights').val(actualweight)
     $('#sseps').val(actualep)
 
-    $('#sstotals').val(parseInt(rate*weight))
+    $('#sstotals').val(parseInt(rate*actualep))
 
     // Call the assignCommitment function with the retrieved arguments
 });
@@ -396,7 +398,7 @@ $('#ssweights, #ssrates,#ssepps').on('input', function() {
 async function postsalesettlement() {
     const ssdate = document.getElementById('ssdates').value;
     const sscrop = document.getElementById('sscrops').value;
-    const ssreference = document.getElementById('ssreference').value;
+    const ssreference = document.getElementById('ssreferences').value;
     const ssweight = document.getElementById('ssweights').value;
     const ssep = document.getElementById('sseps').value;
     const ssepp = document.getElementById('ssepps').value;
