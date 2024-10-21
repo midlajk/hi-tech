@@ -279,6 +279,7 @@ $('#submitTransaction').click(function() {
       $('#transactionpaid').val(0);
       $('#transactionrecieved').val(0);
       $('#transactionrefference').val('');
+      $('#party').val('');
     },
     error: function(xhr, status, error) {
       transactionTable.ajax.reload();
