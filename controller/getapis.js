@@ -6,10 +6,13 @@ const CoffeeSchema = mongoose.model('CoffeeSchema');
 const Reference = mongoose.model('Reference');
 const PoductsSchema = mongoose.model('PoductsSchema')
 const Transportagent = mongoose.model('Transportagent')
+const User = mongoose.model('User')
 
 const Financialyear = mongoose.model('Financialyear')
 const Attendance = mongoose.model('Attendance')
 const Loadinwork = mongoose.model('Loadinwork')
+const Partydelete = mongoose.model('Partydelete')
+const Insidetrash = mongoose.model('Insidetrash');
 
 exports.getclients = async (req, res) => {
   try {
@@ -150,7 +153,6 @@ exports.getclients = async (req, res) => {
   };
 
   exports.getdetailedproductproducts = async (req, res) => {
-    console.log('here')
     try {
 
 
@@ -163,6 +165,23 @@ exports.getclients = async (req, res) => {
     
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+  };
+
+  exports.getuserslist = async (req, res) => {
+    try {
+
+
+    const products = await User.find();
+console.log()
+    res.json(products);
+
+        
+  
+    
+    } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
     }
 
@@ -2265,3 +2284,82 @@ exports.notcalculatedloads = async (req, res) => {
       res.status(500).json({ error: 'Server error' });
   }
 };
+
+
+///////////trash outide ///////////
+
+
+
+exports.trashoutside = async (req, res) => {
+  try {
+   
+      const draw = parseInt(req.query.draw) || 1;
+      const start = parseInt(req.query.start) || 0;
+      const length = parseInt(req.query.length) || 10;
+
+      let pipeline = [
+        { $sort: { '_id': -1 } },
+          {
+              $skip: start
+          },
+          {
+              $limit: length
+          },
+         
+      ];
+    
+      // If name is provided in the query, add a $match stage to filter by name
+    
+      const client = await Partydelete.aggregate(pipeline);
+
+
+      res.json({
+          draw,
+          recordsTotal: client.length,
+          recordsFiltered: client.length,
+          data: client.length>0?client:[],
+      });
+     
+  } catch (error) {
+      console.log('Error fetching data:', error);
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+exports.gettrashinside = async (req, res) => {
+  try {
+   
+      const draw = parseInt(req.query.draw) || 1;
+      const start = parseInt(req.query.start) || 0;
+      const length = parseInt(req.query.length) || 10;
+
+      let pipeline = [
+        { $sort: { '_id': -1 } },
+          {
+              $skip: start
+          },
+          {
+              $limit: length
+          },
+         
+      ];
+    
+      // If name is provided in the query, add a $match stage to filter by name
+    
+      const client = await Insidetrash.aggregate(pipeline);
+
+
+      res.json({
+          draw,
+          recordsTotal: client.length,
+          recordsFiltered: client.length,
+          data: client.length>0?client:[],
+      });
+     
+  } catch (error) {
+      console.log('Error fetching data:', error);
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+ 

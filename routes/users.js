@@ -48,9 +48,10 @@ router.post('/login', async function(req, res, next) {
           // If user exists, compare hashed passwords
           const passwordMatch = await bcrypt.compare(password, user.password);
 
-          if (passwordMatch) {
+          if (passwordMatch && user.accounttype != 'Banned') {
               // Update user's token and save it
               user.uid = uid;
+              user.lastlogin = new Date();
               await user.save();
 
               // Store user session data
@@ -107,7 +108,8 @@ async function createnewuser(username,password,uid,usertype){
         pcomm: 0,
         scomm: 0, // Initial value for urdbillid
         uid: uid,
-        accounttype : usertype?usertype:'Admin'
+        accounttype : usertype?usertype:'Admin',
+        lastlogin:new Date()
     });
     await user.save();
 
@@ -117,6 +119,17 @@ async function createnewuser(username,password,uid,usertype){
     // Send JSON response to the frontend
   
 }
+router.post('/updateuser', async function(req, res, next) {
+    let user = await User.findOne({ username:req.body.user });
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    user.accounttype = req.body.previlage;
+    user.telegram=req.body.telegram;
+    user.password=hashedPassword
+    user.chatid = req.body.chatid
+    await user.save()
+    res.json({ success: true, message: 'User created successfully!'});
+
+})
 module.exports = router;
 

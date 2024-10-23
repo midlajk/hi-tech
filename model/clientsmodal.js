@@ -222,6 +222,9 @@ const referenceSchema = new mongoose.Schema({
     password:String,
     uid:String,
     accounttype:String,
+    telegram:String,
+    chatid:String,
+    lastlogin:Date
   });
   const attendance = new mongoose.Schema({
     date: Date,
@@ -270,3 +273,25 @@ module.exports = User;
 module.exports = Financialyear;
 module.exports = Attendance;
 module.exports = Loadinwork;
+const partydelete = new mongoose.Schema({
+  date: Date,
+  entrydate: String,
+  party: String,
+  deleteditem: String,
+  refference: String,
+  variables: String,
+  user: String,
+  reason: String,
+});
+const Partydelete = mongoose.model('Partydelete', partydelete);
+const insidetrash = new mongoose.Schema({
+  date: Date,
+  entrydate: String,
+  party: String,
+  deleteditem: String,
+  refference: String,
+  variables: String,
+  user: String,
+  reason: String,
+});
+const Insidetrash = mongoose.model('Insidetrash', insidetrash);

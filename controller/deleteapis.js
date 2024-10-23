@@ -8,6 +8,7 @@ const PoductsSchema = mongoose.model('PoductsSchema')
 const Transportagent = mongoose.model('Transportagent')
 const bcrypt = require('bcrypt');
 const User = mongoose.model('User')
+const Partydelete = mongoose.model('Partydelete')
 
 const Loadinwork = mongoose.model('Loadinwork')
 
@@ -26,8 +27,21 @@ exports.deletepurchasecommitment = async (req, res) => {
         }
 
         // Remove the purchase commitment from the array
-        client.purchasecommitments.splice(purchaseCommitmentIndex, 1);
+        let deleted =  client.purchasecommitments.splice(purchaseCommitmentIndex, 1)[0];
         await client.save();
+
+
+        delet = new Partydelete({ 
+            date: new Date(),
+            entrydate:new Date(deleted.date).toLocaleDateString(),
+            party: req.params.name,
+            deleteditem: 'Purchase Commitment',
+            refference: deleted.item+ ' - wght + rate',
+            variables: deleted.balanceweight + ' @ ' +deleted.rate,
+            user: req.session.user.username,
+            reason: '',
+        });
+        await delet.save();
 
         // If successful, send a success response
         return res.json({ message: 'Purchase commitment deleted successfully' });
@@ -50,11 +64,20 @@ exports.deletesalescommitments = async (req, res) => {
         if (salescommitmentindex === -1) {
             return res.status(404).json({ error: 'Purchase commitment not found' });
         }
-
         // Remove the purchase commitment from the array
-        client.salescommitmentsschema.splice(salescommitmentindex, 1);
+        let deleted = client.salescommitmentsschema.splice(salescommitmentindex, 1)[0];
         await client.save();
-
+        delet = new Partydelete({ 
+            date: new Date(),
+            entrydate:new Date(deleted.date).toLocaleDateString(),
+            party: req.params.name,
+            deleteditem: 'Sale Commitment',
+            refference: deleted.item+ ' - wght + rate',
+            variables: deleted.balanceweight + ' @ ' +deleted.rate,
+            user: req.session.user.username,
+            reason: '',
+        });
+        await delet.save();
         // If successful, send a success response
         return res.json({ message: 'Purchase commitment deleted successfully' });
     } catch (error) {
@@ -153,6 +176,20 @@ const deletepurchasebill = async (req, res) => {
         client.storeout = storeout;
         client.storein = storein;
         await client.save();
+
+
+
+        delet = new Partydelete({ 
+            date: new Date(),
+            party: req.params.name,
+            entrydate:new Date(purchasebill.date).toLocaleDateString(),
+            deleteditem: 'Purchase-'+purchasebill.qty,
+            refference: 'commit '+ purchasebill.commitment,
+            variables: 'amount-'+purchasebill.total,
+            user: req.session.user.username,
+            reason: purchasebill.lotnumber,
+        });
+        await delet.save();
 
         // If successful, send a success response
         if(req.params.fun){
@@ -268,9 +305,20 @@ const deletesalesbill = async (req, res) => {
         client.storein = storein;
         await client.save();
 
+
+        delet = new Partydelete({ 
+            date: new Date(),
+            entrydate:new Date(salesbill.date).toLocaleDateString(),
+            party: req.params.name,
+            deleteditem: 'Sale-'+salesbill.qty,
+            refference: 'commit '+ salesbill.commitment,
+            variables: 'amount-'+salesbill.total,
+            user: req.session.user.username,
+            reason: salesbill.lotnumber,
+        });
+        await delet.save();
         // If successful, send a success response
         if(req.params.fun){
-            console.log('here')
             return;
         }else{
             return res.json({ message: ' deleted successfully' });
@@ -293,7 +341,17 @@ exports.deleteuser = async (req, res) => {
 
     if (passwordMatch) {
     const existingClient = await ClientModel.findByIdAndDelete(id);
-    
+    deleted = new Partydelete({ 
+        date: new Date(),
+        party: existingClient.name,
+        entrydate:'',
+        deleteditem: 'Party Accounts',
+        refference: 'Full account',
+        variables: ' ',
+        user: req.session.user.username,
+        reason: '',
+    });
+    await deleted.save();
       res.json({ success: true, message: 'Reference added successfully' });
   
     
@@ -340,11 +398,24 @@ exports.deleteuser = async (req, res) => {
                 await deletepurchasebill(req, res); // Call your function here for each bill
             }
         }else{
-            client.transaction.splice(transactionindex, 1); 
+           let deleted =  client.transaction.splice(transactionindex, 1)[0]; 
+
             client.payable = (client.payable||0) - payable;
         client.recievable = (client.recievable||0) - recievable;
         client.paid = (client.paid||0) - paid;
         client.recieved = (client.recieved||0) - recieved;
+
+        delet = new Partydelete({ 
+            date: new Date(),
+            party: req.params.name,
+            entrydate:new Date(deleted.date).toLocaleDateString(),
+            deleteditem: 'Transaction',
+            refference: 'Payable-Recievable-Paid-Recieved',
+            variables: deleted.payable + '-' +deleted.recievable+ '-' +deleted.paid+ '-' +deleted.recieved,
+            user: req.session.user.username,
+            reason: '',
+        });
+        await delet.save();
         }
       
         // Remove the purchase commitment from the array
@@ -435,9 +506,19 @@ exports.deletepurchase = async (req, res) => {
       }
   
       // Remove the coffee from the client
-      client.coffee.splice(coffeeIndex, 1);
+      let deleted = client.coffee.splice(coffeeIndex, 1)[0];
       await client.save();
-  
+      delet = new Partydelete({ 
+        date: new Date(),
+        party: req.params.name,
+        entrydate:new Date(deleted.date).toLocaleDateString(),
+        deleteditem: 'Arrival',
+        refference: deleted.item+ ' - wght + ep + s.ep',
+        variables: deleted.netWeight + '-' +deleted.netepweight+ '-' +deleted.storage,
+        user: req.session.user.username,
+        reason: '',
+    });
+    await delet.save();
       // If everything is successful
       return res.json({ message: 'Purchase commitment deleted successfully' });
   
@@ -468,8 +549,19 @@ exports.deletepurchase = async (req, res) => {
             product.stockweight = product.stockweight + despatch.netWeight
             await product.save();
             const despatchIndex = client.despatch.findIndex(despatch => despatch.lotnumber == id);
-            client.despatch.splice(despatchIndex, 1);
-            await client.save();    
+            let deleted = client.despatch.splice(despatchIndex, 1)[0];
+            await client.save(); 
+            delet = new Partydelete({ 
+                date: new Date(),
+                entrydate:new Date(deleted.date).toLocaleDateString(),
+                party: req.params.name,
+                deleteditem: 'Despatch',
+                refference: deleted.item+ ' - wght - ep - s.ep',
+                variables: deleted.netWeight + '-' +deleted.netepweight+ '-' +deleted.storage,
+                user: req.session.user.username,
+                reason: '',
+            });
+            await delet.save();   
             return res.json({ message: 'Purchase commitment deleted successfully' });
 
         }

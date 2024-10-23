@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 // const TelegramBot = require('node-telegram-bot-api');
 
 // const token = process.env.TELE_API;
-// const bot = new TelegramBot(token, { polling: true }); 
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -818,6 +817,12 @@ console.log(data.ssitem)
 
 ////////////////////////// dAily Report fragment /////////////////
 exports.createDailyReport = async (req, res) => {
+
+  var key = elegramreq.session.user.telegram || token
+  var chatid = elegramreq.session.user.chatid || process.env.CHAT_ID
+
+  const bot = new TelegramBot(token, { polling: true }); 
+
   try {
     const reportDate = req.body.reportdate;
     const startOfDay = new Date(reportDate);
@@ -865,7 +870,7 @@ exports.createDailyReport = async (req, res) => {
 
     // Generate and send PDF report
     const filePath = await generatePdfReport(data, req.body.reportdate);
-    // await bot.sendDocument(process.env.CHAT_ID, filePath);
+    await bot.sendDocument(chatid, filePath);
 
     // Delete the file after sending
     fs.unlink(filePath, (err) => {

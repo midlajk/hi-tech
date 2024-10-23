@@ -178,7 +178,7 @@
                           <!-- Data will be populated here -->
                       </tbody>
   </table>
-  <a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#adduser">Add user</a>
+  
 
 </div>
 
@@ -200,6 +200,28 @@
       </tbody>
       </table>
 </div>
+<% if(user.username == 'midlaj'){%>
+<div class="table-responsive text-nowrap p-4 col-12">
+  <h3>Users<a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#adduser">Add user</a>          
+  </h3>
+<table class="table table-bordered" id="users">
+  <thead>
+      <tr>
+        <th>User name</th>
+        <th>Previlage</th>
+        <th>Telegram</th>
+        <th>ChatID</th>
+        <th>Lastlogin</th>
+        <th>Password</th>
+        <th>Action</th>
+
+      </tr>
+  </thead>
+  <tbody class="table-border-bottom-0" id="user-table-body">
+    </tbody>
+    </table>
+</div>
+<%}%>
 </div>
                
 </div>
@@ -445,8 +467,9 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" id="closeaddusermodal" data-bs-dismiss="modal" >
           Close
-        </button>
+        </button>        
         <a onclick="adduser()" class="btn btn-primary text-white">Add User</a>
+
       </div>
   </form>
     </div>
@@ -470,6 +493,42 @@
           console.log('Error:', error);
       }
   }
+  async function fetusers() {
+      try {
+          const response = await fetch('/getuserslist');
+          const data = await response.json();
+          console.log(data)
+          updateusertable(data);
+      } catch (error) {
+          console.log('Error:', error);
+      }
+  }
+  function updateusertable(data) {
+      const tableBody = document.getElementById('user-table-body');
+      tableBody.innerHTML = '';
+
+      data.forEach(user => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td><input class="form-control usera disabled" disabled style="width:150px" value="${user.username}" id="usera"/></td>
+              <td>
+                
+    <select class="form-control prev" style="width:150px" id="prev">
+        <option value="Admin" ${user.accounttype === "Admin" ? "selected" : ""}>Admin</option>
+        <option value="Employee" ${user.accounttype === "Employee" ? "selected" : ""}>Employee</option>
+        <option value="Banned" ${user.accounttype === "Banned" ? "selected" : ""}>Banned</option>
+    </select>
+            </td>
+            <td><input class="form-control telegram" style="width:150px" value="${user.telegram}" id="telegram"/></td>
+              <td><input class="form-control chatid" style="width:150px" value="${user.chatid}" id="chatid"/></td>
+              
+              <td>${user.lastlogin}</td>
+              <td><input class="form-control pass" style="width:150px" value="" id="pass"/> </td>
+              <td><a href="#" class="btn btn-primary text-white updateuser">Update </a></td>
+          `;
+          tableBody.appendChild(row);
+      });
+  }
 
   function updateTable(data) {
       const tableBody = document.getElementById('product-table-body');
@@ -491,6 +550,8 @@
 
   // Call fetchData function when the DOM content is loaded
   document.addEventListener('DOMContentLoaded', fetchData);
+  document.addEventListener('DOMContentLoaded', fetusers);
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -604,7 +665,9 @@ var data = {
   username: username,
   password:password
 };
-
+if(!username || !password){
+  return
+}
 // Send a POST request to the server using Axios
 axios.post('/addnewuser', data)
   .then(response => {
@@ -613,7 +676,7 @@ axios.post('/addnewuser', data)
     // Close the modal on successful response
     if (response.data.success) {
     var closeButton = document.getElementById('closeaddusermodal');
-
+    fetusers()
 // Trigger the click event on the button
 closeButton.click();
 
@@ -745,6 +808,40 @@ cache: true // Enable caching to reduce server requests
         error: function(xhr, status, error) {
             // Handle error response
             console.error('API Error:', error);
+        }
+    });
+    });
+
+    $(document).on('click', '.updateuser', function() {
+      var row = $(this).closest('tr');
+      var user = row.find('.usera').val();
+        var previlage = row.find('.prev').val();
+        var telegram = row.find('.telegram').val();
+        var password = row.find('.pass').val();
+        var chatid = row.find('.chatid').val();
+
+        var requestData = {
+          user: user,
+        previlage: previlage,
+        telegram: telegram,
+        password:password,
+        chatid:chatid
+    };
+
+    // Send an API POST request
+    $.ajax({
+        url: 'updateuser', // Endpoint URL
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        success: function(response) {
+            // Handle successful response
+            window.location.reload();
+            // You can perform any further actions here after a successful response
+        },
+        error: function(xhr, status, error) {
+            // Handle error response
+            console.log('API Error:', error);
         }
     });
     });

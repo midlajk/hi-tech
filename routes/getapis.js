@@ -9,6 +9,8 @@ router.get('/getclients',authcheck, adminpostapis.getclients);
 router.get('/getnames',authcheck, adminpostapis.getnames);
 router.get('/getproducts',authcheck, adminpostapis.getproducts);
 router.get('/getdetailedproductproducts',authcheck, adminpostapis.getdetailedproductproducts);
+router.get('/getuserslist',authcheck, adminpostapis.getuserslist);
+
 router.get('/getotherallnames',loginMiddleware, adminpostapis.getotherallnames);
 
 router.get('/purchasecommitments',authcheck, adminpostapis.purchasecommitment);
@@ -59,5 +61,13 @@ router.get('/getworkagents',loginMiddleware, adminpostapis.getworkagents);
 router.get('/getloadingworks',loginMiddleware, adminpostapis.getloadingworks);
 router.get('/getindividualloadingworks',loginMiddleware, adminpostapis.getindividualloadingworks);
 router.get('/notcalculatedloads',loginMiddleware, adminpostapis.notcalculatedloads);
+
+
+
+/////// trash outside 
+
+
+router.get('/gettrashoutside',loginMiddleware, adminpostapis.trashoutside);
+router.get('/gettrashinside',loginMiddleware, adminpostapis.gettrashinside);
 
 module.exports = router;
