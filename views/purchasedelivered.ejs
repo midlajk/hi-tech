@@ -73,6 +73,8 @@
       responsive: true,
       processing: true,
       serverSide: true,
+      dom: '<"top d-flex justify-content-between"l p>rt<"bottom"ip><"clear">', // Custom layout
+      
       ajax: {
         url: '/arrivals', // Replace with your API endpoint
         dataSrc: 'data', // Key that holds the array of data in the API response
@@ -117,7 +119,8 @@
       responsive: true 
     });
 
-  
+    $('#arrivalstable').off('click', '.delete-btn');
+
     $('#arrivalstable').on('click', '.delete-btn', function() {
       if(!confirm('Do you want to delete the data')){
         return 
