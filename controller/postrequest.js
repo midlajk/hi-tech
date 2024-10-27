@@ -1,8 +1,8 @@
 const { ConnectionCheckOutFailedEvent } = require('mongodb');
 const mongoose = require('mongoose');
-// const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
 
-// const token = process.env.TELE_API;
+const token = process.env.TELE_API;
 const ClientModel = mongoose.model('Client')
 const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
@@ -821,7 +821,7 @@ exports.createDailyReport = async (req, res) => {
   var key = elegramreq.session.user.telegram || token
   var chatid = elegramreq.session.user.chatid || process.env.CHAT_ID
 
-  const bot = new TelegramBot(token, { polling: true }); 
+  const bot = new TelegramBot(key, { polling: true }); 
 
   try {
     const reportDate = req.body.reportdate;
