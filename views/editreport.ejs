@@ -496,10 +496,13 @@
   netepweightold = '<%=coffee.netepweight%>';
   function setBillDateToCurrentDate() {
     // Get the current date
-    var currentDate = new Date().toISOString().slice(0, 10);
+    // var currentDate = new Date().toISOString().slice(0, 10);
+    const today = new Date('<%=coffee.date%>')
 
+// Format today's date as yyyy-mm-dd
+    const formattedDate = today.toISOString().split('T')[0];
     // Set the value of the bill date input field to the current date
-    document.getElementById('billingdate').value = currentDate;
+    document.getElementById('billingdate').value = formattedDate;
   }
 
  async function onButtonClick() {
@@ -928,7 +931,7 @@ function updatetotalbillamount() {
 
 // Format today's date as yyyy-mm-dd
 const formattedDate = today.toISOString().split('T')[0];
-
+document.getElementById('billingdate').value = formattedDate;
 // Set the value of the input field to today's date
 document.getElementById('dateOfIssue').value = formattedDate;
   

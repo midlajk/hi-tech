@@ -85,7 +85,7 @@
       },
       columns: [
       {
-        data: 'date',
+        data: 'salesbillSchema.date',
         render: function (data, type, row) {
           // Format the date using moment.js
           return moment(data).format('DD/MM/YYYY');
@@ -114,6 +114,8 @@
         },
       ],
     });
+    $('#arrivalstable').off('click', '.delete-btn');
+
     $('#arrivalstable').on('click', '.delete-btn', function() {
     var id = $(this).data('id');
     var uniqueid = $(this).data('uniqueid');
