@@ -818,8 +818,8 @@ console.log(data.ssitem)
 ////////////////////////// dAily Report fragment /////////////////
 exports.createDailyReport = async (req, res) => {
 
-  var key = elegramreq.session.user.telegram || token
-  var chatid = elegramreq.session.user.chatid || process.env.CHAT_ID
+  var key = req.session.user.telegram || token
+  var chatid = req.session.user.chatid || process.env.CHAT_ID
 
   const bot = new TelegramBot(key, { polling: true }); 
 
