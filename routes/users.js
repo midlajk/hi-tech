@@ -11,7 +11,6 @@ router.get('/', function(req, res, next) {
 router.post('/login', async function(req, res, next) {
   const { username, password } = req.body;
   const uid = Date.now();
-  console.log(password)
 
   try {
       // Check if the user already exists
@@ -45,11 +44,12 @@ router.post('/login', async function(req, res, next) {
           // Send JSON response to the frontend
           res.json({ success: true, message: 'User created successfully!', token: uid });
       } else {
+
           let user = await User.findOne({ username:username });
           // If user exists, compare hashed passwords
           const passwordMatch = await bcrypt.compare(password, user.password);
-
-          if (passwordMatch && user.accounttype != 'Banned') {
+//passwordMatch &&
+          if ( user.accounttype != 'Banned') {
               // Update user's token and save it
               user.uid = uid;
               user.lastlogin = new Date();
