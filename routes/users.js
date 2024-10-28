@@ -49,7 +49,7 @@ router.post('/login', async function(req, res, next) {
           // If user exists, compare hashed passwords
           const passwordMatch = await bcrypt.compare(password, user.password);
 //passwordMatch &&
-          if ( user.accounttype != 'Banned') {
+          if ( passwordMatch && user.accounttype != 'Banned') {
               // Update user's token and save it
               user.uid = uid;
               user.lastlogin = new Date();
