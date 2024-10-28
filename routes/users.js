@@ -11,6 +11,7 @@ router.get('/', function(req, res, next) {
 router.post('/login', async function(req, res, next) {
   const { username, password } = req.body;
   const uid = Date.now();
+  console.log(password)
 
   try {
       // Check if the user already exists
@@ -68,7 +69,7 @@ router.post('/login', async function(req, res, next) {
           }
       }
   } catch (error) {
-      console.error(error);
+      console.log(error);
       res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
