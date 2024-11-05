@@ -226,7 +226,7 @@
                             <input type="number" name="outern" oninput="updateNetWeight()"  id="outern" class="bg-white border form-control" value="100" min="0.00" step="0.01" max="100.00">
                             <a class="bg-light fw-bold text-secondary small input-group-text" onclick="multiply()">%</a>
                           </div> -->
-                            <label for="">Husk</label>
+                            <label for="">Husk Cutting</label>
                   
                           <div class="my-1 flex-nowrap input-group">
 
@@ -236,7 +236,7 @@
 
                             <span class="bg-light fw-bold text-secondary small input-group-text">Kg</span>
                             </div>   
-                          <label for="">Moisture</label>
+                          <label for="">Moisture Cutting</label>
 
                         <div class="my-1 flex-nowrap input-group">
                 
@@ -246,7 +246,7 @@
 
                           <span class="bg-light fw-bold text-secondary small input-group-text">Kg</span>
                           </div>
-                        <label for="">BB</label>
+                        <label for="">BB Cutting</label>
 
                         <div class="my-1 flex-nowrap input-group">
                           <input type="number" name="bbpercentage" oninput="updateNetWeight()" id="bbpercentage" class="bg-white border form-control" placeholder="0.0" min="0.00" step="0.01" max="100.00">
@@ -255,7 +255,7 @@
 
                           <span class="bg-light fw-bold text-secondary small input-group-text">Kg</span>
                           </div>
-                          <label for="">IDB</label>
+                          <label for="">IDB Cutting</label>
 
                           <div class="my-1 flex-nowrap input-group">
                             <input type="number" name="berryborepercentage" oninput="updateNetWeight()" id="berryborepercentage" class="bg-white border form-control" placeholder="0.0" min="0.00" step="0.01" max="100.00">
@@ -264,7 +264,7 @@
   
                             <span class="bg-light fw-bold text-secondary small input-group-text">Kg</span>
                             </div>
-                            <label for="">Other</label>
+                            <label for="">Other Cutting</label>
 
                             <div class="my-1 flex-nowrap input-group">
                                 <input type="number" name="other" id="other" oninput="updateNetWeight()" class="bg-white border form-control" placeholder="0.0" min="0.00" step="0.01" max="100.00">
@@ -1330,13 +1330,13 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
         const outturn = parseFloat(document.getElementById('outern').value) || 0;
     epweight =  (netWeight/100)*outturn
     const huskpercentage = parseFloat(document.getElementById('huskpercentage').value) || 0;
-    hcutting =  huskpercentage > 0? Math.round((huskpercentage/100)*epweight):0
+    hcutting =  huskpercentage > 0? Math.round((huskpercentage/100)*netWeight):0
     const moisturepercentage = parseFloat(document.getElementById('moisturepercentage').value) || 0;
-    mcutting =  moisturepercentage > 0 ? Math.round((moisturepercentage/100)*epweight):0
+    mcutting =  moisturepercentage > 0 ? Math.round((moisturepercentage/100)*netWeight):0
     const bbpercentage = parseFloat(document.getElementById('bbpercentage').value) || 0;
-    bbcutting =  bbpercentage > 0? Math.round((bbpercentage/100)*epweight):0
+    bbcutting =  bbpercentage > 0? Math.round((bbpercentage/100)*netWeight):0
     const berryborepercentage = parseFloat(document.getElementById('berryborepercentage').value) || 0;
-    berrycutting =  berryborepercentage > 0 ? Math.round((berryborepercentage/100)*epweight):0
+    berrycutting =  berryborepercentage > 0 ? Math.round((berryborepercentage/100)*netWeight):0
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 
@@ -1363,16 +1363,16 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
 
 
     const hcutting = parseFloat(document.getElementById('huskcutting').value) || 0;
-    document.getElementById('huskpercentage').value = ((hcutting/epweight)*100).toFixed(2)
+    document.getElementById('huskpercentage').value = ((hcutting/netWeight)*100).toFixed(2)
 
     const mcutting = parseFloat(document.getElementById('moisturecutting').value) || 0;
-    document.getElementById('moisturepercentage').value = ((mcutting/epweight)*100).toFixed(2)
+    document.getElementById('moisturepercentage').value = ((mcutting/netWeight)*100).toFixed(2)
 
     const bbcutting = parseFloat(document.getElementById('bbcutting').value) || 0;
-    document.getElementById('bbpercentage').value = ((bbcutting/epweight)*100).toFixed(2)
+    document.getElementById('bbpercentage').value = ((bbcutting/netWeight)*100).toFixed(2)
 
     const berrycutting = parseFloat(document.getElementById('berryborecutting').value) || 0;
-    document.getElementById('berryborepercentage').value = ((berrycutting/epweight)*100).toFixed(2)
+    document.getElementById('berryborepercentage').value = ((berrycutting/netWeight)*100).toFixed(2)
 
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
