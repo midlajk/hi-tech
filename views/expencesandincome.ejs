@@ -425,7 +425,8 @@ $('#transactionFormTable')[0].reset();
 // Restore the date value after reset
 $('#transactionFormModal #transactiondate').val(modalDateValue);
 $('#transactionFormTable #transactiondate').val(tableDateValue);
-
+$('#transactionFormModal #party').val('');
+$('#transactionFormTable #party').val('');
     },
     error: function(xhr, status, error) {
       transactionTable.ajax.reload();
