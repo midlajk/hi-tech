@@ -9,8 +9,12 @@
             <!-- Basic Bootstrap Table -->
             <div class="card">
               <div class="card-body">
-                
+                <button type="button" class="btn btn-primary d-md-none" data-bs-toggle="modal" data-bs-target="#transactionModal">
+                  Open Transaction Form
+              </button>
                 <div class="table-responsive text-nowrap p-4">
+                  <div class="d-none d-md-block">
+                    <form id="transactionFormTable">
                   <table class="table" style="width: 100%;">
                     <tr>
                       <th>Date</th>
@@ -54,12 +58,14 @@
                         <input style="min-width: 120px;" type="number" value="0" id="transactionrecieved" class="form-control">
                       </td>
                       <td>
-                        <a class="btn btn-success text-white" href="#" id="submitTransaction">Submit</a>
+                        <a class="btn btn-success text-white submit-transaction" href="#" id="submitTransaction">Submit</a>
                 
                       </td>
                     </tr>
                 
                   </table>
+                  </form>
+                  </div>
                     <table class="table" id="transactionTable">
                         <thead>
                             <tr>
@@ -152,6 +158,51 @@
     </div>
   </div>
  </div>
+
+ <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Transaction Form</h5>
+              
+          </div>
+          <div class="modal-body">
+              <form id="transactionFormModal">
+                  <div class="mb-3">
+                      <label for="transactiondate">Date</label>
+                      <input type="date" id="transactiondate" name="transactiondate" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="party">Party / Organisation Name</label>
+                      <select id="party" name="party" class="js-data-example-ajax2 form-control"></select>
+                  </div>
+                  <div class="mb-3">
+                      <label for="transactionreference">Reference</label>
+                      <input type="text" id="transactionrefference" name="transactionrefference" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="transactionmedium">Medium</label>
+                      <select id="transactionmedium" name="transactionmedium" class="form-control">
+                          <option value="bank">BANK</option>
+                          <option value="cash">CASH</option>
+                          <option value="tds">TDS</option>
+                      </select>
+                  </div>
+                  <div class="mb-3">
+                      <label for="transactionpaid">Paid</label>
+                      <input type="number" id="transactionpaid" name="transactionpaid" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                      <label for="transactionreceived">Received</label>
+                      <input type="number" id="transactionrecieved" name="transactionrecieved" class="form-control">
+                  </div>
+                  <button type="button" id="submitTransaction" class="btn btn-primary text-white submit-transaction">Submit</button>
+                  <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" >close</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
 <script src="../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
@@ -202,9 +253,11 @@
 
 // Format the date to YYYY-MM-DD (required format for input type="date")
 var formattedDate = today.toISOString().split('T')[0];
-
+document.querySelectorAll('#transactiondate').forEach(element => {
+    element.value = formattedDate;
+});
 // Set the value of the input field to today's date
-document.getElementById('transactiondate').value = formattedDate;
+// document.getElementById('transactiondate').value = formattedDate;
  // Assuming you're passing this variable from EJS
     transactionTable = $('#transactionTable').DataTable({
       responsive: true,
@@ -303,20 +356,48 @@ cache: true // Enable caching to reduce server requests
 }
 
 });
+$('#transactionModal').on('shown.bs.modal', function () {
+        $('.js-data-example-ajax2').select2({
+            dropdownParent: $("#transactionModal"),
+            ajax: {
+                url: '/getotherallnames',
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.results.map(name => ({ id: name, text: name }))
+                    };
+                },
+                cache: true
+            },
+            placeholder: "Select a Name",
+            allowClear: true
+        });
+    });
 
-$('#submitTransaction').click(function() {
-  console.log('dsd')
-  var data = {
-    name:$('#party').val(),
-    date: $('#transactiondate').val(),
-    medium: $('#transactionmedium').val(),
-    paid: $('#transactionpaid').val(),
-    recieved: $('#transactionrecieved').val(),
-    refference: $('#transactionrefference').val()
+$('.submit-transaction').click(function() {
+  var form = $(this).closest('form');
 
-    // Add other fields as needed
-  };
-  if(data.name){
+// Extract data from the specific form
+var data = {
+  name: form.find('#party').val(),
+  date: form.find('#transactiondate').val(),
+  medium: form.find('#transactionmedium').val(),
+  paid: parseFloat(form.find('#transactionpaid').val())||0,
+  recieved: parseFloat(form.find('#transactionrecieved').val())||0,
+  refference: form.find('#transactionrefference').val()||'N/A'
+};
+  // var data = {
+  //   name:$('#party').val(),
+  //   date: $('#transactiondate').val(),
+  //   medium: $('#transactionmedium').val(),
+  //   paid: $('#transactionpaid').val(),
+  //   recieved: $('#transactionrecieved').val(),
+  //   refference: $('#transactionrefference').val()
+
+  //   // Add other fields as needed
+  // };
+  if(data.name && data.date){
 
   // Send data to the server
   $.ajax({
@@ -328,13 +409,27 @@ $('#submitTransaction').click(function() {
       // Update DataTable on success
       transactionTable.ajax.reload();
       // Optionally, clear the form fields
-      $('#transactionpaid').val(0);
-      $('#transactionrecieved').val(0);
-      $('#transactionrefference').val('');
+      // $('#transactionpaid').val(0);
+      // $('#transactionrecieved').val(0);
+      // $('#transactionrefference').val('');
+      $('#transactionModal').modal('hide');
+
+// Reset the form
+let modalDateValue = $('#transactionFormModal #transactiondate').val();
+let tableDateValue = $('#transactionFormTable #transactiondate').val();
+
+// Reset both forms
+$('#transactionFormModal')[0].reset();
+$('#transactionFormTable')[0].reset();
+
+// Restore the date value after reset
+$('#transactionFormModal #transactiondate').val(modalDateValue);
+$('#transactionFormTable #transactiondate').val(tableDateValue);
+
     },
     error: function(xhr, status, error) {
       transactionTable.ajax.reload();
-
+      $('#transactionModal').modal('hide');
       console.error('Error:', error);
       // Handle error
     }

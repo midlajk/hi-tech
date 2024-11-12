@@ -314,7 +314,6 @@ exports.addTransactions = async (req, res) => {
     // Save the updated client to the database
     res.status(201).json({ message: 'Transaction saved successfully' });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }

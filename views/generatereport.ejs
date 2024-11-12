@@ -36,14 +36,14 @@
                          
                       </div> -->
                       <div class="row">
-                        <div class="d-flex flex-column col-6">
+                        <div class="d-flex flex-column col-sm-6 col-12">
                               
                           <div class="d-flex flex-row align-items-center">
                               <span class="fw-bold d-block me-2">Bill Date:</span>
                               <input type="date" class="form-control" name="dateOfIssue" id="dateOfIssue" value="<%=workingdate%>" style="max-width: 150px;" required>
                           </div>
                       </div>
-                        <div class="d-flex flex-row align-items-center col-6">
+                        <div class="d-flex flex-row align-items-center col-sm-6 col-12">
                         <span class="fw-bold me-2">Refference:&nbsp;</span>
                           <div class="my-1 flex-nowrap input-group">
                             <select class="form-control" name="referenceselect" id="referenceselect" >
@@ -57,7 +57,7 @@
                       
                       <hr class="my-4">
                       <div class="row mb-5">
-                          <div class="col">
+                          <div class="col-sm-6 col-12">
                               <label class="fw-bold">Party Name:</label>
                               
                         <div class="my-1 flex-nowrap input-group">
@@ -76,7 +76,7 @@
                                <input placeholder="Lorry Number" type="text" name="lorry" id="lorry" class="form-control my-2">
                             
                               </div>
-                          <div class="col">
+                          <div class="col-sm-6 col-12">
                             
                              <label class="fw-bold">Transportation Agent:</label>
 
@@ -96,8 +96,23 @@
                         
                           </div>
                       </div>
+                      <style>
+                        /* Responsive container for scrolling */
+.table-responsive-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}
+
+.table-responsive-container .responsive-table {
+    min-width: 550px; /* Set a fixed width for smaller screens */
+    max-width: 100%; /* Limit max-width to container's width */
+}
+
+                      </style>
                       <div class="row">
-                        <table style="border-spacing: 10px; ">
+                        <div class="table-responsive-container">
+
+                        <table class="responsive-table" style="border-spacing: 10px; ">
                           <thead>
                               <tr>
                                   <th>ITEM</th>
@@ -151,6 +166,7 @@
                               <!-- ItemRows will be added here -->
                           </tbody>
                       </table>
+                      </div>
                     
                       </div>
                       
@@ -1330,13 +1346,13 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
         const outturn = parseFloat(document.getElementById('outern').value) || 0;
     epweight =  (netWeight/100)*outturn
     const huskpercentage = parseFloat(document.getElementById('huskpercentage').value) || 0;
-    hcutting =  huskpercentage > 0? Math.round((huskpercentage/100)*netWeight):0
+    hcutting =  huskpercentage > 0? parseFloat((huskpercentage/100)*netWeight).toFixed(1):0
     const moisturepercentage = parseFloat(document.getElementById('moisturepercentage').value) || 0;
-    mcutting =  moisturepercentage > 0 ? Math.round((moisturepercentage/100)*netWeight):0
+    mcutting =  moisturepercentage > 0 ? parseFloat((moisturepercentage/100)*netWeight).toFixed(1):0
     const bbpercentage = parseFloat(document.getElementById('bbpercentage').value) || 0;
-    bbcutting =  bbpercentage > 0? Math.round((bbpercentage/100)*netWeight):0
+    bbcutting =  bbpercentage > 0? parseFloat((bbpercentage/100)*netWeight).toFixed(1):0
     const berryborepercentage = parseFloat(document.getElementById('berryborepercentage').value) || 0;
-    berrycutting =  berryborepercentage > 0 ? Math.round((berryborepercentage/100)*netWeight):0
+    berrycutting =  berryborepercentage > 0 ? parseFloat((berryborepercentage/100)*netWeight).toFixed(1):0
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 

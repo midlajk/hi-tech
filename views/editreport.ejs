@@ -1364,13 +1364,13 @@ document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
         const outturn = parseFloat(document.getElementById('outern').value) || 0;
     epweight =  (netWeight/100)*outturn
     const huskpercentage = parseFloat(document.getElementById('huskpercentage').value) || 0;
-    hcutting =  huskpercentage > 0? Math.round((huskpercentage/100)*netWeight):0
+    hcutting =  huskpercentage > 0? parseFloat((huskpercentage/100)*netWeight).toFixed(1):0
     const moisturepercentage = parseFloat(document.getElementById('moisturepercentage').value) || 0;
-    mcutting =  moisturepercentage > 0 ? Math.round((moisturepercentage/100)*netWeight):0
+    mcutting =  moisturepercentage > 0 ? parseFloat((moisturepercentage/100)*netWeight).toFixed(1):0
     const bbpercentage = parseFloat(document.getElementById('bbpercentage').value) || 0;
-    bbcutting =  bbpercentage > 0? Math.round((bbpercentage/100)*netWeight):0
+    bbcutting =  bbpercentage > 0? parseFloat((bbpercentage/100)*netWeight).toFixed(1):0
     const berryborepercentage = parseFloat(document.getElementById('berryborepercentage').value) || 0;
-    berrycutting =  berryborepercentage > 0 ? Math.round((berryborepercentage/100)*netWeight):0
+    berrycutting =  berryborepercentage > 0 ? parseFloat((berryborepercentage/100)*netWeight).toFixed(1):0
     const other = parseFloat(document.getElementById('other').value) || 0;
     const allowance = parseFloat(document.getElementById('allowance').value) || 0;
 
