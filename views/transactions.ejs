@@ -301,7 +301,7 @@ $('.js-data-example-ajaxs').select2({
             cache: true // Enable caching to reduce server requests
         },
         placeholder: "Select a Name", // Optional
-        allowClear: true // Optional
+        
     });
 
     // Initialize the second Select2 instance for the modal
@@ -320,7 +320,7 @@ $('.js-data-example-ajaxs').select2({
                 cache: true
             },
             placeholder: "Select a Name",
-            allowClear: true
+           
         });
     });
 
@@ -361,6 +361,8 @@ $('#transactionFormTable')[0].reset();
 // Restore the date value after reset
 $('#transactionFormModal #transactiondate').val(modalDateValue);
 $('#transactionFormTable #transactiondate').val(tableDateValue);
+$('#transactionFormModal #party').val('');
+$('#transactionFormTable #party').val('');
 
       // Optionally, clear the form fields
       // $('#transactionpaid').val(0);
