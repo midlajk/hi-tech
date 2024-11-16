@@ -11,7 +11,8 @@
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add Loader</a>
-          
+                  <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
+                  data-bs-target="#koolireport">Kooli Report</a>
                 <div class="table-responsive text-nowrap p-4">
                   <table class="table" id="sellers">
                     <thead>
@@ -146,6 +147,66 @@
     </div>
   </div>
  </div>
+ <div class="modal fade hidden" id="koolireport">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Kooli Report</h5>
+      
+      </div>
+      <div class="modal-body">
+        <form  id="transportagentform">
+      <div class="row">
+        <div class="col mb-3">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="fromdate" id="fromdate" class="form-control" placeholder="Enter Name">
+        </div>
+        <div class="col mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="todate" name="todate" class="form-control" placeholder="Enter Phone">
+        </div>
+        <div class="col-2 mb-3">
+          <label for="description" class="form-label"></label>
+          <button type="button" id="checkkooli" class="btn btn-primary btn-sm add-btnvd mt-2">
+            <i class="bx bx-check"></i> Check
+        </button>      
+        </div>
+        </div>
+        <div class="row">
+          <table>
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Kooli</th>
+                  <th>Paid</th>
+                  <th>Recieved</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody id="koolidetails">
+
+              </tbody>
+
+          </table>
+
+
+
+
+        </div>
+
+        
+      
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" id="downloadpdf" class="btn btn-primary">Download Report</button>
+      </div>
+  </form>
+    </div>
+  </div>
+ </div>
 <script src="../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
@@ -195,7 +256,7 @@
           { 
               data: null,
               render: function (data, type, row) {
-                return row.recieved ? parseInt(row.recieved) : 0;
+                return row.payable ? parseInt(row.payable) : 0;
               }
           }, 
   
@@ -345,4 +406,77 @@ function addtransportagent(){
   
   }
     </script>                
-                                        <%- include('./include/end.ejs') -%>
+                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+                   
+                   <script>
+
+$(document).ready(function() {
+    $('#checkkooli').on('click', function() {
+        // Get the date values from the input fields
+        const fromDate = $('#fromdate').val();
+        const toDate = $('#todate').val();
+
+        // Send an API request to fetch attendance data
+        $.ajax({
+            url: '/getkoolidetails',  // Modify this to your API endpoint
+            method: 'GET',
+            data: {
+                from: fromDate,
+                to: toDate
+            },
+            success: function(response) {
+                // Clear existing table rows
+                $('#koolidetails').empty();
+
+                // Loop through each agent's data and create table rows
+                response.agentData.forEach((agent) => {
+                    const row = `
+                        <tr>
+                            <td>${agent._id}</td>
+                            <td>${agent.totalPayable}</td>
+                            <td>${agent.totalPaid}</td>
+                            <td>${agent.totalReceived}</td>
+                            <td>${agent.balance}</td>
+                        </tr>
+                    `;
+                    $('#koolidetails').append(row);
+                });
+
+                // Add functionality to download as PDF
+                $('#downloadpdf').off('click').on('click', function() {
+                    if(response.agentData<=0){
+                      alert('check data first');
+                      return;
+                    }
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Add a title with the date range
+                    doc.text(`Kooli Details (${fromDate} to ${toDate})`, 14, 10);
+
+                    // Generate the PDF table using response.agentData
+                    doc.autoTable({
+                        head: [['Agent', 'Total Payable', 'Total Paid', 'Total Received', 'Balance']],
+                        body: response.agentData.map((agent) => [
+                            agent._id,
+                            agent.totalPayable,
+                            agent.totalPaid,
+                            agent.totalReceived,
+                            agent.balance
+                        ])
+                    });
+
+                    // Download the PDF
+                    doc.save(`KooliDetails_${fromDate}_to_${toDate}.pdf`);
+                });
+            },
+            error: function(error) {
+                console.error('Error fetching Kooli data:', error);
+            }
+        });
+    });
+});
+
+                   </script>
+                   <%- include('./include/end.ejs') -%>

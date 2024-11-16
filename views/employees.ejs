@@ -280,7 +280,7 @@
         <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
           Close
         </button>
-        <button type="submit"  class="btn btn-primary">Download Attendance</button>
+        <button type="button"  id="downloadpdf" class="btn btn-primary">Download Attendance</button>
       </div>
   </form>
     </div>
@@ -542,7 +542,9 @@ function addtransportagent(){
   
   }
     </script>  
-    
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+       
     <script>
       // $(document).ready(function() {
       //     // Fetch employee data using jQuery
@@ -644,7 +646,31 @@ $(document).ready(function() {
     `;
     $('#attendancedetails').append(row);
 });
+$('#downloadpdf').off('click').on('click', function() {
+                    if(response.attendanceData<=0){
+                      alert('check data first');
+                      return;
+                    }
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
 
+                    // Add a title with the date range
+                    doc.text(`Attendance Details (${fromDate} to ${toDate})`, 14, 10);
+
+                    // Generate the PDF table using response.agentData
+                    doc.autoTable({
+                        head: [['Agent', 'Work Hours']],
+                        body: response.attendanceData.map((agent) => [
+                            agent.src,
+                            agent.totalWorkHours,
+                    
+                        ])
+                    });
+
+                    // Download the PDF
+                    doc.save(`KooliDetails_${fromDate}_to_${toDate}.pdf`);
+                });
+           
 // When basepay is changed, update the total amount field
 $(document).on('input', '.basepay-input', function() {
     const index = $(this).data('index');

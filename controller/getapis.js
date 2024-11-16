@@ -2105,6 +2105,120 @@ exports.getallattendance = async (req, res) => {
   }
 };
 
+exports.getkoolidetails = async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    // Aggregation pipeline
+    const result = await Transportagent.aggregate([
+      {
+        $match: {
+          accounttype : 'Loader',}},
+      {
+        // Unwind the transaction array
+        $unwind: "$transaction"
+      },
+      {
+        // Match records within the date range
+        $match: {
+          "transaction.date": { $gte: fromDate, $lte: toDate }
+        }
+      },
+      {
+        // Group by agent's _id or name and calculate total paid and received
+        $group: {
+          _id: "$agent", // Group by agent name (use "$_id" for IDs)
+          totalPaid: { $sum: "$transaction.paid" },
+          totalReceived: { $sum: "$transaction.received" },
+          totalPayable: { $sum: "$transaction.payable" },
+          // transactions: { $push: "$transaction" } // Include all matching transactions for reference
+        }
+        
+      },
+      {
+        // Add a computed field for balance
+        $addFields: {
+          balance: { 
+            $subtract: [
+              { $add: ["$totalPayable", "$totalReceived"] }, // totalPayable + totalReceived
+              "$totalPaid" // Subtract totalPaid
+            ]
+          }
+        }
+      }
+    ]);
+console.log(result)
+    res.json({ success: true, agentData: result });
+  } catch (error) {
+    console.error("Error fetching agent data with aggregation:", error);
+    res.status(500).json({ success: false, message: "Error fetching agent data" });
+  }
+};
+
+exports.getworkhourdetails = async (req, res) => {
+  try {
+    const { from, to, numvalue, senario, src } = req.query;
+
+    // Validate and parse input
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const numericValue = Number(numvalue);
+    // Determine the comparison condition for "attendance.wrokhour"
+    let workHourMatch = {};
+    if (senario === "gt") {
+      workHourMatch = { $gt: numericValue };
+    } else if (senario === "lt") {
+      workHourMatch = { $lt: numericValue };
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid scenario value" });
+    }
+
+    // Aggregation pipeline
+    const result = await Attendance.aggregate([
+      {
+        // Match records within the date range
+        $match: {
+          date: { $gte: fromDate, $lte: toDate }
+        }
+      },
+      {
+        // Unwind the attendance array to process each entry separately
+        $unwind: "$attendance"
+      },
+      {
+        // Match based on the source field
+        $match: {
+          "attendance.src": src
+        }
+      },
+      {
+        // Match based on the workhour condition
+        $match: {
+          "attendance.wrokhour": workHourMatch
+        }
+      },
+      {
+        // Project fields you want in the output
+        $project: {
+          _id: 0,
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$date" } // Convert date to "YYYY-MM-DD"
+          }, // Include the main document's date field
+          "attendance.src": 1, // Include the source
+          "attendance.wrokhour": 1 // Include the work hours
+        }
+      }
+    ]);
+    // Respond with the filtered data
+    res.json({ success: true, agentData: result });
+  } catch (error) {
+    console.error("Error fetching agent data with aggregation:", error);
+    res.status(500).json({ success: false, message: "Error fetching agent data" });
+  }
+};
+
 
 exports.getworkagents = async (req, res) => {
   try {
