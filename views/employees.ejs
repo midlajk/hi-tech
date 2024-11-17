@@ -78,6 +78,7 @@
   <!-- Content of the popup -->
   <h4>Mark Attendance</h4>
   <h6>Current Date <span id="currentDate"></span></h6>
+  <h6>By standards one day has 8 hours work <span id="currentDate"></span></h6>
   <button id="closePopup" class="close-btn">X</button>
   <div class="row p-2">
       <div class="col-12">
@@ -87,12 +88,15 @@
   </div>
 
   <div class="row p-2">
-      <div class="col-8">
+      <div class="col-6">
           <label for="">Employee Name</label>
       </div>
       <div class="col-4">
           <label for="">Work Hour</label>
       </div>
+      <div class="col-2">
+        <label for="">Mark</label>
+    </div>
   </div>
 
   <!-- Scrollable employee container with dynamic height -->
@@ -274,7 +278,6 @@
         </div>
 
         
-      
     </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
@@ -344,7 +347,14 @@
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+<style>
+  .custom-checkbox {
+    width: 25px;
+    height: 25px;
+    transform: scale(1.5); /* Adjust the scale as needed */
+    cursor: pointer;
+}
+</style>
 <script>
   var thetatable
       $(document).ready(function () {
@@ -593,14 +603,27 @@ function addtransportagent(){
                   var row = $('<div class="row p-2"></div>');
 
                   // Create the name column
-                  var nameCol = $('<div class="col-8"><h4>' + employee.agent + '</h4></div>');
+                  var nameCol = $('<div class="col-6"><h4>' + employee.agent + '</h4></div>');
 
                   // Create the input field column
                   var inputCol = $('<div class="col-4"><input type="number" class="form-control" value="0" name="employee_' + employee._id + '" id="' + employee._id + '" data-src="'+employee.agent+'"></div>');
+                  var checkboxCol = $(
+                    '<div class="col-2"><input type="checkbox" class="custom-checkbox" id="checkbox_' + employee._id + '"></div>'
+                );
 
+                // Add event listener to the checkbox
+                checkboxCol.find('input').on('change', function() {
+                    const inputField = $('#' + employee._id); // Get the associated input field
+                    if ($(this).is(':checked')) {
+                        inputField.val(8); // Set the value to 8 if checked
+                    } else {
+                        inputField.val(0); // Set the value to 0 if unchecked
+                    }
+                });
                   // Append the columns to the row
                   row.append(nameCol);
                   row.append(inputCol);
+                  row.append(checkboxCol);
 
                   // Append the row to the container
                   $('#employee-container').append(row);
