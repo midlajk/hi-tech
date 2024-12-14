@@ -192,9 +192,10 @@
 <script>
   var dataTable
       $(document).ready(function () {
-  
+        const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
          dataTable = $('#sellers').DataTable({
-          responsive: true,
+          responsive: responsive,
           processing: true,
           serverSide: true,
           ajax: {

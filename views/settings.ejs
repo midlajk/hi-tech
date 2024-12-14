@@ -208,6 +208,7 @@
   <thead>
       <tr>
         <th>User name</th>
+        <th>Res</th>
         <th>Previlage</th>
         <th>Telegram</th>
         <th>ChatID</th>
@@ -511,6 +512,13 @@
           const row = document.createElement('tr');
           row.innerHTML = `
               <td><input class="form-control usera disabled" disabled style="width:150px" value="${user.username}" id="usera"/></td>
+               <td>
+                
+    <select class="form-control resp" style="width:150px" id="resp">
+        <option value="true">true</option>
+        <option value="false">false</option>
+    </select>
+            </td>
               <td>
                 
     <select class="form-control prev" style="width:150px" id="prev">
@@ -819,13 +827,17 @@ cache: true // Enable caching to reduce server requests
         var telegram = row.find('.telegram').val();
         var password = row.find('.pass').val();
         var chatid = row.find('.chatid').val();
+        var resp = row.find('.resp').val();
+
+        
 
         var requestData = {
           user: user,
         previlage: previlage,
         telegram: telegram,
         password:password,
-        chatid:chatid
+        chatid:chatid,
+        resp:resp
     };
 
     // Send an API POST request

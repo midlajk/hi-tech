@@ -224,7 +224,8 @@ const referenceSchema = new mongoose.Schema({
     accounttype:String,
     telegram:String,
     chatid:String,
-    lastlogin:Date
+    lastlogin:Date,
+    resp:Boolean
   });
   const attendance = new mongoose.Schema({
     date: Date,

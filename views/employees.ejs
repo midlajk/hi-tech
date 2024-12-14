@@ -390,9 +390,10 @@ const formattedDate = today.toISOString().split('T')[0];
 
 // Set the value of the input field to today's date
 document.getElementById('currentDate').innerText = formattedDate;
+const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
          thetatable = $('#sellers').DataTable({
-          responsive: true,
+          responsive: responsive,
           processing: true,
           serverSide: true,
           ajax: {

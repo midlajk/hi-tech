@@ -1159,8 +1159,10 @@ if (billtype === 'Purchase') {
         dataTable.destroy();
     }
     // Reinitialize the DataTable with new data fetched via AJAX
+    const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
     dataTable = $('#commitments-table').DataTable({
-      responsive: true,
+      responsive: res,
         processing: true,
         serverSide: true,
         searching: false, // Disable search option

@@ -259,8 +259,10 @@ document.querySelectorAll('#transactiondate').forEach(element => {
 // Set the value of the input field to today's date
 // document.getElementById('transactiondate').value = formattedDate;
  // Assuming you're passing this variable from EJS
+ const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
     transactionTable = $('#transactionTable').DataTable({
-      responsive: true,
+      responsive: responsive,
       processing: true,
       serverSide: true,
       ajax: {

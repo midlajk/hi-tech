@@ -199,8 +199,10 @@ modal.style.display = 'flex';
 if (dataTable) {
     dataTable.destroy();
 }
+const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
 dataTable = $('#sale-commitments-table').DataTable({
-  responsive: true,
+  responsive: responsive,
     processing: true,
     serverSide: true,
     searching: false, // Disable search option
@@ -291,9 +293,10 @@ function changeweights(){
      
     // var geturl = routeName == 'featured' ? 'featuredpropertieslist' : 'propertieslist'  // Assuming you're passing this variable from EJS
     // var buttonname = routeName == 'featured' ? 'Remove From Featured' : 'Add To Featured'  // Assuming you're passing this variable from EJS
+    const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
     storeoutTable = $('#storeoutTable').DataTable({
-      responsive: true,
+      responsive: responsive,
       processing: true,
       serverSide: true,
       ajax: {

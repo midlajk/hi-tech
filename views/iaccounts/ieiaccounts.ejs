@@ -164,8 +164,10 @@
   var employee = '<%=employee%>'
       $(document).ready(function () {
         calculatesum()
+        const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
          thetatable = $('#sellers').DataTable({
-          responsive: true,
+          responsive: responsive,
           processing: true,
           serverSide: true,
           ajax: {

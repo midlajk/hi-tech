@@ -33,9 +33,10 @@
      document.getElementById('salesitemname').innerText = itemname;
     // var geturl = routeName == 'featured' ? 'featuredpropertieslist' : 'propertieslist'  // Assuming you're passing this variable from EJS
     // var buttonname = routeName == 'featured' ? 'Remove From Featured' : 'Add To Featured'  // Assuming you're passing this variable from EJS
+    const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
     storeoutdetailtable = $('#storeoutdetailtable').DataTable({
-      responsive: true,
+      responsive: responsive,
       processing: true,
       serverSide: true,
       ajax: {

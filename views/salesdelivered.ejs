@@ -68,9 +68,10 @@
     var routeName = '<%= route %>';
     var geturl =  routeName=='featured' ?'featuredpropertieslist':'propertieslist'  // Assuming you're passing this variable from EJS
     var buttonname =  routeName=='featured' ?'Remove From Featured':'Add To Featured'  // Assuming you're passing this variable from EJS
+    const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
     var betatable = $('#despatchtable').DataTable({
-      responsive: true,
+      responsive: responsive,
       processing: true,
       serverSide: true,
       dom: '<"top d-flex justify-content-between"l p>rt<"bottom"ip><"clear">', 

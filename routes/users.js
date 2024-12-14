@@ -110,7 +110,8 @@ async function createnewuser(username,password,uid,usertype){
         scomm: 0, // Initial value for urdbillid
         uid: uid,
         accounttype : usertype?usertype:'Admin',
-        lastlogin:new Date()
+        lastlogin:new Date(),
+        resp:true
     });
     await user.save();
 
@@ -128,6 +129,7 @@ router.post('/updateuser', async function(req, res, next) {
     user.telegram=req.body.telegram;
     user.password=hashedPassword
     user.chatid = req.body.chatid
+    user.resp = req.body.resp || true
     await user.save()
     res.json({ success: true, message: 'User created successfully!'});
 

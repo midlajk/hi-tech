@@ -173,9 +173,10 @@
 <script>
   var thetatable
       $(document).ready(function () {
-  
+        const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
          thetatable = $('#sellers').DataTable({
-          responsive: true,
+          responsive: responsive,
           processing: true,
           serverSide: true,
           ajax: {
@@ -310,8 +311,10 @@ $('#loadswitchbtn').click(function(e) {
       viewtable()
   });
   function viewtable(){
+    const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
+
     dataTable = $('#loads-table').DataTable({
-      responsive: true,
+      responsive: responsive,
         "pageLength": 10,
         "dom": 'rtip',
 
