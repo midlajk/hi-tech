@@ -4,6 +4,7 @@ const Reference = mongoose.model('Reference')
 const PoductsSchema = mongoose.model('PoductsSchema')
 const Transportagent = mongoose.model('Transportagent')
 const Loadinwork = mongoose.model('Loadinwork')
+const Attendance = mongoose.model('Attendance')
 
 const XLSX = require('xlsx');
 exports.downloadarrivals = async (req, res) => {
@@ -244,7 +245,7 @@ exports.downloadtransport = async (req, res) => {
       const wboutBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
       // Set response headers for file download
-      res.setHeader('Content-Disposition', 'attachment; filename="loaders_report.xlsx"');
+      res.setHeader('Content-Disposition', 'attachment; filename="transport_report.xlsx"');
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
       // Send the file
@@ -360,7 +361,7 @@ exports.downloadallaccounts = async (req, res) => {
       const wboutBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
       // Set response headers for file download
-      res.setHeader('Content-Disposition', 'attachment; filename="loaders_report.xlsx"');
+      res.setHeader('Content-Disposition', 'attachment; filename="allaccounts_report.xlsx"');
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
       // Send the file
@@ -445,7 +446,7 @@ exports.individualloadingworks = async (req, res) => {
     const wboutBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
     // Set response headers for file download
-    res.setHeader('Content-Disposition', 'attachment; filename="loaders_report.xlsx"');
+    res.setHeader('Content-Disposition', 'attachment; filename="loadingworks_report.xlsx"');
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
     // Send the file
@@ -454,4 +455,190 @@ exports.individualloadingworks = async (req, res) => {
     console.error('Error generating Excel file:', error);
     res.status(500).send('Error generating Excel file');
 }
+};
+exports.downloademployeereport = async (req, res) => {
+  try {
+    const fromDate = new Date(req.body.from);
+    const toDate = new Date(req.body.to);
+
+    // Fetch transaction and attendance data using aggregation
+    const result = await Transportagent.aggregate([
+      { $unwind: "$transaction" },
+      {
+        $match: {
+          accounttype: "Labour",
+        },
+      },
+      {
+        $match: {
+          "transaction.date": { $gte: fromDate, $lte: toDate },
+        },
+      },
+      {
+        $lookup: {
+          from: "attendances", // Collection name for attendance
+          let: { agentId: "$_id" },
+          pipeline: [
+            {
+              $unwind: "$attendance",
+            },
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$attendance.id", { $toString: "$$agentId" }] },
+                    { $gte: ["$date", fromDate] },
+                    { $lte: ["$date", toDate] },
+                  ],
+                },
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                totalWorkHours: { $sum: "$attendance.wrokhour" },
+              },
+            },
+          ],
+          as: "attendanceData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$attendanceData",
+          preserveNullAndEmptyArrays: true, // To include agents with no attendance data
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          agent: { $first: "$agent" },
+          totalPayable: { $sum: "$transaction.payable" },
+          totalPaid: { $sum: "$transaction.paid" },
+          totalRecieved: { $sum: "$transaction.recieved" },
+          totalWorkHours: { $first: "$attendanceData.totalWorkHours" },
+        },
+      },
+      { $sort: { agent: 1 } },
+    ]);
+
+    // Top heading
+    const topHeading = [[`Employees Reports: From ${req.body.from} To ${req.body.to}`]];
+
+    // Column headers
+    const columnHeaders = [["Employee", "Payable", "Received", "Paid", "Balance", "Total Work Hours"]];
+
+    // Map data into rows
+    const data = result.map((agent) => [
+      agent.agent,
+      agent.totalPayable || 0,
+      agent.totalRecieved || 0,
+      agent.totalPaid || 0,
+      (agent.totalPayable || 0) + (agent.totalRecieved || 0) - (agent.totalPaid || 0), // Balance
+      agent.totalWorkHours || 0,
+    ]);
+
+    // Combine everything into one array
+    const combinedData = topHeading.concat(columnHeaders).concat(data);
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(combinedData);
+
+    // Merge the top heading row
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }]; // Merge cells for header
+
+    // Append worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Write workbook to binary format
+    const wboutBinary = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+    // Set response headers for file download
+    res.setHeader("Content-Disposition", 'attachment; filename="employee_report.xlsx"');
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+    // Send the file
+    res.send(Buffer.from(wboutBinary, "binary"));
+  } catch (error) {
+    console.error("Error generating Excel file:", error);
+    res.status(500).send("Error generating Excel file");
+  }
+};
+
+exports.downloadincomeexpensereport = async (req, res) => {
+  try {
+      const fromDate = new Date(req.body.from);
+      const toDate = new Date(req.body.to);
+
+      // Fetch transaction data using aggregation
+      const result = await Transportagent.aggregate([
+          { $unwind: "$transaction" },
+          {
+            $match: {
+                "accounttype": "Expence-income"}},
+          {
+              $match: {
+                  "transaction.date": { $gte: fromDate, $lte: toDate }
+              }
+          },
+          {
+              $group: {
+                  _id: "$_id",
+                  agent: { $first: "$agent" },
+                  totalPayable: { $sum: "$transaction.payable" },
+                  totalPaid: { $sum: "$transaction.paid" },
+                  totalRecieved: { $sum: "$transaction.recieved" }
+              }
+          },
+          { $sort: { agent: 1 } }
+      ]);
+      console.log(result)
+
+      // Top heading
+      const topHeading = [
+          [`Income-Expense Reports: From ${req.body.from} To ${req.body.to}`]
+      ];
+
+      // Column headers
+      const columnHeaders = [
+          ['Refference', 'Income', 'Expense', 'Balance']
+      ];
+
+      // Map data into rows
+      const data = result.map(agent => [
+          agent.agent,
+          agent.totalPayable+agent.totalRecieved,
+          agent.totalPaid,
+          agent.totalPayable + agent.totalRecieved - agent.totalPaid // Balance
+      ]);
+
+      // Combine everything into one array
+      const combinedData = topHeading.concat(columnHeaders).concat(data);
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(combinedData);
+
+      // Merge the top heading row
+      ws['!merges'] = [
+          { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } } // Merge cells for header
+      ];
+
+      // Append worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+      // Write workbook to binary format
+      const wboutBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+      // Set response headers for file download
+      res.setHeader('Content-Disposition', 'attachment; filename="expense_report.xlsx"');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+      // Send the file
+      res.send(Buffer.from(wboutBinary, 'binary'));
+  } catch (error) {
+      console.error('Error generating Excel file:', error);
+      res.status(500).send('Error generating Excel file');
+  }
 };

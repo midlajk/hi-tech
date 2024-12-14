@@ -8,5 +8,7 @@ router.post('/downloadloadersreport',authcheck, downloadget.downloadloaders);
 router.post('/downloadtransportreport',authcheck, downloadget.downloadtransport);
 router.post('/downloadallaccounts',authcheck, downloadget.downloadallaccounts);
 router.post('/individualloadingworks',authcheck, downloadget.individualloadingworks);
+router.post('/downloademployeereport',authcheck, downloadget.downloademployeereport);
+router.post('/downloadincomeexpensereport',authcheck, downloadget.downloadincomeexpensereport);
 
 module.exports = router;
