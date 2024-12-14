@@ -12,6 +12,8 @@
                
                 <a class="btn btn-primary text-white" href="#"  data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Claim Salary</a>
+                  <a class="btn btn-primary text-white" href="#"  data-bs-toggle="modal"
+                  data-bs-target="#workdays">Work Days</a>
                   <div class="row mt-3 text-center"> 
                     <div class="col-4"> <h4>Total Payable</h4>
                         <h4 id="payabletotal">0</h4></div>
@@ -142,6 +144,75 @@
         <button type="submit" form="sellerform" id="submitbutton" onclick="addsalary()" class="btn btn-primary">Add Payment</button>
       </div>
 
+    </div>
+  </div>
+ </div>
+ <div class="modal fade hidden" id="workdays">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Work Days</h5>
+      
+      </div>
+      <div class="modal-body">
+        <form  id="transportagentform">
+      <div class="row">
+        <div class="col-6 mb-3">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="fromdate" id="fromdate" class="form-control" placeholder="Enter Name">
+        </div>
+        <div class="col-6 mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="todate" name="todate" class="form-control" placeholder="Enter Phone">
+        </div>
+        <div class="col-5 mb-3">
+          <label for="name" class="form-label">Hour Senario</label>
+          <select name="senario" class="form-control" id="senario">
+            <option value="gt">Greater Than</option>
+            <option value="lt">Less Than</option>
+
+          </select>
+        </div>
+        <div class="col-5 mb-3">
+          <label for="description" class="form-label">Value</label>
+          <input  type="number" value="0" id="numvalue" name="numvalue" class="form-control" placeholder="Enter numvalue">
+        </div>
+        <div class="col-2 mb-3">
+          <label for="description" class="form-label"></label>
+          <button type="button" id="checkworkhours" class="btn btn-primary btn-sm add-btnvd mt-2">
+            <i class="bx bx-check"></i> Check
+        </button>      
+        </div>
+        </div>
+        <div class="row">
+          <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Workhour</th>
+                </tr>
+              </thead>
+              <tbody id="workhoursdetails">
+
+              </tbody>
+
+          </table>
+
+
+
+
+        </div>
+
+        
+      
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" id="downloadpdf" class="btn btn-primary">Download Report</button>
+      </div>
+  </form>
     </div>
   </div>
  </div>
@@ -396,4 +467,79 @@ document.getElementById('claimDate').value = formattedDate;
         });
     });
 });
-                </script>                        <%- include('../include/end.ejs') -%>
+                </script>       
+                
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+                  
+                  <script>
+
+$(document).ready(function() {
+   $('#checkworkhours').on('click', function() {
+       // Get the date values from the input fields
+       const fromDate = $('#fromdate').val();
+       const toDate = $('#todate').val();
+       const senario = $('#senario').val();
+       const numvalue = $('#numvalue').val();
+       // Send an API request to fetch attendance data
+       $.ajax({
+           url: '/getworkhourdetails',  // Modify this to your API endpoint
+           method: 'GET',
+           data: {
+               from: fromDate,
+               to: toDate,
+               senario:senario,
+               numvalue:numvalue,
+               src:employee
+           },
+           success: function(response) {
+               // Clear existing table rows
+               $('#workhoursdetails').empty();
+
+               // Loop through each agent's data and create table rows
+               response.agentData.forEach((agent) => {
+                   const row = `
+                       <tr>
+                           <td>${agent.date}</td>
+                           <td>${agent.attendance.wrokhour}</td>
+                         =
+                       </tr>
+                   `;
+                   $('#workhoursdetails').append(row);
+               });
+
+               // Add functionality to download as PDF
+               $('#downloadpdf').off('click').on('click', function() {
+                   if(response.agentData<=0){
+                     alert('check data first');
+                     return;
+                   }
+                   const { jsPDF } = window.jspdf;
+                   const doc = new jsPDF();
+
+                   // Add a title with the date range
+                   doc.text(`WorkHour Details of ${employee} (${fromDate} to ${toDate})`, 14, 10);
+
+                   // Generate the PDF table using response.agentData
+                   doc.autoTable({
+                       head: [['Date', 'Work Hour']],
+                       body: response.agentData.map((agent) => [
+                           agent.date,
+                           agent.attendance.wrokhour,
+                           
+                       ])
+                   });
+
+                   // Download the PDF
+                   doc.save(`KooliDetails_${fromDate}_to_${toDate}.pdf`);
+               });
+           },
+           error: function(error) {
+               console.error('Error fetching Kooli data:', error);
+           }
+       });
+   });
+});
+
+                  </script>
+                <%- include('../include/end.ejs') -%>

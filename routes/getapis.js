@@ -56,6 +56,8 @@ router.get('/getallemployees',loginMiddleware, adminpostapis.getallemployees);
 router.get('/attendance/:data',loginMiddleware, adminpostapis.getattendance);
 router.post('/getTotalWorkHours',loginMiddleware, adminpostapis.getTotalWorkHours);
 router.get('/getallattendance',loginMiddleware, adminpostapis.getallattendance);
+router.get('/getkoolidetails',loginMiddleware, adminpostapis.getkoolidetails);
+router.get('/getworkhourdetails',loginMiddleware, adminpostapis.getworkhourdetails);
 
 router.get('/getworkagents',loginMiddleware, adminpostapis.getworkagents);
 router.get('/getloadingworks',loginMiddleware, adminpostapis.getloadingworks);

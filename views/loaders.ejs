@@ -11,8 +11,7 @@
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add Loader</a>
-                  <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
-                  data-bs-target="#openreport">Download Report</a>
+          
                 <div class="table-responsive text-nowrap p-4">
                   <h5>Current Month Report</h5>
                   <table class="table" id="sellers">
@@ -180,6 +179,66 @@
     </div>
   </div>
  </div>
+ <div class="modal fade hidden" id="koolireport">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Kooli Report</h5>
+      
+      </div>
+      <div class="modal-body">
+        <form  id="transportagentform">
+      <div class="row">
+        <div class="col mb-3">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="fromdate" id="fromdate" class="form-control" placeholder="Enter Name">
+        </div>
+        <div class="col mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="todate" name="todate" class="form-control" placeholder="Enter Phone">
+        </div>
+        <div class="col-2 mb-3">
+          <label for="description" class="form-label"></label>
+          <button type="button" id="checkkooli" class="btn btn-primary btn-sm add-btnvd mt-2">
+            <i class="bx bx-check"></i> Check
+        </button>      
+        </div>
+        </div>
+        <div class="row">
+          <table>
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Kooli</th>
+                  <th>Paid</th>
+                  <th>Recieved</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody id="koolidetails">
+
+              </tbody>
+
+          </table>
+
+
+
+
+        </div>
+
+        
+      
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" id="downloadpdf" class="btn btn-primary">Download Report</button>
+      </div>
+  </form>
+    </div>
+  </div>
+ </div>
 <script src="../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
@@ -230,7 +289,7 @@
           { 
               data: null,
               render: function (data, type, row) {
-                return row.totalIncome ? parseInt(row.totalIncome) : 0;
+                return row.recieved ? parseInt(row.recieved) : 0;
               }
           }, 
   
@@ -379,41 +438,5 @@ function addtransportagent(){
   
   
   }
-
-  // function downloadloaders(){
-
-  //   var from = document.getElementById("datafrom").value;
-  //   var to = document.getElementById("datato").value;
-  //   if(!from || !to ){
-  //     return alert('PLEASE CHOOSE FROM AND TO DATES')
-  //   }
-  //   var data = {
-  //     from: from,
-  //     to:to,
-   
-  // };
-
-  // axios.post('/downloadloadersreport', data)
-  //   .then(response => {
-  //     // Handle the server response here
-  
-  //     // Close the modal on successful response
-  //     if (response.data.success) {
-
-  // //     var closeButton = document.getElementById('closeTransportModalBtn');
-  // //     thetatable.ajax.reload()
-  // // // Trigger the click event on the button
-  // // closeButton.click();
-  //     }
-  //   })
-  //   .catch(error => {
-  //     // Handle errors here
-  //     console.log('Error:', error);
-  //   });
-  
-
-  // }
-
-  
     </script>                
                                         <%- include('./include/end.ejs') -%>
