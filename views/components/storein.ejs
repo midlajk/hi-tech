@@ -265,7 +265,6 @@ $('#commitments-table').on('click', '.assign-commitment-btn', function() {
 });
 
 function changeep(){
-  console.log('here')
     var actualweightcom = document.getElementById('actualweightcom').value
     ep =  ((actualweightcom/100)*billableeppercentage).toFixed(1)
     document.getElementById('actualepcom').value = ep

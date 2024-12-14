@@ -11,8 +11,10 @@
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add expense or income</a>
-          
-                <div class="table-responsive text-nowrap p-4">
+                  <br>
+         
+                <div class="table-responsive text-nowrap p-4"> 
+                  <h5>Current Month Report</h5>
                   <table class="table" id="sellers">
                     <thead>
                       <tr>
@@ -67,7 +69,7 @@
       <div class="row">
         <div class="col mb-3">
           <label for="name" class="form-label">Name</label>
-          <input required type="text" name="editname" id="editname" class="form-control" placeholder="Enter Name">
+          <input required type="text" disabled name="editname" id="editname" class="form-control" placeholder="Enter Name">
         </div>
         <input type="hidden" name="id" id="id">
         </div>
@@ -192,21 +194,20 @@
           { 
               data: null,
               render: function (data, type, row) {
-                return row.recieved ? parseInt(row.recieved) : 0;
+                return row.totalIncome ? parseInt(row.totalIncome) : 0;
               }
           }, 
   
           { 
               data: null,
               render: function (data, type, row) {
-                  return parseInt(row.paid || 0) 
+                return row.totalExpense ? parseInt(row.totalExpense) : 0;
               }
           },
-          
           { 
               data: null,
               render: function (data, type, row) {
-                return parseInt(((row.recieved||0)-(row.paid || 0))) 
+                return parseInt(((row.totalIncome||0)-(row.totalExpense || 0))) 
               }
           },
           {
@@ -240,6 +241,8 @@
       $('#transportagentModal').modal('show');
       // const rowData = JSON.parse($(this).closest('.edit-btn').attr('data-row'));
     });
+    $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
       var id = $(this).data('id');

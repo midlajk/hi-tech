@@ -248,7 +248,8 @@
           }, // Assuming coffee is an array property
           ],
         });
-        
+        $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
       var id = $(this).data('id');

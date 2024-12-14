@@ -342,7 +342,8 @@
     },
   ],
         });
-     
+        $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
       var id = $(this).data('id');
@@ -484,8 +485,8 @@ $('#sumitworkerswork').on('click', function() {
   const bags = $('#bags').val();
   const basekooli = $('#basekooli').val();
   const agent = $('#agent').val();
-  const manpower = parseInt($('#manpower').val()); // Convert manpower to integer
-
+  const manpower = parseInt($('#manpower').val()||1); // Convert manpower to integer
+console.log(manpower)
   if ( bags && basekooli && agent && manpower) {
     numberofworkers += manpower; // Update total number of workers
 

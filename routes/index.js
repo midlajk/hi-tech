@@ -118,7 +118,7 @@ router.get('/ieiaccounts/:employee',loginMiddleware, function(req, res, next) {
 });
 
 router.get('/indivdualoadingworks/:employee',loginMiddleware, function(req, res, next) {
-  res.render('iaccounts/individuallodingworks',{ route: 'employees',employee:req.params.employee });
+  res.render('iaccounts/individuallodingworks',{ route: 'loaders',employee:req.params.employee });
 });
 
 router.get('/trashinside',authMiddleware, function(req, res, next) {

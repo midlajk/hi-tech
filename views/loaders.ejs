@@ -11,8 +11,10 @@
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
                   data-bs-target="#newagentmodal">Add Loader</a>
-          
+                  <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
+                  data-bs-target="#openreport">Download Report</a>
                 <div class="table-responsive text-nowrap p-4">
+                  <h5>Current Month Report</h5>
                   <table class="table" id="sellers">
                     <thead>
                       <tr>
@@ -55,7 +57,40 @@
 </div>
 <!-- / Layout wrapper -->
 
-<div class="modal fade hidden" id="transportagentModal">
+<div class="modal fade hidden" id="openreport">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Report</h5>
+      
+      </div>
+      <div class="modal-body">
+        <form  id="downloadform" method="post" action="/downloadloadersreport">
+      <div class="row">
+        <div class="col mb-3">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="from" id="datafrom" class="form-control">
+        </div>
+        <div class="col mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="datato" name="to" class="form-control" >
+        </div>
+        </div>
+
+       
+      
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" id="buttonreport" form="downloadform"   class="btn btn-primary">Download loaders</button>
+      </div>
+  </form>
+    </div>
+  </div>
+ </div>
+ <div class="modal fade hidden" id="transportagentModal">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -67,7 +102,7 @@
       <div class="row">
         <div class="col mb-3">
           <label for="name" class="form-label">Name</label>
-          <input required type="text" name="editname" id="editname" class="form-control" placeholder="Enter Name">
+          <input required type="text" disabled name="editname" id="editname" class="form-control" placeholder="Enter Name">
         </div>
         <input type="hidden" name="id" id="id">
         </div>
@@ -94,7 +129,6 @@
     </div>
   </div>
  </div>
- 
 <div class="modal fade hidden" id="newagentmodal">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -195,20 +229,20 @@
           { 
               data: null,
               render: function (data, type, row) {
-                return row.recieved ? parseInt(row.recieved) : 0;
+                return row.totalIncome ? parseInt(row.totalIncome) : 0;
               }
           }, 
   
           { 
               data: null,
               render: function (data, type, row) {
-                  return parseInt(row.paid || 0) 
+                return row.totalExpense ? parseInt(row.totalExpense) : 0;
               }
           },
           { 
               data: null,
               render: function (data, type, row) {
-                return parseInt(((row.recieved||0)-(row.paid || 0))) 
+                return parseInt(((row.totalIncome||0)-(row.totalExpense || 0))) 
               }
           },
           {
@@ -344,5 +378,41 @@ function addtransportagent(){
   
   
   }
+
+  // function downloadloaders(){
+
+  //   var from = document.getElementById("datafrom").value;
+  //   var to = document.getElementById("datato").value;
+  //   if(!from || !to ){
+  //     return alert('PLEASE CHOOSE FROM AND TO DATES')
+  //   }
+  //   var data = {
+  //     from: from,
+  //     to:to,
+   
+  // };
+
+  // axios.post('/downloadloadersreport', data)
+  //   .then(response => {
+  //     // Handle the server response here
+  
+  //     // Close the modal on successful response
+  //     if (response.data.success) {
+
+  // //     var closeButton = document.getElementById('closeTransportModalBtn');
+  // //     thetatable.ajax.reload()
+  // // // Trigger the click event on the button
+  // // closeButton.click();
+  //     }
+  //   })
+  //   .catch(error => {
+  //     // Handle errors here
+  //     console.log('Error:', error);
+  //   });
+  
+
+  // }
+
+  
     </script>                
                                         <%- include('./include/end.ejs') -%>

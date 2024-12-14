@@ -4,5 +4,9 @@ const downloadget = require('../controller/download');
 const authcheck = require('../middleware/authcheck');
 router.get('/downloadarrivals/:name',authcheck, downloadget.downloadarrivals);
 router.get('/downloaddespatch/:name',authcheck, downloadget.downloaddespatch);
+router.post('/downloadloadersreport',authcheck, downloadget.downloadloaders);
+router.post('/downloadtransportreport',authcheck, downloadget.downloadtransport);
+router.post('/downloadallaccounts',authcheck, downloadget.downloadallaccounts);
+router.post('/individualloadingworks',authcheck, downloadget.individualloadingworks);
 
 module.exports = router;

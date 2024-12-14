@@ -545,46 +545,138 @@ exports.commitmenttotal = async (req, res) => {
 };
 
 
+// exports.expenseincometotal = async (req, res) => {
+//     try {
+//       const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
+//       const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
+//       const length = parseInt(req.query.length) || 10; 
+//       const searchValue = req.query.search.value || ''; // Get the search value
+  
+//       // Construct regex to search for any occurrence of the search value in agent field
+//       const regex = new RegExp(searchValue, 'i');
+  
+//       // Fetch documents with pagination and filtering
+//       const docs = await Transportagent.find({
+//         accounttype: req.query.name,
+//         $or: [
+//           { agent: regex }
+//         ]
+//       }).sort({ _id: -1 }).skip(start).limit(length); 
+  
+//       // Fetch total count of documents matching the filter criteria
+//       const totalCount = await Transportagent.countDocuments({
+//         accounttype: req.query.name,
+//         $or: [
+//           { agent: regex }
+//         ]
+//       });
+  
+//       res.json({
+//         draw,
+//         recordsTotal: totalCount, // Total count without filtering
+//         recordsFiltered: totalCount, // Count after filtering with pagination
+//         docs // Documents to be displayed
+//       });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send('An error occurred while fetching clients');
+//     }
+//   };
+  
 exports.expenseincometotal = async (req, res) => {
     try {
-      const draw = parseInt(req.query.draw) || 1; // Get the draw count (used by DataTables)
-      const start = parseInt(req.query.start) || 0; // Get the starting index of the data to fetch
-      const length = parseInt(req.query.length) || 10; 
-      const searchValue = req.query.search.value || ''; // Get the search value
+      const draw = parseInt(req.query.draw) || 1; // DataTables draw count
+      const start = parseInt(req.query.start) || 0; // Start index for pagination
+      const length = parseInt(req.query.length) || 10; // Number of records to fetch
+      const searchValue = req.query.search?.value || ''; // Search value
+      const regex = new RegExp(searchValue, 'i'); // Regex for search
+      const currentDate = new Date();
+      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
   
-      // Construct regex to search for any occurrence of the search value in agent field
-      const regex = new RegExp(searchValue, 'i');
+      const pipeline = [
+        // Match based on `accounttype` and optional search filter
+        {
+          $match: {
+            accounttype: req.query.name,
+            agent: regex
+          }
+        },
+        // Unwind the `transaction` array to process each transaction separately
+        {
+          $unwind: {
+            path: "$transaction",
+            preserveNullAndEmptyArrays: true // Allow agents with no transactions
+          }
+        },
+        // Filter transactions for the current month
+        {
+          $match: {
+            $or: [
+              { "transaction.date": { $gte: firstDayOfMonth, $lte: lastDayOfMonth } },
+              { transaction: null } // Handle agents with no transactions
+            ]
+          }
+        },
+        // Group transactions by agent and calculate totals for the current month
+        {
+          $group: {
+            _id: "$_id",
+            agent: { $first: "$agent" },
+            address: { $first: "$address" },
+            phone: { $first: "$phone" },
+            accounttype: { $first: "$accounttype" },
+            totalPayable: { $sum: "$transaction.payable" },
+            totalReceivable: { $sum: "$transaction.revievable" },
+            totalPaid: { $sum: "$transaction.paid" },
+            totalReceived: { $sum: "$transaction.recieved" }
+          }
+        },
+        // Add computed fields: totalPayable + totalReceived and totalPaid + totalReceivable
+        {
+          $addFields: {
+            totalIncome: { $add: ["$totalPayable", "$totalReceived"] },
+            totalExpense: { $add: ["$totalPaid", "$totalReceivable"] }
+          }
+        },
+        // Sort agents by `_id` in descending order
+        {
+          $sort: { _id: -1 }
+        },
+        // Paginate results
+        {
+          $facet: {
+            paginatedResults: [
+              { $skip: start },
+              { $limit: length }
+            ],
+            totalCount: [
+              { $count: "count" }
+            ]
+          }
+        }
+      ];
   
-      // Fetch documents with pagination and filtering
-      const docs = await Transportagent.find({
-        accounttype: req.query.name,
-        $or: [
-          { agent: regex }
-        ]
-      }).sort({ _id: -1 }).skip(start).limit(length); 
+      // Execute the aggregation pipeline
+      const result = await Transportagent.aggregate(pipeline);
+  console.log(result[0].paginatedResults)
+      const docs = result[0].paginatedResults || [];
+      const totalCount = result[0].totalCount[0]?.count || 0;
   
-      // Fetch total count of documents matching the filter criteria
-      const totalCount = await Transportagent.countDocuments({
-        accounttype: req.query.name,
-        $or: [
-          { agent: regex }
-        ]
-      });
-  
+      // Send response
       res.json({
         draw,
-        recordsTotal: totalCount, // Total count without filtering
-        recordsFiltered: totalCount, // Count after filtering with pagination
-        docs // Documents to be displayed
+        recordsTotal: totalCount,
+        recordsFiltered: totalCount,
+        docs // Documents with transaction summaries
       });
     } catch (error) {
       console.error(error);
-      res.status(500).send('An error occurred while fetching clients');
+      res.status(500).send('An error occurred while fetching agents');
     }
   };
   
-
-  exports.agentsum = async (req, res) => {
+ exports.agentsum = async (req, res) => {
     const decodedName = req.params.name .replace(/&amp;/g, '&');
 
     try {

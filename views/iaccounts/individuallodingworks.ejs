@@ -12,6 +12,8 @@
                
                 
                   <a class="btn btn-primary text-white" href="/ialoaders/<%=employee%>">View Accounts</a>
+                  <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
+                  data-bs-target="#openreport">Download Report</a>
            <div class="row mt-3 text-center"> 
                     <div class="col-4"> 
                         <h4>Loading Works</h4>
@@ -111,6 +113,40 @@
           Close
         </button>
         <button type="submit" form="sellerform" id="submitbutton" onclick="addtransportagent()" class="btn btn-primary">Add Party</button>
+      </div>
+  </form>
+    </div>
+  </div>
+ </div>
+ <div class="modal fade hidden" id="openreport">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Report</h5>
+      
+      </div>
+      <div class="modal-body">
+        <form  id="downloadform" method="post" action="/individualloadingworks">
+      <div class="row">
+        <div class="col mb-3">
+          <label for="name" class="form-label">From</label>
+          <input required type="date" name="from" id="datafrom" class="form-control">
+        </div>
+        <div class="col mb-3">
+          <label for="description" class="form-label">To</label>
+          <input  type="date" id="datato" name="to" class="form-control" >
+          <input type="hidden" name="name" value="<%=employee%>">
+        </div>
+        </div>
+
+       
+      
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" id="buttonreport" form="downloadform"   class="btn btn-primary">Download loaders</button>
       </div>
   </form>
     </div>

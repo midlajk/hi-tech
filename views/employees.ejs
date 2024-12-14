@@ -177,12 +177,13 @@
             <div class="card">
               <div class="card-body">
                 <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
-                  data-bs-target="#newagentmodal">Add Employee</a>
+                  data-bs-target="#newagentmodal">Add Agent</a>
                   <a class="btn btn-primary text-white" href="#" id="openPopup" class="open-btn">Mark Attendance</a>
                   <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
                   data-bs-target="#attendancereport">Attendance Report</a>
 
                 <div class="table-responsive text-nowrap p-4">
+                  <h5>Current Month Report</h5>
                   <table class="table" id="sellers">
                     <thead>
                       <tr>
@@ -390,23 +391,23 @@ document.getElementById('currentDate').innerText = formattedDate;
               }
           },
            
+          { 
+              data: null,
+              render: function (data, type, row) {
+                return row.totalIncome ? parseInt(row.totalIncome) : 0;
+              }
+          }, 
   
           { 
               data: null,
               render: function (data, type, row) {
-                  return parseInt(row.paid || 0) 
+                return row.totalExpense ? parseInt(row.totalExpense) : 0;
               }
           },
           { 
               data: null,
               render: function (data, type, row) {
-                return row.recieved ? parseInt(row.recieved) : 0;
-              }
-          },
-          { 
-              data: null,
-              render: function (data, type, row) {
-                return parseInt(((row.paid || 0)-(row.recieved||0))) 
+                return parseInt(((row.totalIncome||0)-(row.totalExpense || 0))) 
               }
           },
           {
@@ -440,7 +441,8 @@ document.getElementById('currentDate').innerText = formattedDate;
       $('#transportagentModal').modal('show');
       // const rowData = JSON.parse($(this).closest('.edit-btn').attr('data-row'));
     });
-    sellers
+    $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
       var id = $(this).data('id');

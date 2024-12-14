@@ -377,7 +377,7 @@ async function salesbill(req, res, client) {
     id: req.body.uniqueid,
     recieved: existingClient.tds == 'YES' ? parseInt(req.body.total * 0.1 / 100) : 0,
     paid: 0,
-
+    bills:[req.body.uniqueid]
     // Add other fields as needed
   });
 

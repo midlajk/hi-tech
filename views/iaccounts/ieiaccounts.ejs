@@ -73,7 +73,7 @@
       <div class="row">
         <div class="col mb-3">
           <label for="name" class="form-label">Name</label>
-          <input required type="text" name="editname" id="editname" class="form-control" placeholder="Enter Name">
+          <input required type="text" disabled name="editname" id="editname" class="form-control" placeholder="Enter Name">
         </div>
         <input type="hidden" name="id" id="id">
         </div>
@@ -243,6 +243,8 @@
       $('#transportagentModal').modal('show');
       // const rowData = JSON.parse($(this).closest('.edit-btn').attr('data-row'));
     });
+    $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
       var id = $(this).data('id');

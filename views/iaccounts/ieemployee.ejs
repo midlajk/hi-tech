@@ -248,6 +248,8 @@
       $('#transportagentModal').modal('show');
       // const rowData = JSON.parse($(this).closest('.edit-btn').attr('data-row'));
     });
+    $('#sellers').off('click', '.delete-btn');
+
     $('#sellers').on('click', '.delete-btn', function () {
   
   var id = $(this).data('id');

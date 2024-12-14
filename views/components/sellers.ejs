@@ -5,7 +5,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modalCenterTitle">Add New Party</h5>
-
+            
           </div>
           <div class="modal-body">
             <form >
@@ -59,7 +59,7 @@
               <div class="row">
                 <div class="col mb-3">
                   <label for="name" class="form-label">Party Name</label>
-                  <input required type="text" name="editname" id="editname" class="form-control" placeholder="Enter Name">
+                  <input required type="text" disabled name="editname" id="editname" class="form-control" placeholder="Enter Name">
                 </div>
                 <div class="col mb-3">
                   <label for="image" class="form-label">Address</label>
@@ -98,7 +98,8 @@
     <div class="card-body">
       <a class="btn btn-primary text-white" href="#" onclick="openAddModal()" data-bs-toggle="modal"
         data-bs-target="#modalCenter">Add Party</a>
-
+        <a class="btn btn-primary text-white" href="#" data-bs-toggle="modal"
+        data-bs-target="#openreport">Download Report</a>
       <div class="table-responsive text-nowrap p-4">
         <table class="table" id="sellers">
           <thead>
@@ -121,6 +122,49 @@
       </div>
     </div>
   </div>
+  <div class="modal fade hidden" id="openreport">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCenterTitle">Report</h5>
+        
+        </div>
+        <div class="modal-body">
+          <form  id="downloadform" method="post" action="/downloadallaccounts">
+        <div class="row">
+          <div class="col mb-3">
+            <label for="name" class="form-label">From</label>
+            <input  type="date" name="from" id="datafrom" class="form-control">
+          </div>
+          <div class="col mb-3">
+            <label for="description" class="form-label">To</label>
+            <input  type="date" id="datato" name="to" class="form-control" >
+          </div>
+          </div>
+  
+          <div class="row">
+            <div class="col mb-3">
+              <label for="name" class="form-label">Recievable ></label>
+              <input required type="number" name="recievable" value="0" id="datafrom" class="form-control">
+            </div>
+            <div class="col mb-3">
+              <label for="description" class="form-label">Payable ></label>
+              <input required type="number" id="datato" name="payable" value="0" class="form-control" >
+            </div>
+            </div>
+    
+        
+      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" id="closeeditpartybtn" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" id="buttonreport" form="downloadform"   class="btn btn-primary">Download loaders</button>
+        </div>
+    </form>
+      </div>
+    </div>
+   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <script>
