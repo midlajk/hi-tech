@@ -1162,7 +1162,7 @@ if (billtype === 'Purchase') {
     const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
     dataTable = $('#commitments-table').DataTable({
-      responsive: res,
+      responsive: responsive,
         processing: true,
         serverSide: true,
         searching: false, // Disable search option

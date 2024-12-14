@@ -169,7 +169,7 @@ document.querySelectorAll('#transactiondate').forEach(element => {
  const responsive = '<%= resptype %>' === 'true'; // Convert the string to a boolean
 
     transactionTable = $('#transactionTable').DataTable({
-      responsive: res,
+      responsive: responsive,
       processing: true,
       serverSide: true,
       ajax: {
