@@ -123,7 +123,11 @@ async function createnewuser(username,password,uid,usertype){
 }
 router.post('/updateuser', async function(req, res, next) {
     let user = await User.findOne({ username:req.body.user });
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    let hashedPassword = req.session.user.password
+    if(req.body.password){
+hashedPassword = await bcrypt.hash(req.body.password, 10);
+    }
+     
 
     user.accounttype = req.body.previlage;
     user.telegram=req.body.telegram;
