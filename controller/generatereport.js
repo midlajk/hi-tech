@@ -302,7 +302,7 @@ exports.generatepurchasereport = async (req, res, hi) => {
       // 
       // fs.writeFileSync(filePath, PDF);
       req.session.workingdate= new Date(req.body.dateOfIssue);
-    
+    req.session.status = 'Purchase'
     const templatePath = path.join(__dirname, 'template.hbs');
 
         const template = fs.readFileSync(templatePath, 'utf8');
@@ -593,7 +593,7 @@ exports.generatesalesreport = async (req, res) => {
 
     };
     req.session.workingdate= new Date(req.body.dateOfIssue);
-
+    req.session.status = 'Sales'
     // let PDF = await pdfMaster.generatePdf("template.hbs", { data }, options);
 
     // 

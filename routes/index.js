@@ -26,11 +26,11 @@ router.get('/dashboard',loginMiddleware, async function(req, res, next) {
 router.get('/generatereport',authMiddleware, async function(req, res, next) {
   var date = req.session.workingdate || new Date()
   const workingdate = new Date(date).toISOString().split('T')[0]
-
+  const status = req.session.status||'Purchase'
    const reference = await Reference.findOne({})
     .sort({ defaulted: -1 }) // Sort by 'defaulted' date in descending order
     
-    res.render('generatereport',{ route: 'generatereport',refferance:reference?reference.name:'' ,workingdate:workingdate});
+    res.render('generatereport',{ route: 'generatereport',refferance:reference?reference.name:'' ,workingdate:workingdate,status:status});
 });
 router.get('/accounts',authMiddleware, function(req, res, next) {
   res.render('accounts',{ route: 'accounts' });

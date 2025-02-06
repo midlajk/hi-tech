@@ -67,11 +67,10 @@
                           <a class="bg-light fw-bold text-secondary small input-group-text" href="#"  data-bs-toggle="modal" data-bs-target="#modalCenter"><i class="menu-icon tf-icons bx bx-user-plus"></i></a>
                         </div>
                         <label class="fw-bold">Status:</label>
-                            <select name="billtype" class="form-control my-2" id="billtype">
-                                <option value="Purchase">Purchase</option>
-                                <option value="Sales">Sales</option>
-                              </select>
-                       
+                        <select name="billtype" class="form-control my-2" id="billtype">
+                          <option value="Purchase" <%= status === 'Purchase' ? 'selected' : '' %>>Purchase</option>
+                          <option value="Sales" <%= status === 'Sales' ? 'selected' : '' %>>Sales</option>
+                        </select>
                               <!-- <input placeholder="Who is this invoice to?" type="text" name="billTo" id="billto" class="form-control my-2" required> -->
                            
                                <input placeholder="Lorry Number" type="text" name="lorry" id="lorry" class="form-control my-2">

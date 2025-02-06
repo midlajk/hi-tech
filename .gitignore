@@ -1,5 +1,4 @@
 node_modules
-public/report.html
-model/db.js
-app.js
-.env
+# 
+
+const url = `mongodb://midlaj:midlaj%402000@77.37.47.185:27017/keloth`

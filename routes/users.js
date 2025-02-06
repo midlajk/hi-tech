@@ -125,7 +125,8 @@ router.post('/updateuser', async function(req, res, next) {
     let user = await User.findOne({ username:req.body.user });
     let hashedPassword = req.session.user.password
     if(req.body.password){
-hashedPassword = await bcrypt.hash(req.body.password, 10);
+        
+            hashedPassword = await bcrypt.hash(req.body.password, 10);
     }
      
 
